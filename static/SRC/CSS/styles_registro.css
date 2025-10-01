@@ -1,0 +1,167 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.contenedor_fondo {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: linear-gradient(#1a2a31, #2c3e50, #34495e);
+}
+.contenedor_tarjetas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  align-content: space-around; /*esta linea no sirve pa na*/
+  grid-template: repeat(2, 1fr) / repeat(4, 1fr);
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px;
+  z-index: 0;
+}
+.tarjeta {
+  height: 350px;
+  width: 250px;
+  border-radius: 10px;
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 6%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+.tarjeta_1 {
+  transform: rotate(-3deg);
+}
+.tarjeta_2 {
+  transform: rotate(2deg);
+}
+.tarjeta_3 {
+  transform: rotate(-1deg);
+}
+.tarjeta_4 {
+  transform: rotate(4deg);
+}
+.tarjeta_5 {
+  transform: rotate(-2deg);
+}
+.tarjeta_6 {
+  transform: rotate(1deg);
+}
+.tarjeta_7 {
+  transform: rotate(-1deg);
+}
+.tarjeta_8 {
+  transform: rotate(3deg);
+}
+.tarjeta_9 {
+  transform: rotate(-2deg);
+}
+
+.tarjeta:hover {
+  transform: scale(1.07); /* agranda */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* Sombra más intensa */
+}
+.imagen {
+  height: 50%;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.imagen img {
+  height: 100%;
+  width: 80%;
+  border-radius: 5px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.contenedor_formulario {
+  width: 500px;
+  height: 600px;
+  background-color: #1a2a31e7;
+  border-radius: 15px;
+  padding: 30px;
+  z-index: 10;
+  z-index: 1;
+}
+.formulario_cabecera h1 {
+  color: white;
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 300;
+}
+
+.formulario_campos form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formulario_campos input[type="text"],
+.formulario_campos input[type="password"] {
+  padding: 12px 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.formulario_campos input[type="text"]::placeholder,
+.formulario_campos input[type="password"]::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.formulario_campos input[type="text"]:focus,
+.formulario_campos input[type="password"]:focus {
+  outline: none;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #3498db;
+  box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+}
+
+.formulario_campos input[type="submit"] {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(45deg, #3498db, #2c3e50);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+}
+
+.formulario_campos input[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+}
+.formulario_campos input[type="button"]:active {
+  transform: translateY(0);
+}
+.formulario_footer{
+  display: flex;
+  flex-direction: column;;
+}
+.mensajeRegistro {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1.1em;
+}

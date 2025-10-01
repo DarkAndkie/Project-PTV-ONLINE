@@ -1,0 +1,255 @@
+/* ===== RESET BÁSICO ===== */
+/* Elimina márgenes y padding por defecto del navegador */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Incluye padding y border en el cálculo del ancho/alto */
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+/* Este es el layout base - controla toda la estructura de la página */
+.container {
+    width: 100vw;  /* 100% del ancho de la ventana */
+    height: 100vh; /* 100% del alto de la ventana */
+    position: relative; /* Permite que elementos hijos usen position: absolute */
+    overflow: hidden; /* Oculta cualquier contenido que se salga */
+}
+
+/* ===== FONDO DE CARTAS ===== */
+/* Contiene todas las tarjetas de álbumes como fondo */
+.fondo_cartas {
+    /* POSICIONAMIENTO: Ocupa toda la pantalla como fondo */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* FONDO: Gradiente que simula el estilo de la imagen */
+    background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 50%, #34495e 100%);
+    
+    /* LAYOUT: CSS Grid para distribuir las tarjetas */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Columnas responsivas */
+    grid-template-rows: repeat(auto-fill, minmax(200px, 1fr)); /* Filas responsivas */
+    gap: 20px; /* Espacio entre tarjetas */
+    padding: 30px; /* Espacio desde los bordes */
+    
+    /* ALINEACIÓN: Distribuye el contenido desde el inicio */
+    align-content: start;
+    justify-content: center;
+}
+
+/* ===== TARJETA INDIVIDUAL ===== */
+/* Cada álbum es una tarjeta con imagen y texto */
+.tarjeta {
+    /* TAMAÑO: Dimensiones controladas */
+    width: 180px;
+    height: 220px;
+    
+    /* APARIENCIA: Estilo de tarjeta física */
+    background: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente */
+    border-radius: 8px; /* Esquinas redondeadas */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra para dar profundidad */
+    
+    /* LAYOUT INTERNO: Flexbox para organizar contenido */
+    display: flex;
+    flex-direction: column; /* Imagen arriba, texto abajo */
+    
+    /* ESPACIADO: Padding interno */
+    padding: 15px;
+    
+    /* EFECTOS: Transiciones suaves */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    /* POSICIONAMIENTO: Permite rotaciones aleatorias */
+    transform-origin: center;
+}
+
+/* ===== ROTACIONES ALEATORIAS ===== */
+/* Cada tarjeta tiene una ligera rotación para parecer dispersa */
+.tarjeta_1 { transform: rotate(-3deg); }
+.tarjeta_2 { transform: rotate(2deg); }
+.tarjeta_3 { transform: rotate(-1deg); }
+.tarjeta_4 { transform: rotate(4deg); }
+.tarjeta_5 { transform: rotate(-2deg); }
+.tarjeta_6 { transform: rotate(1deg); }
+
+/* EFECTO HOVER: Interactividad al pasar el mouse */
+.tarjeta:hover {
+    transform: rotate(0deg) scale(1.05); /* Endereza y agranda */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); /* Sombra más intensa */
+}
+
+/* ===== IMAGEN DE LA TARJETA ===== */
+.imagen_tarjeta {
+    /* TAMAÑO: Ocupa la mayor parte de la tarjeta */
+    width: 100%;
+    height: 140px;
+    
+    /* COMPORTAMIENTO: Controla el desbordamiento */
+    overflow: hidden;
+    border-radius: 4px; /* Esquinas redondeadas */
+    
+    /* LAYOUT: Centra la imagen */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.imagen_tarjeta img {
+    /* TAMAÑO: Se adapta al contenedor */
+    width: 100%;
+    height: 100%;
+    
+    /* AJUSTE: Mantiene proporción sin deformar */
+    object-fit: cover; /* Recorta para llenar el espacio */
+    object-position: center; /* Centra la imagen */
+}
+
+/* ===== CONTENIDO DE LA TARJETA ===== */
+/* Texto debajo de cada imagen */
+.contenido {
+    /* ESPACIADO: Margen superior */
+    margin-top: 10px;
+    
+    /* LAYOUT: Flexbox para organizar texto */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.contenido h4 {
+    /* TIPOGRAFÍA: Título del álbum */
+    font-size: 14px;
+    font-weight: 600;
+    color: #2c3e50; /* Color oscuro */
+    
+    /* COMPORTAMIENTO: Controla texto largo */
+    overflow: hidden;
+    text-overflow: ellipsis; /* Puntos suspensivos */
+    white-space: nowrap; /* No hace salto de línea */
+}
+
+.contenido p {
+    /* TIPOGRAFÍA: Información secundaria */
+    font-size: 12px;
+    color: #7f8c8d; /* Color gris */
+    font-weight: 400;
+}
+
+
+/* ===== MODAL DE LOGIN ===== */
+/* El formulario que aparece centrado sobre las tarjetas */
+.login_apartado {
+    /* POSICIONAMIENTO: Centrado absoluto */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centra perfectamente */
+    
+    /* Z-INDEX: Aparece encima del fondo */
+    z-index: 1000;
+    
+    /* TAMAÑO: Ancho fijo */
+    width: 400px;
+    
+    /* APARIENCIA: Estilo de modal */
+    background: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente */
+    backdrop-filter: blur(10px); /* Efecto de desenfoque del fondo */
+    border-radius: 12px; /* Esquinas muy redondeadas */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Sombra intensa */
+    
+    /* ESPACIADO: Padding interno */
+    padding: 40px;
+    
+    /* LAYOUT: Flexbox para organizar elementos */
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Espacio entre elementos */
+}
+
+/* ===== CABECERA DEL LOGIN ===== */
+.cabecera_Login {
+    /* ALINEACIÓN: Centra el texto */
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.cabecera_Login h4 {
+    /* TIPOGRAFÍA: Título principal */
+    font-size: 18px;
+    font-weight: 600;
+    color: #2c3e50;
+    
+    /* ESPACIADO: Altura de línea para mejor legibilidad */
+    line-height: 1.4;
+}
+.sesion_foot{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== CAMPOS DEL FORMULARIO ===== */
+.usuario_form,
+.password_form {
+    /* LAYOUT: Cada campo ocupa toda la fila */
+    width: 100%;
+}
+
+.usuario_form input,
+.password_form input {
+    /* TAMAÑO: Ocupa todo el ancho disponible */
+    width: 100%;
+    
+    /* ESPACIADO: Padding interno generoso */
+    padding: 15px;
+    
+    /* APARIENCIA: Estilo de campo moderno */
+    border: 2px solid #e0e0e0; /* Borde gris claro */
+    border-radius: 8px; /* Esquinas redondeadas */
+    background: rgba(255, 255, 255, 0.9); /* Fondo blanco */
+    
+    /* TIPOGRAFÍA: Texto legible */
+    font-size: 16px;
+    color: #2c3e50;
+    
+    /* EFECTOS: Transiciones suaves */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    
+    /* COMPORTAMIENTO: Sin outline por defecto */
+    outline: none;
+}
+
+/* ESTADO FOCUS: Cuando el usuario hace clic en el campo */
+.usuario_form input:focus,
+.password_form input:focus {
+    border-color: #3498db; /* Borde azul */
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2); /* Sombra azul suave */
+}
+
+/* PLACEHOLDER: Estilo del texto de ayuda */
+.usuario_form input::placeholder,
+.password_form input::placeholder {
+    color: #95a5a6; /* Color gris medio */
+    font-style: italic;
+}
+
+/* ===== RESPONSIVIDAD ===== */
+/* Adaptación a pantallas pequeñas */
+@media (max-width: 768px) {
+    .login_apartado {
+        width: 90%; /* Ancho relativo en móviles */
+        padding: 30px; /* Menos padding */
+    }
+    
+    .fondo_cartas {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Tarjetas más pequeñas */
+    }
+    
+    .tarjeta {
+        width: 150px;
+        height: 180px;
+    }
+}
