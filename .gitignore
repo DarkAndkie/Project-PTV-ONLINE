@@ -1,0 +1,7 @@
+
+*.exe
+*.out
+*.test
+*.log
+env.env
+vendor/

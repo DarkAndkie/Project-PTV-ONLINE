@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"fmt"
-	servicios "proyecto-ptv-online/servicios/models"
+	servicios "proyecto-ptv-online/backend/servicios/config"
 
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
@@ -24,9 +24,18 @@ func LoginValidacion(_db *gorm.DB, c *fiber.Ctx) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(validador_user.Password), []byte(user.Password)); err != nil {
 		return c.Status(401).SendString("Contraseña incorrecta " + err.Error())
 	}
+
 	fmt.Printf("usuario Logueado ", user.Id_user)
+	if user.Id_user == 0 {
+		// por implementar tokens
+		return c.JSON(fiber.Map{
+			"direccion": "/SRC/html_templates/home_admin.html",
+			"mensaje":   "Login exitoso",
+			"usuario":   validador_user.Nombre,
+		})
+	}
 	return c.JSON(fiber.Map{
-		"direccion": "./static/SRC/html_templates/home.html",
+		"direccion": "/SRC/html_templates/home.html",
 		"mensaje":   "Login exitoso",
 		"usuario":   validador_user.Nombre,
 	})

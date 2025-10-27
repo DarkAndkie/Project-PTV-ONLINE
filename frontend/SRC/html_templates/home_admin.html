@@ -1,26 +1,50 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/SRC/CSS/home_admin.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <title>Administración</title>
 </head>
 <body>
     <div class="principal">
         <header>
-            <h4>Ventana de administración</h4>
+            <h4>Panel de administración</h4>
         </header>
-        <section>
-            <ul>
-
+        
+        <div id="sidebar">
+            <div class="toggle-btn">
+                <span>☰</span>
+            </div>
+            <ul class="lista_sidebar">
+                <!-- ✅ AGREGAR data-module -->
+                <li class="btn-module" data-module="albums">Álbums</li>
+                <li class="btn-module" data-module="usuarios">Usuarios</li>
+                <li class="btn-module" data-module="canciones">Canciones</li>
+                <li class="btn-module" data-module="playlist">Playlist</li>
             </ul>
-        </section>
-        <div class="contenedor">
-
         </div>
+        
+        <div class="contenedor" id="contenedor-principal">
+            <h2>Bienvenido al panel de administración</h2>
+            <p>Selecciona una opción del menú</p>
+        </div>
+    </div>
+        
         <footer>
-
+            <p>&copy; 2025 PTV-Online</p>
         </footer>
     </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Tu script principal -->
+<script src="/SRC/JS/main_admin_dashboard.js"></script>
+
 </body>
 </html>

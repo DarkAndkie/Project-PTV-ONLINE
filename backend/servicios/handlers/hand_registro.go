@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"log"
-	servicios "proyecto-ptv-online/servicios/models"
-	utils "proyecto-ptv-online/servicios/utils"
+	servicios "proyecto-ptv-online/backend/servicios/config"
+	utils "proyecto-ptv-online/backend/servicios/utils"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"

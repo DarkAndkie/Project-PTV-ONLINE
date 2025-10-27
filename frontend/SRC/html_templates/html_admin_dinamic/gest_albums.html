@@ -1,0 +1,63 @@
+<h2>Gestión de Álbums</h2>
+
+<form class="albums_gestion">
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="nombre-album">Nombre del álbum</label>
+            <input type="text" id="nombre-album" placeholder="Nombre del álbum" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="direccion-caratula">Dirección de la carátula</label>
+            <input type="text" id="direccion-caratula" placeholder="URL de la carátula" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="descripcion-album">Descripción del álbum</label>
+            <input type="text" id="descripcion-album" placeholder="Descripción" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="fecha-album">Fecha de lanzamiento</label>
+            <input type="date" id="fecha-album" required>
+        </div>
+        
+        <!-- ✅ CORRECCIÓN: Usar <select> en vez de <option> -->
+        <div class="form-group">
+            <label for="banda">Seleccione la banda</label>
+            <select id="banda" class="select-banda" required>
+                <option value="">Cargando bandas...</option>
+            </select>
+        </div>
+    </div>
+    
+    <button type="submit">Crear álbum</button>
+</form>
+
+<h2>Agregar canciones al álbum</h2>
+
+<div class="cancion-container">
+    <button type="button" class="btn-añadir-cancion btn-success">+ Agregar canción</button>
+</div>
+
+<h2>Lista de álbumes</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Álbum</th>
+            <th>Descripción</th>
+            <th>Fecha</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody id="lista-albums">
+        <tr>
+            <td colspan="4" style="text-align: center; color: #7f8c8d; padding: 30px;">
+                No hay álbumes registrados
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>Gestionar álbum</h2>
+<button type="button" class="btn-eliminar">Deshabilitar álbum</button>
