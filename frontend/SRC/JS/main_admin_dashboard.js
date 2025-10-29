@@ -70,8 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ✅ Función para inicializar todo el módulo de albums
     function inicializarModuloAlbums() {
+        console.log("✅ Inicializando módulo de álbumes...");
+        
         // Cargar artistas
         loadArtistas();
+        
+        // Cargar álbumes en la tabla
+        cargarAlbums();
         
         // Configurar botón de añadir canciones
         añadirCanciones();
@@ -82,6 +87,22 @@ document.addEventListener('DOMContentLoaded', () => {
             submitAlbum.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 await crearAlbum();
+            });
+        }
+        
+        // ✅ Configurar buscador
+        const buscadorAlbum = document.getElementById('buscar-album');
+        if (buscadorAlbum) {
+            buscadorAlbum.addEventListener('input', (e) => {
+                filtrarAlbums(e.target.value);
+            });
+        }
+        
+        // ✅ Configurar filtro por estado
+        const filtroEstado = document.getElementById('filtro-estado');
+        if (filtroEstado) {
+            filtroEstado.addEventListener('change', (e) => {
+                filtrarPorEstado(e.target.value);
             });
         }
     }
@@ -102,13 +123,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             console.log("✅ Select encontrado:", select);
-            console.log("✅ Tipo de elemento:", select.tagName); // Debe ser "SELECT"
+            console.log("✅ Tipo de elemento:", select.tagName);
             
-            // ✅ IMPORTANTE: Destruir Select2 si existe antes de modificar
+            // ✅ IMPORTANTE: Destruir Select2 SOLO si ya existe
             if (typeof $ !== 'undefined' && $.fn.select2) {
                 try {
-                    $('#banda').select2('destroy');
-                    console.log("🗑️ Select2 anterior destruido");
+                    // Verificar si Select2 ya está inicializado
+                    if ($('#banda').hasClass('select2-hidden-accessible')) {
+                        $('#banda').select2('destroy');
+                        console.log("🗑️ Select2 anterior destruido");
+                    }
                 } catch (e) {
                     console.log("ℹ️ No había Select2 previo");
                 }
@@ -232,23 +256,53 @@ document.addEventListener('DOMContentLoaded', () => {
     function recolectar_canciones() {
         const songBloques = document.querySelectorAll(".cancion-item");
         const songs = [];
+        const errores = [];
 
-        songBloques.forEach(bloque => {
+        songBloques.forEach((bloque, index) => {
             const id = bloque.id.split('-')[1];
-            const nombre = document.getElementById(`nombre-cancion-${id}`)?.value || "";
-            const descrip = document.getElementById(`descripcion-cancion-${id}`)?.value || "";
-            const duracion = document.getElementById(`duracion-cancion-${id}`)?.value || "";
-            const cancion_path = document.getElementById(`url-cancion-${id}`)?.value || "";
+            const nombre = document.getElementById(`nombre-cancion-${id}`)?.value?.trim() || "";
+            const descrip = document.getElementById(`descripcion-cancion-${id}`)?.value?.trim() || "";
+            const duracion = document.getElementById(`duracion-cancion-${id}`)?.value?.trim() || "";
+            const cancion_path = document.getElementById(`url-cancion-${id}`)?.value?.trim() || "";
 
-            if (nombre && duracion && cancion_path) {
-                songs.push({
-                    nombre,
-                    descrip,
-                    duracion,
-                    cancion_path
-                });
+            // ✅ Validar que los campos obligatorios estén llenos
+            if (!nombre || !duracion || !cancion_path) {
+                errores.push(`Canción ${index + 1}: Faltan campos obligatorios`);
+                return;
             }
+            
+            // ✅ Validar formato de duración
+            const duracionRegex = /^[0-5][0-9]:[0-5][0-9]$/;
+            if (!duracionRegex.test(duracion)) {
+                errores.push(`Canción ${index + 1} ("${nombre}"): Duración inválida. Use formato mm:ss (ejemplo: 03:45)`);
+                return;
+            }
+            
+            // ✅ Validar que no sea 00:00
+            if (duracion === "00:00") {
+                errores.push(`Canción ${index + 1} ("${nombre}"): La duración no puede ser 00:00`);
+                return;
+            }
+            
+            // ✅ Validar URL
+            if (!cancion_path.startsWith('http://') && !cancion_path.startsWith('https://')) {
+                errores.push(`Canción ${index + 1} ("${nombre}"): La URL debe comenzar con http:// o https://`);
+                return;
+            }
+
+            songs.push({
+                nombre,
+                descrip,
+                duracion,
+                cancion_path
+            });
         });
+        
+        // Si hay errores, mostrarlos
+        if (errores.length > 0) {
+            alert("❌ Errores en las canciones:\n\n" + errores.join("\n"));
+            return null;
+        }
         
         console.log(`📦 Canciones recolectadas: ${songs.length}`);
         return songs;
@@ -342,6 +396,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const canciones = recolectar_canciones();
         
+        // ✅ Si recolectar_canciones devuelve null, hay errores
+        if (canciones === null) {
+            return; // Los errores ya fueron mostrados en recolectar_canciones
+        }
+        
         if (canciones.length === 0) {
             alert("Debes agregar al menos una canción");
             return;
@@ -379,7 +438,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof $ !== 'undefined' && $.fn.select2) {
                     $('#banda').val(null).trigger('change');
                 }
-                
+                if (resp.ok) {
+    alert(data.mensaje || "¡Álbum creado exitosamente!");
+    
+    document.querySelector('.albums_gestion')?.reset();
+    sonContador = 0;
+    
+    cargarAlbums(); // ✅ AGREGAR ESTA LÍNEA
+}
             } else {
                 alert(data.error || "Error al crear el álbum");
             }
@@ -389,7 +455,78 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("Error de conexión con el servidor");
         }
     }
-    async function tabla_albumes(){
-        
+    async function cargarAlbums() {
+    console.log("📦 Cargando álbumes...");
+    const tbody = document.getElementById('lista-albums');
+    
+    if (!tbody) {
+        console.error("❌ No se encontró #lista-albums");
+        return;
     }
+    
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Cargando...</td></tr>';
+    
+    try {
+        const resp = await fetch('/api/albums_listar');
+        
+        if (!resp.ok) {
+            throw new Error(`Error ${resp.status}`);
+        }
+        
+        const albums = await resp.json();
+        console.log("✅ Álbumes recibidos:", albums);
+        
+        if (albums.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay álbumes</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = albums.map(album => `
+            <tr>
+                <td><img src="${album.caratula_dir}" style="width: 50px; height: 50px; object-fit: cover;" onerror="this.src='https://via.placeholder.com/50'"></td>
+                <td>${album.nombre_album}</td>
+                <td>Banda ${album.id_banda}</td>
+                <td>${album.descrip || 'Sin descripción'}</td>
+                <td>${album.fecha_lanza}</td>
+                <td>
+                    <select onchange="cambiarEstadoAlbum('${album.id_album}', this.value)" style="padding: 5px;">
+                        <option value="borrador" ${album.estado === 'borrador' ? 'selected' : ''}>Borrador</option>
+                        <option value="activo" ${album.estado === 'activo' ? 'selected' : ''}>Activo</option>
+                        <option value="deshabilitado" ${album.estado === 'deshabilitado' ? 'selected' : ''}>Deshabilitado</option>
+                    </select>
+                </td>
+                <td>
+                    <button onclick="verAlbum('${album.id_album}')">Ver</button>
+                </td>
+            </tr>
+        `).join('');
+        
+    } catch (error) {
+        console.error('❌ Error:', error);
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: red;">Error al cargar</td></tr>';
+    }
+}
+
+window.cambiarEstadoAlbum = async function(id_album, nuevoEstado) {
+    try {
+        const resp = await fetch(`/api/actualizar_estado_album/${id_album}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ estado: nuevoEstado })
+        });
+        
+        if (resp.ok) {
+            alert('✅ Estado actualizado');
+            cargarAlbums();
+        } else {
+            alert('❌ Error al actualizar');
+        }
+    } catch (error) {
+        alert('❌ Error de conexión');
+    }
+};
+
+window.verAlbum = function(id_album) {
+    alert('Ver álbum: ' + id_album);
+};
 });

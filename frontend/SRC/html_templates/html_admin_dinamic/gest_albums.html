@@ -22,7 +22,6 @@
             <input type="date" id="fecha-album" required>
         </div>
         
-        <!-- ✅ CORRECCIÓN: Usar <select> en vez de <option> -->
         <div class="form-group">
             <label for="banda">Seleccione la banda</label>
             <select id="banda" class="select-banda" required>
@@ -40,24 +39,43 @@
     <button type="button" class="btn-añadir-cancion btn-success">+ Agregar canción</button>
 </div>
 
+<hr style="margin: 40px 0; border: 1px solid #ddd;">
+
 <h2>Lista de álbumes</h2>
-<table>
+
+<!-- ✅ BUSCADOR -->
+<div class="form-group" style="margin-bottom: 20px;">
+    <input type="text" id="buscar-album" placeholder="🔍 Buscar álbum por nombre..." style="width: 100%; max-width: 400px;">
+</div>
+
+<!-- ✅ FILTRO POR ESTADO -->
+<div class="form-group" style="margin-bottom: 20px;">
+    <label for="filtro-estado">Filtrar por estado:</label>
+    <select id="filtro-estado" style="width: 200px;">
+        <option value="">Todos</option>
+        <option value="borrador">Borrador</option>
+        <option value="publicado">Publicado</option>
+        <option value="deshabilitado">Deshabilitado</option>
+    </select>
+</div>
+
+<table id="tabla-albums">
     <thead>
         <tr>
+            <th>Carátula</th>
             <th>Álbum</th>
+            <th>Banda</th>
             <th>Descripción</th>
             <th>Fecha</th>
+            <th>Estado</th>
             <th>Acciones</th>
         </tr>
     </thead>
     <tbody id="lista-albums">
         <tr>
-            <td colspan="4" style="text-align: center; color: #7f8c8d; padding: 30px;">
-                No hay álbumes registrados
+            <td colspan="7" style="text-align: center; color: #7f8c8d; padding: 30px;">
+                Cargando álbumes...
             </td>
         </tr>
     </tbody>
 </table>
-
-<h2>Gestionar álbum</h2>
-<button type="button" class="btn-eliminar">Deshabilitar álbum</button>
