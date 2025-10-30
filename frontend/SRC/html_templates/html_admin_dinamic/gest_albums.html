@@ -43,18 +43,18 @@
 
 <h2>Lista de álbumes</h2>
 
-<!-- ✅ BUSCADOR -->
+<!-- Buscador de álbumes por nombre -->
 <div class="form-group" style="margin-bottom: 20px;">
-    <input type="text" id="buscar-album" placeholder="🔍 Buscar álbum por nombre..." style="width: 100%; max-width: 400px;">
+    <input type="text" id="buscar-album" placeholder="🔍 Buscar álbum por nombre..." style="width: 100%; max-width: 400px; padding: 8px;">
 </div>
 
-<!-- ✅ FILTRO POR ESTADO -->
+<!-- Filtro por estado con valores correctos del modelo Go -->
 <div class="form-group" style="margin-bottom: 20px;">
     <label for="filtro-estado">Filtrar por estado:</label>
-    <select id="filtro-estado" style="width: 200px;">
+    <select id="filtro-estado" style="width: 200px; padding: 8px;">
         <option value="">Todos</option>
         <option value="borrador">Borrador</option>
-        <option value="publicado">Publicado</option>
+        <option value="activo">Activo</option>
         <option value="deshabilitado">Deshabilitado</option>
     </select>
 </div>

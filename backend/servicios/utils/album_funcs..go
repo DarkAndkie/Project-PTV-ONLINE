@@ -250,59 +250,32 @@ func CrearAlbumCompleto(_db *gorm.DB, c *fiber.Ctx) error {
 }
 
 // Actualizar estado del álbum
-func ActualizarEstadoAlbum(_db *gorm.DB, c *fiber.Ctx) error {
-	id := c.Params("id")
 
+func ActualizarEstadoAlbum(_db *gorm.DB, c *fiber.Ctx) error {
 	var body struct {
-		Estado string `json:"estado"`
+		IdAlbum string `json:"id_album"`
+		Estado  string `json:"estado"`
 	}
 
 	if err := c.BodyParser(&body); err != nil {
-		log.Println("❌ Error al parsear estado:", err)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Error al parsear estado",
-		})
+		return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
 	}
 
-	// ✅ AGREGAR LOG PARA VER QUÉ LLEGA
-	log.Printf("📥 Solicitud cambiar estado - ID: %s, Nuevo estado: %s", id, body.Estado)
-
-	estadosValidos := map[string]bool{
-		"borrador":      true,
-		"activo":        true,
-		"deshabilitado": true,
+	if body.IdAlbum == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "id_album es requerido"})
 	}
 
-	if !estadosValidos[body.Estado] {
-		log.Printf("❌ Estado inválido recibido: %s", body.Estado)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "Estado inválido. Debe ser: borrador, activo o deshabilitado",
-		})
+	if body.Estado == "" {
+		return c.Status(400).JSON(fiber.Map{"error": "estado es requerido"})
 	}
 
-	// ✅ EJECUTAR UPDATE
-	result := _db.Model(&models.Albums{}).Where("id_album = ?", id).Update("estado", body.Estado)
+	result := _db.Model(&models.Albums{}).Where("id_album = ?", body.IdAlbum).Update("estado", body.Estado)
 
-	if result.Error != nil {
-		log.Printf("❌ Error en DB: %v", result.Error)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "Error al actualizar estado en la base de datos",
-		})
-	}
-
-	// ✅ VERIFICAR QUE SE ACTUALIZÓ
 	if result.RowsAffected == 0 {
-		log.Printf("⚠️ No se encontró el álbum con ID: %s", id)
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Álbum no encontrado",
-		})
+		return c.Status(404).JSON(fiber.Map{"error": "Álbum no encontrado"})
 	}
 
-	log.Printf("✅ Estado actualizado correctamente - ID: %s, Nuevo estado: %s", id, body.Estado)
-	return c.JSON(fiber.Map{
-		"message": "Estado actualizado correctamente",
-		"estado":  body.Estado,
-	})
+	return c.JSON(fiber.Map{"message": "Estado actualizado correctamente"})
 }
 
 // Listar todos los álbumes

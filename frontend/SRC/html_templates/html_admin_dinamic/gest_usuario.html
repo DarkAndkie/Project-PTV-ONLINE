@@ -1,14 +1,66 @@
 <div class="administracion_usuario">
-    <div class="crear_usuario">
-        <form class="form_creacion_usuario">
-            <input type="text" class="nombre_usuario" placeholder="Nombre de usuario">
-            <input type="text" class="tipo_usuario" placeholder="Rol del usuario">
-            <input type="email" class="email_usuario" placeholder="Correo electrónico">
-            <input type="password" class="contrasena_usuario" placeholder="Contraseña">
-        </form>
-        <button type="button" class="btn_crear_usuario">Crear usuario</button>
-
+    <h2>Administracion usuarios</h2>
+    <div class="cambiar-habilitado">
+        <input type="text" placeholder="Ingrese el usuario a consultar">
+        <tr class="tabla-usuarios">
+            <th clasS="nombre-usuario">Nombre</th>
+            <th class="apellido-usuario">Apellido</th>
+            <th class="telefono-usuario">Telefono</th>
+            <th class="correo-usuario">Correo</th>
+            <th class="tipo-usuario">
+                <select class="select-tipo-usuario">
+                    <option></option>
+                </select>
+            </th>
+        
+        </tr>
+       
     </div>
 
 
+</div><div class="administracion_usuario">
+    <h2>Administración de Usuarios</h2>
+    
+    <!-- Sección de búsqueda y filtros -->
+    <div class="busqueda-usuarios" style="margin-bottom: 20px;">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="buscar-usuario">Buscar usuario</label>
+                <input type="text" id="buscar-usuario" placeholder="Buscar por nombre, apellido o correo">
+            </div>
+            <div class="form-group">
+                <label for="filtro-tipo-usuario">Filtrar por tipo</label>
+                <select id="filtro-tipo-usuario">
+                    <option value="">Todos los tipos</option>
+                    <option value="admin">Admin</option>
+                    <option value="curador">Curador</option>
+                    <option value="banda">Banda</option>
+                    <option value="artista">Artista</option>
+                    <option value="finalusuario">Usuario Final</option>
+                    <option value="deshabilitado">Deshabilitado</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de usuarios -->
+    <div class="tabla-usuarios-container">
+        <table class="tabla-usuarios">
+            <thead>
+                <tr>
+                    <th class="nombre-usuario">Nombre</th>
+                    <th class="apellido-usuario">Apellido</th>
+                    <th class="telefono-usuario">Teléfono</th>
+                    <th class="correo-usuario">Correo</th>
+                    <th class="tipo-usuario">Tipo de Usuario</th>
+                    <th class="acciones-usuario">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="lista-usuarios">
+                <tr>
+                    <td colspan="6" style="text-align: center;">Cargando usuarios...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
