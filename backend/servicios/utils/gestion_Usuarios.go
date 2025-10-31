@@ -140,7 +140,7 @@ func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error {
 		}
 		return nil
 	})
-
+	
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al registrar el usuario: " + err.Error(),
@@ -192,6 +192,53 @@ func VerificarCodigo(_db *gorm.DB, c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "Correo verificado correctamente",
 		"direccion": "../../SRC/html_templates/index.html"})
+}
+
+// ✅ REENVIAR CÓDIGO DE VERIFICACIÓN
+func ReenviarCodigo(_db *gorm.DB, c *fiber.Ctx) error {
+	email := c.FormValue("Correo")
+
+	log.Printf("📧 Solicitud de reenvío de código para: %s", email)
+
+	var usuario models.Usuario
+	if err := _db.First(&usuario, "correo = ?", email).Error; err != nil {
+		log.Printf("❌ Usuario no encontrado: %s", email)
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Usuario no encontrado",
+		})
+	}
+
+	// Verificar si ya está verificado
+	var validacion models.ValidacionCorreo
+	if err := _db.First(&validacion, "id_user = ?", usuario.Id_user).Error; err == nil {
+		if validacion.Verificado {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Este usuario ya está verificado",
+			})
+		}
+	}
+
+	// Eliminar códigos anteriores del mismo usuario
+	if err := _db.Where("id_user = ?", usuario.Id_user).Delete(&models.ValidacionCorreo{}).Error; err != nil {
+		log.Printf("⚠️ Error al limpiar códigos antiguos: %v", err)
+	}
+
+	// Enviar nuevo código usando transacción
+	err := _db.Transaction(func(tx *gorm.DB) error {
+		return EnvioDeCodigo(tx, usuario, usuario.Email)
+	})
+
+	if err != nil {
+		log.Printf("❌ Error al reenviar código: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error al reenviar código: " + err.Error(),
+		})
+	}
+
+	log.Printf("✅ Código reenviado a: %s", email)
+	return c.JSON(fiber.Map{
+		"message": "Código reenviado correctamente. Revisa tu correo.",
+	})
 }
 
 // pucha la wea por fin, vamos con lo next

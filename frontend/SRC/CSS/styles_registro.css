@@ -223,3 +223,16 @@
   font-weight: bold;
   font-size: 1.1em;
 }
+#verificacionForm input[type="text"] {
+    font-family: 'Courier New', monospace;
+}
+
+#verificacionForm button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#verificacionForm button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

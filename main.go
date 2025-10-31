@@ -73,6 +73,22 @@ func main() {
 		return utils.ActualizarEstadoAlbum(_DB, c)
 	})
 
+	app.Get("/api/albums/:id/canciones", func(c *fiber.Ctx) error {
+		return utils.ObtenerCancionesPorAlbum(_DB, c)
+	})
+
+	app.Put("/api/canciones/:id", func(c *fiber.Ctx) error {
+		return utils.ActualizarCancion(_DB, c)
+	})
+
+	app.Put("/api/canciones/:id/estado", func(c *fiber.Ctx) error {
+		return utils.CambiarEstadoCancion(_DB, c)
+	})
+
+	app.Delete("/api/canciones/:id", func(c *fiber.Ctx) error {
+		return utils.EliminarCancion(_DB, c)
+	})
+
 	// Rutas de API - Bandas
 	app.Get("/api/bandas", func(c *fiber.Ctx) error {
 		return utils.ListarBandas(_DB, c)
@@ -98,7 +114,26 @@ func main() {
 	app.Delete("/api/usuarios/:id", func(c *fiber.Ctx) error {
 		return utils.EliminarUsuarioPorID(_DB, c)
 	})
+	// Rutas de API - Autenticación
+	app.Post("/registro_post", func(c *fiber.Ctx) error {
+		return utils.CrearUsuario(_DB, c)
+	})
 
+	app.Post("/login_Post", func(c *fiber.Ctx) error {
+		return handlers.LoginValidacion(_DB, c)
+	})
+
+	app.Post("/verificar_codigo", func(c *fiber.Ctx) error {
+		return utils.VerificarCodigo(_DB, c)
+	})
+
+	// ✅ NUEVA RUTA: Reenviar código
+	app.Post("/reenviar_codigo", func(c *fiber.Ctx) error {
+		return utils.ReenviarCodigo(_DB, c)
+	})
+	app.Post("/api/albums/canciones", func(c *fiber.Ctx) error {
+		return utils.ObtenerCancionesPorAlbum(_DB, c)
+	})
 	log.Println("🚀 Servidor iniciado en http://localhost:3000")
 	log.Fatal(app.Listen(":3000"))
 }

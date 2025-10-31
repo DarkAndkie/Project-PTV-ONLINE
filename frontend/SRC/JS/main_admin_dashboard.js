@@ -3,11 +3,61 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.querySelector(".toggle-btn")
   const side = document.getElementById("sidebar")
   const side_bnt = document.querySelectorAll(".btn-module")
-  const $ = window.jQuery // Declare the $ variable
+  const $ = window.jQuery
 
   let sonContador = 0
   let todosLosAlbums = []
-  let bandasMap = {} // { id_banda: nombre_banda }
+  let todosLosUsuarios = []
+  let bandasMap = {}
+  const cancionesPorAlbum = {}
+
+  function filtrarAlbums(textoBusqueda) {
+    console.log("🔍 Buscando álbum:", textoBusqueda)
+
+    const filtroEstado = document.getElementById("filtro-estado")?.value || ""
+    const textoLower = textoBusqueda.toLowerCase().trim()
+
+    let albumsFiltrados = todosLosAlbums
+
+    if (textoLower) {
+      albumsFiltrados = albumsFiltrados.filter(
+        (album) =>
+          album.nombre_album.toLowerCase().includes(textoLower) ||
+          bandasMap[album.id_banda]?.toLowerCase().includes(textoLower),
+      )
+    }
+
+    if (filtroEstado) {
+      albumsFiltrados = albumsFiltrados.filter((album) => album.estado === filtroEstado)
+    }
+
+    console.log(`✅ Encontrados: ${albumsFiltrados.length} de ${todosLosAlbums.length}`)
+    renderizarAlbums(albumsFiltrados)
+  }
+
+  function filtrarPorEstado(estado) {
+    console.log("🎯 Filtrando por estado:", estado)
+
+    const buscador = document.getElementById("buscar-album")?.value || ""
+    const textoLower = buscador.toLowerCase().trim()
+
+    let albumsFiltrados = todosLosAlbums
+
+    if (estado) {
+      albumsFiltrados = albumsFiltrados.filter((album) => album.estado === estado)
+    }
+
+    if (textoLower) {
+      albumsFiltrados = albumsFiltrados.filter(
+        (album) =>
+          album.nombre_album.toLowerCase().includes(textoLower) ||
+          bandasMap[album.id_banda]?.toLowerCase().includes(textoLower),
+      )
+    }
+
+    console.log(`✅ Encontrados: ${albumsFiltrados.length} de ${todosLosAlbums.length}`)
+    renderizarAlbums(albumsFiltrados)
+  }
 
   if (container) {
     toggleBtn.addEventListener("click", () => {
@@ -34,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
       switch (nombreModulo) {
         case "albums":
           htmlContent = await fetch("html_admin_dinamic/gest_albums.html").then((res) => res.text())
-          
+
           divEspacio.innerHTML = `<div class="modulo">${htmlContent}</div>`
 
           if (nombreModulo === "albums") {
@@ -44,8 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
           }
           break
         case "usuarios":
-          htmlContent = await fetch("html_admin_dinamic/gest_usuarios.html").then((res) => res.text())
-              
+          htmlContent = await fetch("html_admin_dinamic/gest_usuario.html").then((res) => res.text())
+
           divEspacio.innerHTML = `<div class="modulo">${htmlContent}</div>`
 
           if (nombreModulo === "usuarios") {
@@ -66,7 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
         default:
           htmlContent = "<h2>Módulo no encontrado</h2>"
       }
-
     } catch (error) {
       console.error("Error al cargar el módulo:", error)
       divEspacio.innerHTML = `
@@ -77,11 +126,222 @@ document.addEventListener("DOMContentLoaded", () => {
             `
     }
   }
-  function inicializarModuloUsuarios(){
 
+  function inicializarModuloUsuarios() {
+    console.log("✅ Inicializando módulo de usuarios...")
+
+    cargarUsuarios()
+
+    const buscadorUsuario = document.getElementById("buscar-usuario")
+    if (buscadorUsuario) {
+      buscadorUsuario.addEventListener("input", (e) => {
+        filtrarUsuarios(e.target.value)
+      })
+    }
+
+    const filtroTipo = document.getElementById("filtro-tipo-usuario")
+    if (filtroTipo) {
+      filtroTipo.addEventListener("change", (e) => {
+        filtrarPorTipoUsuario(e.target.value)
+      })
+    }
   }
-  async function mostrarUsuarios(){
-    const res = await fetch()
+
+  async function cargarUsuarios() {
+    console.log("📦 Cargando usuarios...")
+    const tbody = document.getElementById("lista-usuarios")
+
+    if (!tbody) {
+      console.error("❌ No se encontró #lista-usuarios")
+      return
+    }
+
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Cargando...</td></tr>'
+
+    try {
+      const resp = await fetch("/api/usuarios")
+
+      if (!resp.ok) {
+        throw new Error(`Error ${resp.status}`)
+      }
+
+      const usuarios = await resp.json()
+      console.log("✅ Usuarios recibidos:", usuarios)
+
+      todosLosUsuarios = usuarios
+
+      if (usuarios.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay usuarios</td></tr>'
+        return
+      }
+
+      renderizarUsuarios(usuarios)
+    } catch (error) {
+      console.error("❌ Error:", error)
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error al cargar usuarios</td></tr>'
+    }
+  }
+
+  function renderizarUsuarios(usuarios) {
+    const tbody = document.getElementById("lista-usuarios")
+
+    if (!tbody) {
+      console.error("❌ No se encontró #lista-usuarios")
+      return
+    }
+
+    if (usuarios.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="6" style="text-align: center; color: #7f8c8d;">No se encontraron usuarios</td></tr>'
+      return
+    }
+
+    tbody.innerHTML = usuarios
+      .map((usuario) => {
+        const getTipoBadge = (tipo) => {
+          const badges = {
+            admin: "background: #e74c3c; color: white;",
+            curador: "background: #9b59b6; color: white;",
+            banda: "background: #3498db; color: white;",
+            artista: "background: #1abc9c; color: white;",
+            finalusuario: "background: #27ae60; color: white;",
+            deshabilitado: "background: #95a5a6; color: white;",
+          }
+          return badges[tipo] || badges["finalusuario"]
+        }
+
+        const getTipoLabel = (tipo) => {
+          const labels = {
+            admin: "👑 Admin",
+            curador: "📝 Curador",
+            banda: "🎸 Banda",
+            artista: "🎤 Artista",
+            finalusuario: "👤 Usuario",
+            deshabilitado: "🚫 Deshabilitado",
+          }
+          return labels[tipo] || tipo
+        }
+
+        return `
+                <tr data-usuario-id="${usuario.id_user}" data-usuario-nombre="${usuario.nombre.toLowerCase()}" data-usuario-tipo="${usuario.tipo_user}">
+                    <td><strong>${usuario.nombre}</strong></td>
+                    <td>${usuario.apellido}</td>
+                    <td>${usuario.celular || "N/A"}</td>
+                    <td>${usuario.email}</td>
+                    <td>
+                        <select onchange="cambiarTipoUsuario(${usuario.id_user}, this.value)" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd; ${getTipoBadge(usuario.tipo_user)} font-weight: bold;">
+                            <option value="admin" ${usuario.tipo_user === "admin" ? "selected" : ""}>👑 Admin</option>
+                            <option value="curador" ${usuario.tipo_user === "curador" ? "selected" : ""}>📝 Curador</option>
+                            <option value="banda" ${usuario.tipo_user === "banda" ? "selected" : ""}>🎸 Banda</option>
+                            <option value="artista" ${usuario.tipo_user === "artista" ? "selected" : ""}>🎤 Artista</option>
+                            <option value="finalusuario" ${usuario.tipo_user === "finalusuario" ? "selected" : ""}>👤 Usuario</option>
+                            <option value="deshabilitado" ${usuario.tipo_user === "deshabilitado" ? "selected" : ""}>🚫 Deshabilitado</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button onclick="verUsuario(${usuario.id_user})" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Ver</button>
+                    </td>
+                </tr>
+            `
+      })
+      .join("")
+  }
+
+  function filtrarUsuarios(textoBusqueda) {
+    console.log("🔍 Buscando usuario:", textoBusqueda)
+
+    const filtroTipo = document.getElementById("filtro-tipo-usuario")?.value || ""
+    const textoLower = textoBusqueda.toLowerCase().trim()
+
+    let usuariosFiltrados = todosLosUsuarios
+
+    if (textoLower) {
+      usuariosFiltrados = usuariosFiltrados.filter(
+        (usuario) =>
+          usuario.nombre.toLowerCase().includes(textoLower) ||
+          usuario.apellido.toLowerCase().includes(textoLower) ||
+          usuario.email.toLowerCase().includes(textoLower),
+      )
+    }
+
+    if (filtroTipo) {
+      usuariosFiltrados = usuariosFiltrados.filter((usuario) => usuario.tipo_user === filtroTipo)
+    }
+
+    console.log(`✅ Encontrados: ${usuariosFiltrados.length} de ${todosLosUsuarios.length}`)
+    renderizarUsuarios(usuariosFiltrados)
+  }
+
+  function filtrarPorTipoUsuario(tipo) {
+    console.log("🎯 Filtrando por tipo:", tipo)
+
+    const buscador = document.getElementById("buscar-usuario")?.value || ""
+    const textoLower = buscador.toLowerCase().trim()
+
+    let usuariosFiltrados = todosLosUsuarios
+
+    if (tipo) {
+      usuariosFiltrados = usuariosFiltrados.filter((usuario) => usuario.tipo_user === tipo)
+    }
+
+    if (textoLower) {
+      usuariosFiltrados = usuariosFiltrados.filter(
+        (usuario) =>
+          usuario.nombre.toLowerCase().includes(textoLower) ||
+          usuario.apellido.toLowerCase().includes(textoLower) ||
+          usuario.email.toLowerCase().includes(textoLower),
+      )
+    }
+
+    console.log(`✅ Encontrados: ${usuariosFiltrados.length} de ${todosLosUsuarios.length}`)
+    renderizarUsuarios(usuariosFiltrados)
+  }
+
+  window.cambiarTipoUsuario = async (id_usuario, nuevoTipo) => {
+    console.log(`🔄 Cambiando tipo del usuario ${id_usuario} a "${nuevoTipo}"`)
+
+    try {
+      const resp = await fetch(`/api/usuarios/${id_usuario}/tipo`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tipo: nuevoTipo }),
+      })
+
+      const data = await resp.json()
+      console.log("📥 Respuesta:", data)
+
+      if (resp.ok) {
+        alert(`✅ Tipo de usuario actualizado a: ${nuevoTipo}`)
+
+        const usuarioIndex = todosLosUsuarios.findIndex((u) => u.id_user === id_usuario)
+        if (usuarioIndex !== -1) {
+          todosLosUsuarios[usuarioIndex].tipo_user = nuevoTipo
+        }
+
+        cargarUsuarios()
+      } else {
+        alert(data.error || "Error al actualizar: " + (data.error || "Error desconocido"))
+        cargarUsuarios()
+      }
+    } catch (error) {
+      console.error("❌ Error:", error)
+      alert("❌ Error de conexión con el servidor")
+      cargarUsuarios()
+    }
+  }
+
+  window.verUsuario = (id_usuario) => {
+    const usuario = todosLosUsuarios.find((u) => u.id_user === id_usuario)
+    if (usuario) {
+      alert(
+        `👤 Detalles del Usuario:\n\n` +
+          `ID: ${usuario.id_user}\n` +
+          `Nombre: ${usuario.nombre} ${usuario.apellido}\n` +
+          `Email: ${usuario.email}\n` +
+          `Teléfono: ${usuario.celular || "N/A"}\n` +
+          `Tipo: ${usuario.tipo_user}`,
+      )
+    }
   }
 
   function inicializarModuloAlbums() {
@@ -462,22 +722,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const albums = await resp.json()
       console.log("✅ Álbumes recibidos:", albums)
 
-      console.log("[v0] ========== IDs DE ÁLBUMES RECIBIDOS ==========")
-      albums.forEach((album, index) => {
-        console.log(`[v0] Álbum ${index + 1}:`)
-        console.log(`  - ID: "${album.id_album}"`)
-        console.log(`  - Tipo: ${typeof album.id_album}`)
-        console.log(`  - Longitud: ${album.id_album.length}`)
-        console.log(
-          `  - Bytes (hex):`,
-          Array.from(album.id_album)
-            .map((c) => c.charCodeAt(0).toString(16).padStart(2, "0"))
-            .join(" "),
-        )
-        console.log(`  - Nombre: "${album.nombre_album}"`)
-      })
-      console.log("[v0] ================================================")
-
       todosLosAlbums = albums
 
       if (albums.length === 0) {
@@ -508,15 +752,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     tbody.innerHTML = albums
       .map((album) => {
-        const getEstadoBadge = (estado) => {
-          const badges = {
-            borrador: "background: #95a5a6; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;",
-            activo: "background: #27ae60; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;",
-            deshabilitado: "background: #e74c3c; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px;",
-          }
-          return badges[estado] || badges["borrador"]
-        }
-
         const nombreBanda = bandasMap[album.id_banda] || `Banda ${album.id_banda}`
 
         return `
@@ -534,100 +769,269 @@ document.addEventListener("DOMContentLoaded", () => {
                         </select>
                     </td>
                     <td>
-                        <button onclick="verAlbum('${album.id_album}')" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Ver</button>
+                        <button onclick="toggleCancionesAlbum('${album.id_album}')" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Ver Canciones</button>
+                        <button onclick="verAlbum('${album.id_album}')" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Info</button>
+                    </td>
+                </tr>
+                <tr id="canciones-${album.id_album}" style="display: none;">
+                    <td colspan="7" style="background: #f8f9fa; padding: 20px;">
+                        <div class="canciones-accordion">
+                            <h4 style="margin-bottom: 15px;">🎵 Canciones del álbum "${album.nombre_album}"</h4>
+                            <div id="lista-canciones-${album.id_album}">
+                                <p style="text-align: center;">Cargando canciones...</p>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             `
       })
       .join("")
   }
+window.cambiarEstadoAlbum = async (id_album, nuevoEstado) => {
+  try {
+    const resp = await fetch("/api/actualizar_estado_album", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id_album, estado: nuevoEstado }),
+    })
 
-  function filtrarAlbums(textoBusqueda) {
-    console.log("🔍 Buscando:", textoBusqueda)
+    const data = await resp.json()
 
-    const filtroEstado = document.getElementById("filtro-estado")?.value || ""
-    const textoLower = textoBusqueda.toLowerCase().trim()
-
-    let albumsFiltrados = todosLosAlbums
-
-    // Filtrar por nombre
-    if (textoLower) {
-      albumsFiltrados = albumsFiltrados.filter((album) => album.nombre_album.toLowerCase().includes(textoLower))
+    if (resp.ok) {
+      alert("✅ Estado actualizado correctamente")
+      await cargarAlbums()
+    } else {
+      alert("❌ Error: " + (data.error || "No se pudo actualizar el estado"))
     }
-
-    // Aplicar filtro de estado si existe
-    if (filtroEstado) {
-      albumsFiltrados = albumsFiltrados.filter((album) => album.estado === filtroEstado)
-    }
-
-    console.log(`✅ Encontrados: ${albumsFiltrados.length} de ${todosLosAlbums.length}`)
-    renderizarAlbums(albumsFiltrados)
+  } catch (error) {
+    console.error("❌ Error:", error)
+    alert("❌ Error de conexión con el servidor")
   }
+}
+  window.toggleCancionesAlbum = async (id_album) => {
+    const row = document.getElementById(`canciones-${id_album}`)
 
-  function filtrarPorEstado(estado) {
-    console.log("🎯 Filtrando por estado:", estado)
-
-    const buscador = document.getElementById("buscar-album")?.value || ""
-    const textoLower = buscador.toLowerCase().trim()
-
-    let albumsFiltrados = todosLosAlbums
-
-    // Filtrar por estado
-    if (estado) {
-      albumsFiltrados = albumsFiltrados.filter((album) => album.estado === estado)
+    if (!row) {
+      console.error("❌ No se encontró la fila de canciones")
+      return
     }
 
-    // Aplicar filtro de búsqueda si existe
-    if (textoLower) {
-      albumsFiltrados = albumsFiltrados.filter((album) => album.nombre_album.toLowerCase().includes(textoLower))
-    }
+    if (row.style.display === "none") {
+      row.style.display = "table-row"
 
-    console.log(`✅ Encontrados: ${albumsFiltrados.length} de ${todosLosAlbums.length}`)
-    renderizarAlbums(albumsFiltrados)
+      if (!cancionesPorAlbum[id_album]) {
+        await cargarCancionesAlbum(id_album)
+      }
+    } else {
+      row.style.display = "none"
+    }
   }
+// main_admin_dashboard.js
+// main_admin_dashboard.js
+// main_admin_dashboard.js
 
-  window.cambiarEstadoAlbum = async (id_album, nuevoEstado) => {
-    console.log(`🔄 Cambiando estado del álbum "${id_album}" a "${nuevoEstado}"`)
+async function cargarCancionesAlbum(id_album) {
+    const container = document.getElementById(`lista-canciones-${id_album}`)
+
+    if (!container) {
+      console.error("❌ No se encontró el contenedor de canciones")
+      return
+    }
+
+    container.innerHTML = '<p style="text-align: center;">Cargando canciones...</p>'
 
     try {
-      const body = {
-        id_album: id_album,
-        estado: nuevoEstado,
+      const resp = await fetch(`/api/albums/canciones`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_album: id_album }),
+      })
+
+      if (!resp.ok) {
+        let errorData = await resp.json().catch(() => ({ error: "Respuesta no JSON" }))
+        throw new Error(`Error ${resp.status}: ${errorData.error || resp.statusText}`)
       }
 
-      console.log("📤 Enviando:", body)
+      const canciones = await resp.json()
+      console.log("✅ Canciones recibidas:", canciones)
 
-      const resp = await fetch("/api/actualizar_estado_album", {
+      cancionesPorAlbum[id_album] = canciones
+
+      if (canciones.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">No hay canciones en este álbum</p>'
+        return
+      }
+
+      // ✅ CORRECCIÓN CLAVE: ¡Llamar a la función de renderizado!
+      renderizarCanciones(id_album, canciones) // <--- Esta línea faltaba
+      
+    } catch (error) {
+      console.error("❌ Error al cargar canciones:", error)
+      container.innerHTML =
+        `<p style="text-align: center; color: red;">Error al cargar canciones: ${error.message}. Verifica que el endpoint /api/albums/canciones exista en tu backend.</p>`
+    }
+}
+  function renderizarCanciones(id_album, canciones) {
+    const container = document.getElementById(`lista-canciones-${id_album}`)
+
+    if (!container) return
+
+    container.innerHTML = `
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr style="background: #e8e8e8;">
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">#</th>
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Nombre</th>
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Descripción</th>
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Duración</th>
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Reproducciones</th>
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Enlace</th>
+            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${canciones
+            .map(
+              (cancion, index) => `
+            <tr id="cancion-row-${cancion.id_cancion}">
+              <td style="padding: 10px; border: 1px solid #ddd;">${index + 1}</td>
+              <td style="padding: 10px; border: 1px solid #ddd;">
+                <input type="text" id="nombre-${cancion.id_cancion}" value="${cancion.nombre}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+              </td>
+              <td style="padding: 10px; border: 1px solid #ddd;">
+                <input type="text" id="descrip-${cancion.id_cancion}" value="${cancion.descrip || ""}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+              </td>
+              <td style="padding: 10px; border: 1px solid #ddd;">${cancion.duracion}</td>
+              <td style="padding: 10px; border: 1px solid #ddd;">${cancion.n_reproduccion || 0}</td>
+              <td style="padding: 10px; border: 1px solid #ddd;">
+                <input type="url" id="path-${cancion.id_cancion}" value="${cancion.cancion_path}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+              </td>
+              <td style="padding: 10px; border: 1px solid #ddd;">
+                <button onclick="guardarCancion('${cancion.id_cancion}')" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">💾 Guardar</button>
+                <button onclick="toggleEstadoCancion('${cancion.id_cancion}', '${id_album}')" style="padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">🚫 Deshabilitar</button>
+              </td>
+            </tr>
+          `,
+            )
+            .join("")}
+        </tbody>
+      </table>
+    `
+  }
+
+  window.guardarCancion = async (id_cancion) => {
+    const nombre = document.getElementById(`nombre-${id_cancion}`)?.value
+    const descrip = document.getElementById(`descrip-${id_cancion}`)?.value
+    const cancion_path = document.getElementById(`path-${id_cancion}`)?.value
+
+    if (!nombre || !cancion_path) {
+      alert("❌ El nombre y el enlace son obligatorios")
+      return
+    }
+
+    try {
+      const resp = await fetch(`/api/canciones/${id_cancion}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          nombre,
+          descrip,
+          cancion_path,
+        }),
       })
 
       const data = await resp.json()
-      console.log("📥 Respuesta:", data)
 
       if (resp.ok) {
-        alert(`✅ Estado actualizado a: ${nuevoEstado}`)
-
-        const albumIndex = todosLosAlbums.findIndex((a) => a.id_album === id_album)
-        if (albumIndex !== -1) {
-          todosLosAlbums[albumIndex].estado = nuevoEstado
-        }
-
-        cargarAlbums()
+        alert("✅ Canción actualizada correctamente")
       } else {
-        alert("❌ Error al actualizar: " + (data.error || "Error desconocido"))
-        cargarAlbums()
+        alert(
+          "❌ Error: " +
+            (data.error || "Error desconocido. Verifica que el endpoint /api/canciones/:id exista en tu backend."),
+        )
       }
     } catch (error) {
       console.error("❌ Error:", error)
-      alert("❌ Error de conexión con el servidor")
-      cargarAlbums()
+      alert("❌ Error de conexión. Verifica que el endpoint /api/canciones/:id exista en tu backend.")
     }
   }
 
-  window.verAlbum = (id_album) => {
-    alert("Ver álbum: " + id_album)
-    // Aquí puedes implementar la lógica para ver los detalles del álbum
+  window.toggleEstadoCancion = async (id_cancion, id_album) => {
+    const confirmar = confirm("¿Deseas deshabilitar esta canción?")
+
+    if (!confirmar) return
+
+    try {
+      const resp = await fetch(`/api/canciones/${id_cancion}/estado`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: "deshabilitado" }),
+      })
+
+      const data = await resp.json()
+
+      if (resp.ok) {
+        alert("✅ Canción deshabilitada")
+        delete cancionesPorAlbum[id_album]
+        await cargarCancionesAlbum(id_album)
+      } else {
+        alert(
+          "❌ Error: " +
+            (data.error ||
+              "Error desconocido. Verifica que el endpoint /api/canciones/:id/estado exista en tu backend."),
+        )
+      }
+    } catch (error) {
+      console.error("❌ Error:", error)
+      alert("❌ Error de conexión. Verifica que el endpoint /api/canciones/:id/estado exista en tu backend.")
+    }
+  }
+
+  window.verAlbum = async (id_album) => {
+    const album = todosLosAlbums.find((a) => a.id_album === id_album)
+
+    if (!album) {
+      alert("❌ Álbum no encontrado")
+      return
+    }
+
+    const nombreBanda = bandasMap[album.id_banda] || `Banda ${album.id_banda}`
+
+    let mensaje =
+      `📀 Información del Álbum\n\n` +
+      `Nombre: ${album.nombre_album}\n` +
+      `Banda: ${nombreBanda}\n` +
+      `Descripción: ${album.descrip || "Sin descripción"}\n` +
+      `Fecha de lanzamiento: ${album.fecha_lanza}\n` +
+      `Estado: ${album.estado}\n` +
+      `ID: ${album.id_album}\n\n`
+
+    try {
+      const resp = await fetch(`/api/albums/canciones`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id_album: id_album }),
+      })
+
+      if (resp.ok) {
+        const canciones = await resp.json()
+
+        if (canciones.length > 0) {
+          mensaje += `🎵 Canciones (${canciones.length}):\n\n`
+          canciones.forEach((cancion, index) => {
+            mensaje += `${index + 1}. ${cancion.nombre} (${cancion.duracion})\n`
+          })
+        } else {
+          mensaje += `🎵 No hay canciones en este álbum`
+        }
+      } else {
+        mensaje += `⚠️ No se pudieron cargar las canciones.\nVerifica que el endpoint /api/albums/canciones exista en tu backend.`
+      }
+    } catch (error) {
+      console.error("❌ Error:", error)
+      mensaje += `⚠️ Error al cargar canciones.\nVerifica que el endpoint /api/albums/canciones exista en tu backend.`
+    }
+
+    alert(mensaje)
   }
 })
