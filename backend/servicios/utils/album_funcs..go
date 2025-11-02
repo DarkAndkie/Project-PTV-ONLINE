@@ -289,3 +289,90 @@ func ListarAlbums(_db *gorm.DB, c *fiber.Ctx) error {
 	log.Printf("✅ Álbums encontrados: %d\n", len(albums))
 	return c.JSON(albums)
 }
+func ActualizarAlbumConCanciones(_db *gorm.DB, c *fiber.Ctx) error {
+	type Payload struct {
+		Album     models.Albums    `json:"album"`
+		Canciones []models.Cancion `json:"canciones"`
+	}
+
+	var datos Payload
+	if err := c.BodyParser(&datos); err != nil {
+		log.Println("❌ Error al parsear:", err)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "No se pudo parsear los datos",
+		})
+	}
+
+	album := datos.Album
+	canciones := datos.Canciones
+
+	log.Printf("📥 Actualizando álbum: %s (ID: %s)", album.Nombre_album, album.Id_album)
+
+	// ✅ NO validar nombre duplicado en actualización
+	// Comentar la validación de nombre único en Parsear_ValidarAlbum para updates
+
+	// Transacción: actualizar álbum y canciones
+	err := _db.Transaction(func(tx *gorm.DB) error {
+		// Actualizar álbum
+		if err := tx.Model(&models.Albums{}).
+			Where("id_album = ?", album.Id_album).
+			Updates(map[string]interface{}{
+				"nombre_album": album.Nombre_album,
+				"caratula_dir": album.Caratula_dir,
+				"descrip":      album.Descrip,
+				"fecha_lanza":  album.Fecha_lanza,
+				"id_banda":     album.Id_banda,
+			}).Error; err != nil {
+			log.Println("❌ Error actualizando álbum:", err)
+			return err
+		}
+
+		log.Println("✅ Álbum actualizado")
+
+		// Actualizar o insertar canciones
+		for i, cancion := range canciones {
+			cancion.Id_album = album.Id_album
+			cancion.Id_banda = album.Id_banda
+
+			if cancion.Id_cancion != "" {
+				// ✅ Canción existente: actualizar
+				log.Printf("🔄 Actualizando canción %d: %s (ID: %s)", i+1, cancion.Nombre, cancion.Id_cancion)
+
+				if err := tx.Model(&models.Cancion{}).
+					Where("id_cancion = ?", cancion.Id_cancion).
+					Updates(map[string]interface{}{
+						"nombre":       cancion.Nombre,
+						"descrip":      cancion.Descrip,
+						"duracion":     cancion.Duracion,
+						"cancion_path": cancion.Cancion_path,
+					}).Error; err != nil {
+					log.Println("❌ Error actualizando canción:", err)
+					return err
+				}
+			} else {
+				// ✅ Canción nueva: insertar
+				log.Printf("➕ Insertando nueva canción %d: %s", i+1, cancion.Nombre)
+
+				if err := tx.Create(&cancion).Error; err != nil {
+					log.Println("❌ Error insertando canción:", err)
+					return err
+				}
+			}
+		}
+
+		log.Println("✅ Todas las canciones procesadas")
+		return nil
+	})
+
+	if err != nil {
+		log.Println("❌ Error en transacción:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "No se pudo actualizar el álbum y sus canciones: " + err.Error(),
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"mensaje":  "Álbum y canciones actualizados correctamente",
+		"id_album": album.Id_album,
+	})
+}

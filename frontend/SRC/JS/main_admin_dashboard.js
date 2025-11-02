@@ -1,15 +1,54 @@
+// 🚫 Verificar si el token sigue existiendo al cargar el dashboard
+document.addEventListener("DOMContentLoaded", () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    alert("⚠️ Tu sesión ha expirado o no has iniciado sesión.");
+    window.location.href = "/";
+    return;
+  }
+
+  fetch('/api/albums_listar', {
+    method: 'GET',
+    headers: { "Authorization": `Bearer ${token}` }
+  }).then(res => {
+    if (res.status === 401 || res.status === 403) {
+      alert("⚠️ Tu sesión ya no es válida.");
+      localStorage.removeItem("token");
+      window.location.replace("/"); // usar replace en vez de href
+    }
+  }).catch(() => {
+    localStorage.removeItem("token");
+    window.location.replace("/");
+  });
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const logoutBtn = document.getElementById("btnLogout");
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      if (confirm("¿Deseas cerrar sesión?")) {
+        localStorage.removeItem("token");
+        sessionStorage.clear();
+        window.location.replace("/"); // vuelve al login y evita volver con “adelante”
+      }
+    });
+  }
+});
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.querySelector(".principal")
   const toggleBtn = document.querySelector(".toggle-btn")
   const side = document.getElementById("sidebar")
   const side_bnt = document.querySelectorAll(".btn-module")
   const $ = window.jQuery
+// ✅ Botón de cierre de sesión
 
   let sonContador = 0
   let todosLosAlbums = []
   let todosLosUsuarios = []
   let bandasMap = {}
   const cancionesPorAlbum = {}
+
 
   function filtrarAlbums(textoBusqueda) {
     console.log("🔍 Buscando álbum:", textoBusqueda)
@@ -768,10 +807,11 @@ document.addEventListener("DOMContentLoaded", () => {
                             <option value="deshabilitado" ${album.estado === "deshabilitado" ? "selected" : ""}>🚫 Deshabilitado</option>
                         </select>
                     </td>
-                    <td>
-                        <button onclick="toggleCancionesAlbum('${album.id_album}')" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Ver Canciones</button>
-                        <button onclick="verAlbum('${album.id_album}')" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Info</button>
-                    </td>
+                  <td>
+                      <button onclick="editarAlbum('${album.id_album}')" style="padding: 5px 10px; background: #f39c12; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">✏️ Editar</button>
+                      <button onclick="toggleCancionesAlbum('${album.id_album}')" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Ver Canciones</button>
+                      <button onclick="verAlbum('${album.id_album}')" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Info</button>
+                  </td>
                 </tr>
                 <tr id="canciones-${album.id_album}" style="display: none;">
                     <td colspan="7" style="background: #f8f9fa; padding: 20px;">
@@ -786,29 +826,47 @@ document.addEventListener("DOMContentLoaded", () => {
             `
       })
       .join("")
-  }
-window.cambiarEstadoAlbum = async (id_album, nuevoEstado) => {
-  try {
-    const resp = await fetch("/api/actualizar_estado_album", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id_album, estado: nuevoEstado }),
-    })
+  }// ===== CAMBIAR ESTADO DEL ÁLBUM =====
+  window.cambiarEstadoAlbum = async (id_album, nuevoEstado) => {
+    console.log(`🔄 Cambiando estado del álbum "${id_album}" a "${nuevoEstado}"`)
 
-    const data = await resp.json()
+    try {
+      // ✅ Enviar id_album en el BODY
+      const resp = await fetch("/api/actualizar_estado_album", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          id_album: id_album,  // ✅ ID en el body
+          estado: nuevoEstado 
+        }),
+      })
 
-    if (resp.ok) {
-      alert("✅ Estado actualizado correctamente")
-      await cargarAlbums()
-    } else {
-      alert("❌ Error: " + (data.error || "No se pudo actualizar el estado"))
+      const data = await resp.json()
+      console.log("📥 Respuesta:", data)
+
+      if (resp.ok) {
+        alert("✅ Estado actualizado correctamente")
+        
+        // Actualizar en el array local
+        const albumIndex = todosLosAlbums.findIndex((a) => a.id_album === id_album)
+        if (albumIndex !== -1) {
+          todosLosAlbums[albumIndex].estado = nuevoEstado
+        }
+        
+        await cargarAlbums()
+      } else {
+        alert("❌ Error: " + (data.error || "No se pudo actualizar el estado"))
+        await cargarAlbums()
+      }
+    } catch (error) {
+      console.error("❌ Error:", error)
+      alert("❌ Error de conexión con el servidor")
     }
-  } catch (error) {
-    console.error("❌ Error:", error)
-    alert("❌ Error de conexión con el servidor")
   }
-}
+
+  // ===== TOGGLE CANCIONES DEL ÁLBUM =====
   window.toggleCancionesAlbum = async (id_album) => {
+    console.log("🎵 Toggle canciones para álbum:", id_album)
     const row = document.getElementById(`canciones-${id_album}`)
 
     if (!row) {
@@ -826,11 +884,9 @@ window.cambiarEstadoAlbum = async (id_album, nuevoEstado) => {
       row.style.display = "none"
     }
   }
-// main_admin_dashboard.js
-// main_admin_dashboard.js
-// main_admin_dashboard.js
 
-async function cargarCancionesAlbum(id_album) {
+  // ===== CARGAR CANCIONES DEL ÁLBUM =====
+  async function cargarCancionesAlbum(id_album) {
     const container = document.getElementById(`lista-canciones-${id_album}`)
 
     if (!container) {
@@ -841,10 +897,11 @@ async function cargarCancionesAlbum(id_album) {
     container.innerHTML = '<p style="text-align: center;">Cargando canciones...</p>'
 
     try {
+      // ✅ Enviar id_album en el BODY
       const resp = await fetch(`/api/albums/canciones`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id_album: id_album }),
+        body: JSON.stringify({ id_album: id_album }),  // ✅ ID en el body
       })
 
       if (!resp.ok) {
@@ -862,131 +919,512 @@ async function cargarCancionesAlbum(id_album) {
         return
       }
 
-      // ✅ CORRECCIÓN CLAVE: ¡Llamar a la función de renderizado!
-      renderizarCanciones(id_album, canciones) // <--- Esta línea faltaba
+      renderizarCanciones(id_album, canciones)
       
     } catch (error) {
       console.error("❌ Error al cargar canciones:", error)
       container.innerHTML =
-        `<p style="text-align: center; color: red;">Error al cargar canciones: ${error.message}. Verifica que el endpoint /api/albums/canciones exista en tu backend.</p>`
+        `<p style="text-align: center; color: red;">Error al cargar canciones: ${error.message}</p>`
     }
-}
-  function renderizarCanciones(id_album, canciones) {
-    const container = document.getElementById(`lista-canciones-${id_album}`)
-
-    if (!container) return
-
-    container.innerHTML = `
-      <table style="width: 100%; border-collapse: collapse;">
-        <thead>
-          <tr style="background: #e8e8e8;">
-            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">#</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Nombre</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Descripción</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Duración</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Reproducciones</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Enlace</th>
-            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${canciones
-            .map(
-              (cancion, index) => `
-            <tr id="cancion-row-${cancion.id_cancion}">
-              <td style="padding: 10px; border: 1px solid #ddd;">${index + 1}</td>
-              <td style="padding: 10px; border: 1px solid #ddd;">
-                <input type="text" id="nombre-${cancion.id_cancion}" value="${cancion.nombre}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
-              </td>
-              <td style="padding: 10px; border: 1px solid #ddd;">
-                <input type="text" id="descrip-${cancion.id_cancion}" value="${cancion.descrip || ""}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
-              </td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${cancion.duracion}</td>
-              <td style="padding: 10px; border: 1px solid #ddd;">${cancion.n_reproduccion || 0}</td>
-              <td style="padding: 10px; border: 1px solid #ddd;">
-                <input type="url" id="path-${cancion.id_cancion}" value="${cancion.cancion_path}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
-              </td>
-              <td style="padding: 10px; border: 1px solid #ddd;">
-                <button onclick="guardarCancion('${cancion.id_cancion}')" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">💾 Guardar</button>
-                <button onclick="toggleEstadoCancion('${cancion.id_cancion}', '${id_album}')" style="padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">🚫 Deshabilitar</button>
-              </td>
-            </tr>
-          `,
-            )
-            .join("")}
-        </tbody>
-      </table>
-    `
   }
 
-  window.guardarCancion = async (id_cancion) => {
-    const nombre = document.getElementById(`nombre-${id_cancion}`)?.value
-    const descrip = document.getElementById(`descrip-${id_cancion}`)?.value
-    const cancion_path = document.getElementById(`path-${id_cancion}`)?.value
+  // ===== RENDERIZAR CANCIONES =====
+function renderizarCanciones(id_album, canciones) {
+  const container = document.getElementById(`lista-canciones-${id_album}`)
+  if (!container) return
 
-    if (!nombre || !cancion_path) {
-      alert("❌ El nombre y el enlace son obligatorios")
+  const totalActivas = canciones.filter(c => c.estado === 'activo').length
+  const totalDeshabilitadas = canciones.filter(c => c.estado === 'deshabilitado').length
+  const totalReproducciones = canciones.reduce((sum, c) => sum + (c.n_reproduccion || 0), 0)
+
+  container.innerHTML = `
+    <div style="margin-bottom: 20px; padding: 15px; background: #ecf0f1; border-radius: 8px; display: flex; gap: 20px; justify-content: space-around;">
+      <div style="text-align: center;">
+        <div style="font-size: 24px; font-weight: bold; color: #2c3e50;">${canciones.length}</div>
+        <div style="font-size: 12px; color: #7f8c8d;">Total Canciones</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 24px; font-weight: bold; color: #27ae60;">${totalActivas}</div>
+        <div style="font-size: 12px; color: #7f8c8d;">Activas</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 24px; font-weight: bold; color: #e74c3c;">${totalDeshabilitadas}</div>
+        <div style="font-size: 12px; color: #7f8c8d;">Deshabilitadas</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 24px; font-weight: bold; color: #3498db;">${totalReproducciones}</div>
+        <div style="font-size: 12px; color: #7f8c8d;">Reproducciones</div>
+      </div>
+    </div>
+    
+    <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+      <input 
+        type="text" 
+        id="buscar-cancion-${id_album}" 
+        placeholder="🔍 Buscar canción por nombre..." 
+        style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"
+        onkeyup="filtrarCancionesAlbum('${id_album}')"
+      >
+      <select 
+        id="filtro-estado-cancion-${id_album}" 
+        style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;"
+        onchange="filtrarCancionesAlbum('${id_album}')"
+      >
+        <option value="">📊 Todos los estados</option>
+        <option value="activo">✅ Activos</option>
+        <option value="deshabilitado">🚫 Deshabilitados</option>
+      </select>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead>
+        <tr style="background: #e8e8e8;">
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">#</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Nombre</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Descripción</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Duración</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Reproducciones</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Estado</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Enlace</th>
+          <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-canciones-${id_album}">
+        ${canciones
+          .map((cancion, index) => {
+            const estadoActual = cancion.estado || 'activo'
+            const esActivo = estadoActual === 'activo'
+            
+            return `
+          <tr id="cancion-row-${cancion.id_cancion}" class="cancion-fila" data-nombre="${cancion.nombre.toLowerCase()}" data-estado="${estadoActual}">
+            <td style="padding: 10px; border: 1px solid #ddd;">${index + 1}</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">
+              <input type="text" id="nombre-${cancion.id_cancion}" value="${cancion.nombre}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd;">
+              <input type="text" id="descrip-${cancion.id_cancion}" value="${cancion.descrip || ""}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd;">
+              <input type="text" id="duracion-${cancion.id_cancion}" value="${cancion.duracion}" pattern="[0-5][0-9]:[0-5][0-9]" style="width: 80px; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${cancion.n_reproduccion || 0}</td>
+            <td style="padding: 10px; border: 1px solid #ddd;">
+              <span style="padding: 5px 10px; border-radius: 4px; font-weight: bold; ${esActivo ? 'background: #27ae60; color: white;' : 'background: #e74c3c; color: white;'}">
+                ${esActivo ? '✅ Activo' : '🚫 Deshabilitado'}
+              </span>
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd;">
+              <input type="url" id="path-${cancion.id_cancion}" value="${cancion.cancion_path}" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            </td>
+            <td style="padding: 10px; border: 1px solid #ddd;">
+              <button onclick="guardarCancion('${cancion.id_cancion}')" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">💾 Guardar</button>
+              <button onclick="toggleEstadoCancion('${cancion.id_cancion}', '${id_album}', '${estadoActual}')" style="padding: 5px 10px; background: ${esActivo ? '#e74c3c' : '#27ae60'}; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">
+                ${esActivo ? '🚫 Deshabilitar' : '✅ Activar'}
+              </button>
+            </td>
+          </tr>
+        `
+          })
+          .join("")}
+      </tbody>
+    </table>
+  `
+}
+// ===== FILTRAR CANCIONES DENTRO DE UN ÁLBUM =====
+window.filtrarCancionesAlbum = (id_album) => {
+  const busqueda = document.getElementById(`buscar-cancion-${id_album}`)?.value.toLowerCase().trim() || ""
+  const filtroEstado = document.getElementById(`filtro-estado-cancion-${id_album}`)?.value || ""
+  
+  const filas = document.querySelectorAll(`#tbody-canciones-${id_album} .cancion-fila`)
+  
+  let visibles = 0
+  
+  filas.forEach(fila => {
+    const nombre = fila.dataset.nombre
+    const estado = fila.dataset.estado
+    
+    let mostrar = true
+    
+    if (busqueda && !nombre.includes(busqueda)) {
+      mostrar = false
+    }
+    
+    if (filtroEstado && estado !== filtroEstado) {
+      mostrar = false
+    }
+    
+    fila.style.display = mostrar ? '' : 'none'
+    if (mostrar) visibles++
+  })
+  
+  console.log(`🔍 Mostrando ${visibles} de ${filas.length} canciones`)
+}
+  // ===== GUARDAR CANCIÓN =====
+ // ===== GUARDAR CANCIÓN (ID EN BODY) =====
+ window.guardarCancion = async (id_cancion) => {
+  console.log("💾 Guardando canción:", id_cancion)
+  
+  const nombre = document.getElementById(`nombre-${id_cancion}`)?.value.trim()
+  const descrip = document.getElementById(`descrip-${id_cancion}`)?.value.trim()
+  const duracion = document.getElementById(`duracion-${id_cancion}`)?.value.trim()
+  const cancion_path = document.getElementById(`path-${id_cancion}`)?.value.trim()
+
+  if (!nombre || !cancion_path || !duracion) {
+    alert("❌ El nombre, duración y el enlace son obligatorios")
+    return
+  }
+
+  const duracionRegex = /^[0-5][0-9]:[0-5][0-9]$/
+  if (!duracionRegex.test(duracion)) {
+    alert("❌ Duración inválida. Use formato mm:ss (ejemplo: 03:45)")
+    return
+  }
+
+  if (duracion === "00:00") {
+    alert("❌ La duración no puede ser 00:00")
+    return
+  }
+
+  if (!cancion_path.startsWith("http://") && !cancion_path.startsWith("https://")) {
+    alert("❌ La URL debe comenzar con http:// o https://")
+    return
+  }
+
+  try {
+    const resp = await fetch(`/api/canciones/actualizar`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id_cancion: id_cancion,
+        nombre,
+        descrip,
+        duracion,
+        cancion_path,
+      }),
+    })
+
+    const data = await resp.json()
+
+    if (resp.ok) {
+      alert("✅ Canción actualizada correctamente")
+      
+      for (let album_id in cancionesPorAlbum) {
+        const index = cancionesPorAlbum[album_id].findIndex(c => c.id_cancion === id_cancion)
+        if (index !== -1) {
+          cancionesPorAlbum[album_id][index].nombre = nombre
+          cancionesPorAlbum[album_id][index].descrip = descrip
+          cancionesPorAlbum[album_id][index].duracion = duracion
+          cancionesPorAlbum[album_id][index].cancion_path = cancion_path
+        }
+      }
+    } else {
+      alert("❌ Error: " + (data.error || "Error desconocido"))
+    }
+  } catch (error) {
+    console.error("❌ Error:", error)
+    alert("❌ Error de conexión")
+  }
+}
+
+  // ===== DESHABILITAR CANCIÓN =====
+ // ===== TOGGLE ESTADO CANCIÓN =====
+  window.toggleEstadoCancion = async (id_cancion, id_album, estadoActual) => {
+  console.log(`🔄 Toggle estado canción ${id_cancion} desde "${estadoActual}"`)
+  
+  const nuevoEstado = estadoActual === 'activo' ? 'deshabilitado' : 'activo'
+  const accion = nuevoEstado === 'activo' ? 'activar' : 'deshabilitar'
+  
+  const confirmar = confirm(`¿Deseas ${accion} esta canción?`)
+
+  if (!confirmar) return
+
+  try {
+    const resp = await fetch(`/api/canciones/estado`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        id_cancion: id_cancion,
+        estado: nuevoEstado
+      }),
+    })
+
+    const data = await resp.json()
+
+    if (resp.ok) {
+      alert(`✅ Canción ${nuevoEstado === 'activo' ? 'activada' : 'deshabilitada'}`)
+      
+      if (cancionesPorAlbum[id_album]) {
+        const index = cancionesPorAlbum[id_album].findIndex(c => c.id_cancion === id_cancion)
+        if (index !== -1) {
+          cancionesPorAlbum[id_album][index].estado = nuevoEstado
+        }
+      }
+      
+      delete cancionesPorAlbum[id_album]
+      await cargarCancionesAlbum(id_album)
+    } else {
+      alert("❌ Error: " + (data.error || "Error desconocido"))
+    }
+  } catch (error) {
+    console.error("❌ Error:", error)
+    alert("❌ Error de conexión")
+  }
+}
+
+ // ===== 🆕 EDITAR ÁLBUM (CORREGIDO) =====
+  window.editarAlbum = (id_album) => {
+    console.log("✏️ Editando álbum:", id_album)
+    
+    const album = todosLosAlbums.find((a) => a.id_album === id_album)
+
+    if (!album) {
+      alert("❌ Álbum no encontrado")
       return
     }
 
+    // Scroll al formulario
+    document.querySelector('.albums_gestion').scrollIntoView({ behavior: 'smooth' })
+
+    // ✅ DESTRUIR Select2 antes de modificar
+    if ($ && $.fn.select2 && $('#banda').hasClass('select2-hidden-accessible')) {
+      $('#banda').select2('destroy')
+    }
+
+    // Rellenar campos
+    document.getElementById('nombre-album').value = album.nombre_album
+    document.getElementById('direccion-caratula').value = album.caratula_dir
+    document.getElementById('descripcion-album').value = album.descrip || ''
+    document.getElementById('fecha-album').value = album.fecha_lanza
+    document.getElementById('banda').value = album.id_banda
+
+    // ✅ REINICIALIZAR Select2 DESPUÉS de setear el valor
+    if ($ && $.fn.select2) {
+      $('#banda').select2({
+        placeholder: 'Buscar Banda...',
+        allowClear: true,
+        width: '100%'
+      })
+      $('#banda').val(album.id_banda).trigger('change')
+    }
+
+    // ✅ CAMBIAR COMPORTAMIENTO DEL FORMULARIO
+    const form = document.querySelector('.albums_gestion')
+    const submitBtn = form.querySelector('button[type="submit"]')
+    
+    form.dataset.editandoId = id_album
+
+    submitBtn.textContent = '💾 Actualizar álbum'
+    submitBtn.style.background = 'linear-gradient(45deg, #f39c12, #e67e22)'
+
+    // ✅ AGREGAR NUEVO LISTENER sin clonar
+    const nuevoHandler = async (e) => {
+      e.preventDefault()
+      await actualizarAlbum(id_album)
+    }
+
+    // Remover listeners anteriores y agregar el nuevo
+    form.removeEventListener('submit', nuevoHandler)
+    form.addEventListener('submit', nuevoHandler)
+
+    // Agregar botón de cancelar
+    let cancelBtn = form.querySelector('.btn-cancelar-edicion')
+    if (!cancelBtn) {
+      cancelBtn = document.createElement('button')
+      cancelBtn.type = 'button'
+      cancelBtn.className = 'btn-cancelar-edicion'
+      cancelBtn.textContent = '❌ Cancelar edición'
+      cancelBtn.style.cssText = 'margin-left: 10px; padding: 12px 25px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer;'
+      submitBtn.parentNode.insertBefore(cancelBtn, submitBtn.nextSibling)
+
+      cancelBtn.addEventListener('click', () => {
+        location.reload()
+      })
+    }
+
+    // Cargar canciones del álbum para edición
+    cargarCancionesParaEdicion(id_album)
+  }
+
+  // ===== 🆕 ACTUALIZAR ÁLBUM (NUEVA FUNCIÓN) =====
+  async function actualizarAlbum(id_album) {
+    console.log("💾 Actualizando álbum:", id_album)
+
+    const nombre_album = document.getElementById('nombre-album')?.value?.trim() || ""
+    const caratula_dir = document.getElementById('direccion-caratula')?.value?.trim() || ""
+    const descrip = document.getElementById('descripcion-album')?.value?.trim() || ""
+    const fecha_lanza = document.getElementById('fecha-album')?.value || ""
+    const selectElement = document.getElementById('banda')
+    let id_banda_str = selectElement?.value || ""
+
+    // Validaciones
+    if (!nombre_album || !caratula_dir || !fecha_lanza || !id_banda_str) {
+      alert("❌ Todos los campos son obligatorios")
+      return
+    }
+
+    const id_banda = parseInt(id_banda_str, 10)
+    if (isNaN(id_banda) || id_banda <= 0) {
+      alert("❌ Selecciona una banda válida")
+      return
+    }
+
+    const album = {
+      id_album,  // ✅ Incluir el ID
+      nombre_album,
+      caratula_dir,
+      descrip,
+      fecha_lanza,
+      id_banda,
+    }
+
+    // ✅ Recolectar canciones (incluye las existentes con su ID)
+    const canciones = recolectar_canciones_con_id()
+
+    if (canciones === null) {
+      return
+    }
+
+    if (canciones.length === 0) {
+      alert("❌ Debes tener al menos una canción")
+      return
+    }
+
+    const payload = { album, canciones }
+
+    console.log("📤 Payload actualización:", JSON.stringify(payload, null, 2))
+
     try {
-      const resp = await fetch(`/api/canciones/${id_cancion}`, {
+      const resp = await fetch(`/api/actualizar_album_completo`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nombre,
-          descrip,
-          cancion_path,
-        }),
+        body: JSON.stringify(payload),
       })
 
       const data = await resp.json()
+      console.log("📥 Respuesta:", data)
 
       if (resp.ok) {
-        alert("✅ Canción actualizada correctamente")
+        alert(data.mensaje || "¡Álbum actualizado exitosamente!")
+        location.reload()  // Recargar para volver al estado normal
       } else {
-        alert(
-          "❌ Error: " +
-            (data.error || "Error desconocido. Verifica que el endpoint /api/canciones/:id exista en tu backend."),
-        )
+        alert("❌ Error: " + (data.error || "No se pudo actualizar"))
       }
     } catch (error) {
       console.error("❌ Error:", error)
-      alert("❌ Error de conexión. Verifica que el endpoint /api/canciones/:id exista en tu backend.")
+      alert("❌ Error de conexión con el servidor")
     }
   }
 
-  window.toggleEstadoCancion = async (id_cancion, id_album) => {
-    const confirmar = confirm("¿Deseas deshabilitar esta canción?")
+  // ===== 🆕 RECOLECTAR CANCIONES CON ID (para actualización) =====
+  function recolectar_canciones_con_id() {
+    const songBloques = document.querySelectorAll(".cancion-item")
+    const songs = []
+    const errores = []
 
-    if (!confirmar) return
+    songBloques.forEach((bloque, index) => {
+      const id = bloque.id.split("-")[1]
+      const id_cancion = bloque.dataset.idCancion || ""  // ✅ Obtener ID si existe
+      const nombre = document.getElementById(`nombre-cancion-${id}`)?.value?.trim() || ""
+      const descrip = document.getElementById(`descripcion-cancion-${id}`)?.value?.trim() || ""
+      const duracion = document.getElementById(`duracion-cancion-${id}`)?.value?.trim() || ""
+      const cancion_path = document.getElementById(`url-cancion-${id}`)?.value?.trim() || ""
 
+      if (!nombre || !duracion || !cancion_path) {
+        errores.push(`Canción ${index + 1}: Faltan campos obligatorios`)
+        return
+      }
+
+      const duracionRegex = /^[0-5][0-9]:[0-5][0-9]$/
+      if (!duracionRegex.test(duracion)) {
+        errores.push(`Canción ${index + 1} ("${nombre}"): Duración inválida`)
+        return
+      }
+
+      if (duracion === "00:00") {
+        errores.push(`Canción ${index + 1} ("${nombre}"): La duración no puede ser 00:00`)
+        return
+      }
+
+      if (!cancion_path.startsWith("http://") && !cancion_path.startsWith("https://")) {
+        errores.push(`Canción ${index + 1} ("${nombre}"): URL debe comenzar con http:// o https://`)
+        return
+      }
+
+      const cancion = {
+        nombre,
+        descrip,
+        duracion,
+        cancion_path,
+      }
+
+      // ✅ Si tiene ID, incluirlo (es una canción existente)
+      if (id_cancion) {
+        cancion.id_cancion = id_cancion
+      }
+
+      songs.push(cancion)
+    })
+
+    if (errores.length > 0) {
+      alert("❌ Errores en las canciones:\n\n" + errores.join("\n"))
+      return null
+    }
+
+    console.log(`📦 Canciones recolectadas para actualización: ${songs.length}`)
+    return songs
+  }
+  // ===== 🆕 CARGAR CANCIONES PARA EDICIÓN =====
+  async function cargarCancionesParaEdicion(id_album) {
     try {
-      const resp = await fetch(`/api/canciones/${id_cancion}/estado`, {
-        method: "PUT",
+      const resp = await fetch(`/api/albums/canciones`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ estado: "deshabilitado" }),
+        body: JSON.stringify({ id_album: id_album }),
       })
 
-      const data = await resp.json()
-
       if (resp.ok) {
-        alert("✅ Canción deshabilitada")
-        delete cancionesPorAlbum[id_album]
-        await cargarCancionesAlbum(id_album)
-      } else {
-        alert(
-          "❌ Error: " +
-            (data.error ||
-              "Error desconocido. Verifica que el endpoint /api/canciones/:id/estado exista en tu backend."),
-        )
+        const canciones = await resp.json()
+        
+        const cancionContainer = document.querySelector('.cancion-container')
+        if (cancionContainer && canciones.length > 0) {
+          cancionContainer.innerHTML = '<button type="button" class="btn-añadir-cancion btn-success">+ Agregar canción</button>'
+          añadirCanciones()
+
+          canciones.forEach(cancion => {
+            sonContador++
+            const htmlContent = `
+              <div class="form-grid cancion-item" id="cancion-${sonContador}" data-id-cancion="${cancion.id_cancion}">
+                <div class="form-group">
+                  <label>Nombre de la canción</label>
+                  <input type="text" id="nombre-cancion-${sonContador}" value="${cancion.nombre}" placeholder="Título de la canción" required>
+                </div>
+                <div class="form-group">
+                  <label>Descripción de la canción</label>
+                  <input type="text" id="descripcion-cancion-${sonContador}" value="${cancion.descrip || ''}" placeholder="Descripción">
+                </div>
+                <div class="form-group">
+                  <label>Duración (mm:ss)</label>
+                  <input type="text" id="duracion-cancion-${sonContador}" value="${cancion.duracion}" placeholder="03:45" pattern="[0-5][0-9]:[0-5][0-9]" required>
+                </div>
+                <div class="form-group">
+                  <label>URL de la canción</label>
+                  <input type="url" id="url-cancion-${sonContador}" value="${cancion.cancion_path}" placeholder="https://..." required>
+                </div>
+                <div class="form-group">
+                  <button type="button" class="btn-eliminar" onclick="eliminarCancion(${sonContador})">Eliminar canción</button>
+                </div>
+              </div>
+            `
+            cancionContainer.insertAdjacentHTML('beforeend', htmlContent)
+          })
+        }
       }
     } catch (error) {
-      console.error("❌ Error:", error)
-      alert("❌ Error de conexión. Verifica que el endpoint /api/canciones/:id/estado exista en tu backend.")
+      console.error("❌ Error al cargar canciones para edición:", error)
     }
   }
 
+  // ===== VER INFO DEL ÁLBUM =====
   window.verAlbum = async (id_album) => {
     const album = todosLosAlbums.find((a) => a.id_album === id_album)
 
@@ -1025,11 +1463,11 @@ async function cargarCancionesAlbum(id_album) {
           mensaje += `🎵 No hay canciones en este álbum`
         }
       } else {
-        mensaje += `⚠️ No se pudieron cargar las canciones.\nVerifica que el endpoint /api/albums/canciones exista en tu backend.`
+        mensaje += `⚠️ No se pudieron cargar las canciones`
       }
     } catch (error) {
       console.error("❌ Error:", error)
-      mensaje += `⚠️ Error al cargar canciones.\nVerifica que el endpoint /api/albums/canciones exista en tu backend.`
+      mensaje += `⚠️ Error al cargar canciones`
     }
 
     alert(mensaje)

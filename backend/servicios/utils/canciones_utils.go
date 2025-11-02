@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	models "proyecto-ptv-online/backend/servicios/models"
-	"unicode/utf8"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -30,7 +29,6 @@ func ObtenerCancionesPorAlbum(_db *gorm.DB, c *fiber.Ctx) error {
 
 	log.Printf("🔍 Buscando canciones para álbum: %s\n", body.IdAlbum)
 
-	// Verificar que el álbum existe
 	var album models.Albums
 	if err := _db.Where("id_album = ?", body.IdAlbum).First(&album).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -44,13 +42,18 @@ func ObtenerCancionesPorAlbum(_db *gorm.DB, c *fiber.Ctx) error {
 		})
 	}
 
-	// Obtener todas las canciones del álbum
+	// ✅ CRÍTICO: Seleccionar TODOS los campos incluyendo estado
 	var canciones []models.Cancion
-	if err := _db.Where("id_album = ?", body.IdAlbum).Find(&canciones).Error; err != nil {
+	if err := _db.Select("*").Where("id_album = ?", body.IdAlbum).Find(&canciones).Error; err != nil {
 		log.Println("❌ Error al consultar canciones:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al consultar las canciones",
 		})
+	}
+
+	// ✅ Log para debugging
+	for _, cancion := range canciones {
+		log.Printf("   📀 %s | Estado: '%s' | Reprod: %d\n", cancion.Nombre, cancion.Estado, cancion.N_reproduccion)
 	}
 
 	log.Printf("✅ Canciones encontradas para álbum %s: %d\n", body.IdAlbum, len(canciones))
@@ -58,21 +61,14 @@ func ObtenerCancionesPorAlbum(_db *gorm.DB, c *fiber.Ctx) error {
 }
 
 // ActualizarCancion actualiza los datos de una canción
+// ActualizarCancion actualiza una canción por su ID (recibido en el body)
 func ActualizarCancion(_db *gorm.DB, c *fiber.Ctx) error {
-	idCancion := c.Params("id")
-
-	if idCancion == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "El ID de la canción es requerido",
-		})
-	}
-
-	// Estructura para recibir los datos a actualizar
 	var body struct {
+		IdCancion   string `json:"id_cancion"`
 		Nombre      string `json:"nombre"`
 		Descrip     string `json:"descrip"`
-		CancionPath string `json:"cancion_path"`
 		Duracion    string `json:"duracion"`
+		CancionPath string `json:"cancion_path"`
 	}
 
 	if err := c.BodyParser(&body); err != nil {
@@ -81,93 +77,65 @@ func ActualizarCancion(_db *gorm.DB, c *fiber.Ctx) error {
 		})
 	}
 
-	// Verificar que la canción existe
+	if body.IdCancion == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "El ID de la canción es requerido",
+		})
+	}
+
 	var cancion models.Cancion
-	if err := _db.Where("id_cancion = ?", idCancion).First(&cancion).Error; err != nil {
+	if err := _db.Where("id_cancion = ?", body.IdCancion).First(&cancion).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Canción no encontrada",
 			})
 		}
-		log.Println("❌ Error al buscar canción:", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al buscar la canción",
 		})
 	}
 
-	// Validar los datos antes de actualizar
-	if body.Nombre != "" {
-		if utf8.RuneCountInString(body.Nombre) > 40 {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "El nombre de la canción no puede ser superior a 40 caracteres",
-			})
-		}
-		cancion.Nombre = body.Nombre
-	}
+	// ✅ Actualizar TODOS los campos (incluyendo duración)
+	result := _db.Model(&models.Cancion{}).
+		Where("id_cancion = ?", body.IdCancion).
+		Updates(map[string]interface{}{
+			"nombre":       body.Nombre,
+			"descrip":      body.Descrip,
+			"duracion":     body.Duracion,
+			"cancion_path": body.CancionPath,
+		})
 
-	if body.Descrip != "" {
-		if utf8.RuneCountInString(body.Descrip) > 300 {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "La descripción de la canción no puede ser superior a 300 caracteres",
-			})
-		}
-		cancion.Descrip = body.Descrip
-	}
-
-	if body.CancionPath != "" {
-		// Validar URL
-		if !existeElArchivo(body.CancionPath, "audio") {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "El enlace de la canción es inválido",
-			})
-		}
-		cancion.Cancion_path = body.CancionPath
-	}
-
-	if body.Duracion != "" {
-		if err := validarDuracionCancion(body.Duracion); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		}
-		cancion.Duracion = body.Duracion
-	}
-
-	// Actualizar la canción en la base de datos
-	if err := _db.Save(&cancion).Error; err != nil {
-		log.Println("❌ Error al actualizar canción:", err)
+	if result.Error != nil {
+		log.Println("❌ Error al actualizar canción:", result.Error)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al actualizar la canción",
 		})
 	}
 
-	log.Printf("✅ Canción actualizada: %s\n", idCancion)
+	log.Printf("✅ Canción actualizada: %s\n", body.IdCancion)
 	return c.JSON(fiber.Map{
 		"mensaje": "Canción actualizada correctamente",
-		"cancion": cancion,
 	})
 }
 
-// CambiarEstadoCancion cambia el estado de una canción (habilitada/deshabilitada)
-// Nota: Como el modelo Cancion no tiene un campo "estado" explícito,
-// usaremos una convención: si n_reproduccion es -1, está deshabilitada
-// O puedes agregar un campo "estado" al modelo si lo prefieres
 func CambiarEstadoCancion(_db *gorm.DB, c *fiber.Ctx) error {
-	idCancion := c.Params("id")
-
-	if idCancion == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "El ID de la canción es requerido",
-		})
-	}
-
 	var body struct {
-		Estado string `json:"estado"` // "activo" o "deshabilitado"
+		IdCancion string `json:"id_cancion"`
+		Estado    string `json:"estado"`
 	}
 
 	if err := c.BodyParser(&body); err != nil {
+		log.Println("❌ Error al parsear body:", err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Datos inválidos",
+		})
+	}
+
+	log.Printf("📥 Recibido: id_cancion='%s', estado='%s'\n", body.IdCancion, body.Estado)
+
+	if body.IdCancion == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "El ID de la canción es requerido",
 		})
 	}
 
@@ -177,9 +145,8 @@ func CambiarEstadoCancion(_db *gorm.DB, c *fiber.Ctx) error {
 		})
 	}
 
-	// Verificar que la canción existe
 	var cancion models.Cancion
-	if err := _db.Where("id_cancion = ?", idCancion).First(&cancion).Error; err != nil {
+	if err := _db.Where("id_cancion = ?", body.IdCancion).First(&cancion).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Canción no encontrada",
@@ -191,24 +158,12 @@ func CambiarEstadoCancion(_db *gorm.DB, c *fiber.Ctx) error {
 		})
 	}
 
-	// Actualizar el estado
-	// Como el modelo no tiene campo "estado", usamos n_reproduccion como indicador
-	// -1 = deshabilitado, >= 0 = activo
-	var nuevoValor int
-	if body.Estado == "deshabilitado" {
-		nuevoValor = -1
-	} else {
-		// Si estaba deshabilitado, lo ponemos en 0, si no, mantenemos el valor actual
-		if cancion.N_reproduccion == -1 {
-			nuevoValor = 0
-		} else {
-			nuevoValor = cancion.N_reproduccion
-		}
-	}
+	log.Printf("🔍 Canción encontrada: '%s' | Estado actual: '%s'\n", cancion.Nombre, cancion.Estado)
 
+	// ✅ Usar Update (singular) no Updates (plural)
 	result := _db.Model(&models.Cancion{}).
-		Where("id_cancion = ?", idCancion).
-		Update("n_reproduccion", nuevoValor)
+		Where("id_cancion = ?", body.IdCancion).
+		Update("estado", body.Estado)
 
 	if result.Error != nil {
 		log.Println("❌ Error al actualizar estado:", result.Error)
@@ -218,12 +173,14 @@ func CambiarEstadoCancion(_db *gorm.DB, c *fiber.Ctx) error {
 	}
 
 	if result.RowsAffected == 0 {
+		log.Println("⚠️ No se actualizó ninguna fila")
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"error": "Canción no encontrada",
+			"error": "No se pudo actualizar el estado",
 		})
 	}
 
-	log.Printf("✅ Estado de canción actualizado: %s -> %s\n", idCancion, body.Estado)
+	log.Printf("✅ Estado actualizado: '%s' -> '%s' (Filas: %d)\n", body.IdCancion, body.Estado, result.RowsAffected)
+
 	return c.JSON(fiber.Map{
 		"mensaje": "Estado actualizado correctamente",
 		"estado":  body.Estado,

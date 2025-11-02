@@ -15,30 +15,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const data = await respuesta.json();
         console.log('📥 Respuesta login:', data);
-
         if (respuesta.ok) {
-          // ✅ Login exitoso
+          // Guardar token
+          if (data.token) {
+            localStorage.setItem("token", data.token);
+          }
+
           mensaje.innerText = `Bienvenido ${data.usuario}`;
           mensaje.style.color = 'green';
 
           setTimeout(() => {
             window.location.href = data.direccion;
-          }, 1500);
-
-          LoginForm.reset();
-          
-        } else if (data.requiere_verificacion==true) {
-          // ✅ CASO ESPECIAL: Necesita verificar correo
+          }, 100);
+        } else if (data.requiere_verificacion == true) {
           mensaje.innerText = data.error;
           mensaje.style.color = 'orange';
           
-          // Mostrar formulario de verificación
           setTimeout(() => {
             mostrarFormularioVerificacion(data.correo);
           }, 500);
           
         } else {
-          // ❌ Error normal
           mensaje.innerText = data.error || 'Error al iniciar sesión';
           mensaje.style.color = 'red';
         }
@@ -51,71 +48,122 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // ✅ FUNCIÓN PARA MOSTRAR VERIFICACIÓN
   function mostrarFormularioVerificacion(correo) {
-    const contenedor = LoginForm;
+    const contenedor = document.querySelector('.login_apartado');
     
     if (!contenedor) {
-      console.error('❌ No se encontró el contenedor del formulario');
+      console.error('❌ No se encontró .login_apartado');
       return;
     }
 
     contenedor.innerHTML = `
-      <div style="text-align: center; padding: 20px;">
-        <h2 style="color: #2c3e50;">✉️ Verificación de correo</h2>
-        <p style="margin: 20px 0;">Se ha enviado un código a:</p>
-        <p style="font-weight: bold; color: #3498db; font-size: 18px;">${correo}</p>
+      <div class="cabecera_Login">
+        <h4>✉️ Verificación de correo</h4>
+        <p style="color: #7f8c8d; font-size: 14px; margin-top: 10px;">
+          Código enviado a: <strong style="color: #3498db;">${correo}</strong>
+        </p>
+      </div>
+
+      <form id="verificacionForm" style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="usuario_form">
+          <input type="text" name="Correo" value="${correo}" readonly style="background: #ecf0f1; cursor: not-allowed;" />
+        </div>
         
-        <form id="verificacionForm" style="margin-top: 30px;">
-          <input type="hidden" name="Correo" value="${correo}" />
-          
-          <div style="margin-bottom: 20px;">
-            <input 
-              type="text" 
-              name="Codigo" 
-              placeholder="Ingresa el código de 6 dígitos" 
-              required 
-              maxlength="6"
-              style="padding: 12px; font-size: 18px; text-align: center; letter-spacing: 5px; width: 250px; border: 2px solid #3498db; border-radius: 5px;"
-            />
-          </div>
-          
-          <button 
-            type="submit" 
-            style="background: #27ae60; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px;">
-            ✅ Verificar código
-          </button>
-          
-          <button 
-            type="button" 
-            id="reenviarCodigo"
-            style="background: #3498db; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px;">
-            🔄 Reenviar código
-          </button>
-          
-          <button 
-            type="button" 
-            id="volverLogin"
-            style="background: #95a5a6; color: white; padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 5px;">
-            ← Volver al login
-          </button>
-        </form>
+        <div class="password_form">
+          <input 
+            type="text" 
+            name="Codigo" 
+            placeholder="Código de 6 dígitos" 
+            required 
+            maxlength="6"
+            style="text-align: center; letter-spacing: 8px; font-size: 20px; font-weight: bold;"
+          />
+        </div>
         
-        <p id="mensajeVerificacion" style="margin-top: 20px; font-weight: bold;"></p>
+        <div class="sesion_foot">
+          <input type="submit" value="Verificar código" id="btnVerificar" />
+        </div>
+      </form>
+      
+      <div class="formulario_footer" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
+        <button type="button" id="reenviarCodigo" style="
+          width: 100%;
+          padding: 12px;
+          border: none;
+          border-radius: 8px;
+          background: linear-gradient(45deg, #f39c12, #e67e22);
+          color: white;
+          font-size: 14px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        ">
+          🔄 Reenviar código
+        </button>
+        
+        <button type="button" id="volverLogin" style="
+          width: 100%;
+          padding: 12px;
+          border: none;
+          border-radius: 8px;
+          background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+          color: white;
+          font-size: 14px;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        ">
+          ← Volver al login
+        </button>
       </div>
     `;
 
-    const mensajeVerif = document.getElementById('mensajeVerificacion');
+    // ✅ Aplicar efectos hover después de crear elementos
+    setTimeout(() => {
+      const btnReenviar = document.getElementById('reenviarCodigo');
+      const btnVolver = document.getElementById('volverLogin');
+
+      if (btnReenviar) {
+        btnReenviar.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-2px)';
+          this.style.boxShadow = '0 5px 15px rgba(243, 156, 18, 0.4)';
+        });
+        btnReenviar.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
+          this.style.boxShadow = 'none';
+        });
+      }
+
+      if (btnVolver) {
+        btnVolver.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-2px)';
+          this.style.boxShadow = '0 5px 15px rgba(149, 165, 166, 0.4)';
+        });
+        btnVolver.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0)';
+          this.style.boxShadow = 'none';
+        });
+      }
+    }, 50);
+
     const form = document.getElementById('verificacionForm');
-    
+    const btnReenviar = document.getElementById('reenviarCodigo');
+    const btnVolver = document.getElementById('volverLogin');
+
     // ✅ SUBMIT: Verificar código
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      const formData = new FormData(this);
+      const submitBtn = document.getElementById('btnVerificar');
+      const originalValue = submitBtn.value;
       
-      mensajeVerif.innerText = "Verificando...";
-      mensajeVerif.style.color = "blue";
-
+      submitBtn.disabled = true;
+      submitBtn.value = "Verificando...";
+      submitBtn.style.opacity = "0.6";
+      submitBtn.style.cursor = "not-allowed";
+      
+      const formData = new FormData(this);
+      console.log("Verificando:", formData.get("Correo"), formData.get("Codigo"));
+      
       try {
         const res = await fetch('/verificar_codigo', {
           method: 'POST',
@@ -125,30 +173,44 @@ document.addEventListener('DOMContentLoaded', function () {
         const data = await res.json();
         
         if (res.ok) {
-          mensajeVerif.innerText = data.message || "✅ Correo verificado correctamente";
-          mensajeVerif.style.color = 'green';
+          mensaje.innerText = data.message || "✅ Correo verificado correctamente";
+          mensaje.style.color = 'green';
+          
+          submitBtn.value = "✅ Verificado";
           
           setTimeout(() => {
-            window.location.href = data.direccion || '/';
+            window.location.href = data.direccion;
           }, 1500);
         } else {
-          mensajeVerif.innerText = data.error || "❌ Código inválido o expirado";
-          mensajeVerif.style.color = 'red';
+          mensaje.innerText = data.error || "❌ Código inválido o expirado";
+          mensaje.style.color = 'red';
+          
+          submitBtn.disabled = false;
+          submitBtn.value = originalValue;
+          submitBtn.style.opacity = "1";
+          submitBtn.style.cursor = "pointer";
         }
       } catch (error) {
         console.error('❌ Error:', error);
-        mensajeVerif.innerText = "❌ Error de red al verificar";
-        mensajeVerif.style.color = 'red';
+        mensaje.innerText = "❌ Error de red al verificar";
+        mensaje.style.color = 'red';
+        
+        submitBtn.disabled = false;
+        submitBtn.value = originalValue;
+        submitBtn.style.opacity = "1";
+        submitBtn.style.cursor = "pointer";
       }
     });
 
     // ✅ BOTÓN: Reenviar código
-    document.getElementById('reenviarCodigo').addEventListener('click', async function() {
+    btnReenviar.addEventListener('click', async function() {
+      const originalText = this.innerHTML;
       this.disabled = true;
-      this.innerText = "Enviando...";
+      this.innerHTML = "📧 Enviando...";
+      this.style.opacity = "0.6";
       
-      mensajeVerif.innerText = "Reenviando código...";
-      mensajeVerif.style.color = 'blue';
+      mensaje.innerText = "📧 Reenviando código...";
+      mensaje.style.color = 'blue';
       
       try {
         const formData = new FormData();
@@ -160,26 +222,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         
         const data = await res.json();
+        console.log('📥 Respuesta reenvío:', data);
         
         if (res.ok) {
-          mensajeVerif.innerText = "✅ " + data.message;
-          mensajeVerif.style.color = 'green';
+          mensaje.innerText = "✅ " + (data.message || "Código reenviado. Revisa tu correo.");
+          mensaje.style.color = 'green';
         } else {
-          mensajeVerif.innerText = "❌ " + data.error;
-          mensajeVerif.style.color = 'red';
+          mensaje.innerText = "❌ " + (data.error || "Error al reenviar código");
+          mensaje.style.color = 'red';
         }
       } catch (error) {
         console.error('❌ Error:', error);
-        mensajeVerif.innerText = "❌ Error al reenviar código";
-        mensajeVerif.style.color = 'red';
+        mensaje.innerText = "❌ Error de red al reenviar código";
+        mensaje.style.color = 'red';
       } finally {
         this.disabled = false;
-        this.innerText = "🔄 Reenviar código";
+        this.innerHTML = originalText;
+        this.style.opacity = "1";
       }
     });
     
     // ✅ BOTÓN: Volver al login
-    document.getElementById('volverLogin').addEventListener('click', function() {
+    btnVolver.addEventListener('click', function() {
       location.reload();
     });
   }

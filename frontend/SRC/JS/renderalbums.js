@@ -10,12 +10,14 @@ function renderAlbums() {
         <option value="borrador">Borrador</option>
         <option value="activo">Activo</option>
         <option value="deshabilitado">Deshabilitado</option>
+        
       </select>
       <button type="submit">Guardar</button>
     </form>
     <table>
       <thead>
         <tr><th>ID</th><th>Nombre</th><th>Estado</th><th>Fecha</th></tr>
+        
       </thead>
       <tbody id="tbody-albums"></tbody>
     </table>

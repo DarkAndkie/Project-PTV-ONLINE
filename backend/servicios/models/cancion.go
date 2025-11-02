@@ -10,6 +10,7 @@ type Cancion struct {
 	Cancion_path   string `gorm:"column:cancion_path" json:"cancion_path"`
 	Caratula_path  string `gorm:"column:caratula_path" json:"caratula_path"`             // ← Corregido: era gormn ahora es gorm                // ← Corregido: era gormn ahora es gorm
 	N_reproduccion int    `gorm:"column:n_reproduccion;default:0" json:"n_reproduccion"` // ← Cambié a int con default 0
+	Estado         string `gorm:"column:estado;default:'activo'" json:"estado"`
 }
 
 func (Cancion) TableName() string {

@@ -6,10 +6,45 @@
     <link rel="stylesheet" href="/SRC/CSS/home_admin.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <title>Administración</title>
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<!-- Desactiva el caché de navegador -->
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script>
+  // Bloquea acceso si no hay token
+  if (!localStorage.getItem("token")) {
+    window.location.replace("/");
+  }
+  // También detecta navegación hacia adelante/atrás
+  window.onpageshow = function(event) {
+    if (event.persisted || !localStorage.getItem("token")) {
+      window.location.replace("/");
+    }
+  };
+</script>
+
 </head>
 <body>
     <div class="principal">
         <header>
+            <button id="btnLogout" style="
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  padding: 10px 15px;
+  border: none;
+  background: linear-gradient(45deg, #e74c3c, #c0392b);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+">
+  🚪 Cerrar sesión
+</button>
+
             <h4>Panel de administración</h4>
         </header>
         

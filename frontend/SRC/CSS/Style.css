@@ -252,4 +252,42 @@
         width: 150px;
         height: 180px;
     }
+    /* Estilos para botones de verificación */
+#reenviarCodigo:hover,
+#volverLogin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+#reenviarCodigo:active,
+#volverLogin:active {
+    transform: translateY(0);
+}
+
+#reenviarCodigo:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Animación para el mensaje */
+.mensajeRegistro {
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: color 0.3s ease;
+}
+}
+#verificacionForm input[type="text"] {
+    font-family: 'Courier New', monospace;
+}
+
+#verificacionForm button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+#verificacionForm button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
