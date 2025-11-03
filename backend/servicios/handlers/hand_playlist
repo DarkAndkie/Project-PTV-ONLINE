@@ -1,0 +1,59 @@
+// backend/servicios/handlers/playlist_routes.go
+package handlers
+
+import (
+	"proyecto-ptv-online/backend/servicios/utils"
+
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
+)
+
+func SetupPlaylistRoutes(app *fiber.App, db *gorm.DB) {
+	playlistGroup := app.Group("/api/playlist")
+	playlistGroup.Use(utils.AutenticacionRequerida(""))
+
+	// Crear playlist
+	playlistGroup.Post("/crear", func(c *fiber.Ctx) error {
+		return utils.CrearPlaylist(db, c)
+	})
+
+	// Obtener playlists del usuario
+	playlistGroup.Get("/mis-playlists", func(c *fiber.Ctx) error {
+		return utils.ObtenerPlaylistsPorUsuario(db, c)
+	})
+
+	// Buscar canciones
+	playlistGroup.Post("/buscar-canciones", func(c *fiber.Ctx) error {
+		return utils.BuscarCanciones(db, c)
+	})
+
+	// Buscar álbumes
+	playlistGroup.Post("/buscar-albumes", func(c *fiber.Ctx) error {
+		return utils.BuscarAlbumes(db, c)
+	})
+
+	// Obtener canciones de un álbum
+	playlistGroup.Post("/canciones-album", func(c *fiber.Ctx) error {
+		return utils.ObtenerCancionesPorAlbumActivas(db, c)
+	})
+
+	// Agregar canción a playlist
+	playlistGroup.Post("/agregar-cancion", func(c *fiber.Ctx) error {
+		return utils.AgregarCancionAPlaylist(db, c)
+	})
+
+	// Eliminar canción de playlist
+	playlistGroup.Post("/eliminar-cancion", func(c *fiber.Ctx) error {
+		return utils.EliminarCancionDePlaylist(db, c)
+	})
+
+	// Obtener canciones de una playlist
+	playlistGroup.Post("/obtener-canciones", func(c *fiber.Ctx) error {
+		return utils.ObtenerCancionesDePLaylist(db, c)
+	})
+
+	// Incrementar reproducciones
+	playlistGroup.Post("/incrementar-reproducciones", func(c *fiber.Ctx) error {
+		return utils.IncrementarReproducciones(db, c)
+	})
+}

@@ -1,81 +1,209 @@
-<h2>Gestión de Álbums</h2>
-
-<form class="albums_gestion">
-    <div class="form-grid">
-        <div class="form-group">
-            <label for="nombre-album">Nombre del álbum</label>
-            <input type="text" id="nombre-album" placeholder="Nombre del álbum" required>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Álbumes</title>
+  <style>
+    .upload-zone {
+      border: 2px dashed #3498db;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .upload-zone:hover {
+      border-color: #2980b9;
+      background: #ecf0f1;
+    }
+    
+    .upload-zone.dragover {
+      border-color: #27ae60;
+      background: #d5f4e6;
+    }
+    
+    .upload-zone input[type="file"] {
+      display: none;
+    }
+    
+    .preview-container {
+      margin-top: 15px;
+      position: relative;
+    }
+    
+    .preview-image {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .remove-preview {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    .audio-preview {
+      margin-top: 10px;
+      padding: 10px;
+      background: white;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .upload-progress {
+      width: 100%;
+      height: 6px;
+      background: #ecf0f1;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    
+    .upload-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #3498db, #2ecc71);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .cancion-upload-zone {
+      border: 1px dashed #95a5a6;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 4px;
+      background: #fafafa;
+    }
+  </style>
+</head>
+<body>
+  <div style="padding: 20px;">
+    <h2>📀 Crear Nuevo Álbum</h2>
+    
+    <form class="albums_gestion" style="max-width: 900px;">
+      <div style="display: grid; gap: 20px;">
+        
+        <!-- Información básica -->
+        <div>
+          <label for="nombre-album" style="display: block; margin-bottom: 5px; font-weight: bold;">Nombre del álbum *</label>
+          <input type="text" id="nombre-album" placeholder="Ej: The Dark Side of the Moon" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
         </div>
         
-        <div class="form-group">
-            <label for="direccion-caratula"> carátula</label>
-            <input type="file" id="direccion-caratula">
+        <div>
+          <label for="banda" style="display: block; margin-bottom: 5px; font-weight: bold;">Banda *</label>
+          <select id="banda" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <option value="">Selecciona una banda</option>
+          </select>
         </div>
         
-        <div class="form-group">
-            <label for="descripcion-album">Descripción del álbum</label>
-            <input type="text" id="descripcion-album" placeholder="Descripción" required>
+        <div>
+          <label for="descripcion-album" style="display: block; margin-bottom: 5px; font-weight: bold;">Descripción</label>
+          <textarea id="descripcion-album" placeholder="Describe el álbum..." rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
         </div>
         
-        <div class="form-group">
-            <label for="fecha-album">Fecha de lanzamiento</label>
-            <input type="date" id="fecha-album" required>
+        <div>
+          <label for="fecha-album" style="display: block; margin-bottom: 5px; font-weight: bold;">Fecha de lanzamiento *</label>
+          <input type="date" id="fecha-album" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
         </div>
         
-        <div class="form-group">
-            <label for="banda">Seleccione la banda</label>
-            <select id="banda" class="select-banda" required>
-                <option value="">Cargando bandas...</option>
-            </select>
+        <!-- Subida de carátula -->
+        <div>
+          <label style="display: block; margin-bottom: 10px; font-weight: bold;">🖼️ Carátula del álbum *</label>
+          <div class="upload-zone" id="upload-caratula">
+            <input type="file" id="file-caratula" accept="image/*">
+            <div class="upload-prompt">
+              <p style="margin: 0; font-size: 18px;">📷 Haz clic o arrastra una imagen</p>
+              <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 14px;">PNG, JPG o WebP - Máx 10MB</p>
+            </div>
+            <div class="upload-progress" id="progress-caratula" style="display: none;">
+              <div class="upload-progress-bar" id="progress-bar-caratula"></div>
+            </div>
+            <div class="preview-container" id="preview-caratula" style="display: none;">
+              <img class="preview-image" id="preview-img-caratula">
+              <button type="button" class="remove-preview" onclick="removerCaratula()">✕</button>
+            </div>
+          </div>
+          <input type="hidden" id="direccion-caratula" required>
         </div>
+        
+        <!-- Canciones -->
+        <div>
+          <label style="display: block; margin-bottom: 10px; font-weight: bold;">🎵 Canciones del álbum</label>
+          <div class="cancion-container">
+            <button type="button" class="btn-añadir-cancion btn-success" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              + Agregar canción
+            </button>
+          </div>
+        </div>
+        
+        <!-- Botones de acción -->
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" style="flex: 1; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">
+            💾 Crear Álbum
+          </button>
+          <button type="button" onclick="location.reload()" style="padding: 15px 30px; background: #95a5a6; color: white; border: none; border-radius: 8px; cursor: pointer;">
+            🔄 Limpiar
+          </button>
+        </div>
+      </div>
+    </form>
+    
+    <hr style="margin: 40px 0; border: none; border-top: 2px solid #ecf0f1;">
+    
+    <!-- Lista de álbumes -->
+    <h2>📚 Álbumes Registrados</h2>
+    
+    <div style="margin-bottom: 20px; display: flex; gap: 15px;">
+      <input 
+        type="text" 
+        id="buscar-album" 
+        placeholder="🔍 Buscar por nombre o banda..." 
+        style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px;"
+      >
+      <select id="filtro-estado" style="padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+        <option value="">📊 Todos los estados</option>
+        <option value="borrador">📝 Borrador</option>
+        <option value="activo">✅ Activo</option>
+        <option value="deshabilitado">🚫 Deshabilitado</option>
+      </select>
     </div>
     
-    <button type="submit">Crear álbum</button>
-</form>
-
-<h2>Agregar canciones al álbum</h2>
-
-<div class="cancion-container">
-    <button type="button" class="btn-añadir-cancion btn-success">+ Agregar canción</button>
-</div>
-
-<hr style="margin: 40px 0; border: 1px solid #ddd;">
-
-<h2>Lista de álbumes</h2>
-
-<!-- Buscador de álbumes por nombre -->
-<div class="form-group" style="margin-bottom: 20px;">
-    <input type="text" id="buscar-album" placeholder="🔍 Buscar álbum por nombre..." style="width: 100%; max-width: 400px; padding: 8px;">
-</div>
-
-<!-- Filtro por estado con valores correctos del modelo Go -->
-<div class="form-group" style="margin-bottom: 20px;">
-    <label for="filtro-estado">Filtrar por estado:</label>
-    <select id="filtro-estado" style="width: 200px; padding: 8px;">
-        <option value="">Todos</option>
-        <option value="borrador">Borrador</option>
-        <option value="activo">Activo</option>
-        <option value="deshabilitado">Deshabilitado</option>
-    </select>
-</div>
-
-<table id="tabla-albums">
-    <thead>
-        <tr>
-            <th>Carátula</th>
-            <th>Álbum</th>
-            <th>Banda</th>
-            <th>Descripción</th>
-            <th>Fecha</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody id="lista-albums">
-        <tr>
-            <td colspan="7" style="text-align: center; color: #7f8c8d; padding: 30px;">
-                Cargando álbumes...
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <tr>
+            <th style="padding: 15px; text-align: left;">Carátula</th>
+            <th style="padding: 15px; text-align: left;">Álbum</th>
+            <th style="padding: 15px; text-align: left;">Banda</th>
+            <th style="padding: 15px; text-align: left;">Descripción</th>
+            <th style="padding: 15px; text-align: left;">Fecha</th>
+            <th style="padding: 15px; text-align: left;">Estado</th>
+            <th style="padding: 15px; text-align: left;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="lista-albums">
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px;">
+              Cargando álbumes...
             </td>
-        </tr>
-    </tbody>
-</table>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

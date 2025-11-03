@@ -39,6 +39,11 @@ func Parsear_ValidarAlbum(_db *gorm.DB, album models.Albums) error {
 		return errors.New("La URL de la carátula debe comenzar con http:// o https://")
 	}
 
+	if strings.Contains(album.Caratula_dir, "cloudinary.com") || strings.Contains(album.Caratula_dir, "res.cloudinary.com") {
+		log.Printf("✅ Cloudinary URL aceptada: %s", album.Caratula_dir)
+		return nil
+	}
+
 	if !existeElArchivo(album.Caratula_dir, "caratula") {
 		return errors.New("El enlace de la carátula no es existente, por favor ingrese un enlace válido y que pertenezca a una imagen")
 	}
@@ -55,14 +60,17 @@ func parsear_Validar_Cancion(_db *gorm.DB, cancion models.Cancion) error {
 		return errors.New("La descripción de la canción no puede ser superior a 300 caracteres")
 	}
 
-	// ✅ Validar duración con límites reales
 	if err := validarDuracionCancion(cancion.Duracion); err != nil {
 		return err
 	}
 
-	// ✅ Validar URL antes de verificar si existe
 	if !strings.HasPrefix(cancion.Cancion_path, "http://") && !strings.HasPrefix(cancion.Cancion_path, "https://") {
 		return errors.New("La URL de la canción debe comenzar con http:// o https://")
+	}
+
+	if strings.Contains(cancion.Cancion_path, "cloudinary.com") || strings.Contains(cancion.Cancion_path, "res.cloudinary.com") {
+		log.Printf("✅ Cloudinary URL aceptada: %s", cancion.Cancion_path)
+		return nil
 	}
 
 	if !existeElArchivo(cancion.Cancion_path, "audio") {

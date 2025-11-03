@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	config "proyecto-ptv-online/backend/servicios/config"
 	"proyecto-ptv-online/backend/servicios/handlers"
@@ -37,9 +38,29 @@ func main() {
 	// 🌐 Servir archivos estáticos
 	app.Static("/", "./frontend")
 
+	app.Use(func(c *fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
+		if authHeader != "" {
+			userID, userRole, err := utils.ExtraerInfoDelToken(authHeader)
+			if err == nil {
+				c.Locals("userID", userID)
+				c.Locals("userRole", userRole)
+			}
+		}
+		return c.Next()
+	})
+
 	// -------------------------------
 	// 🌍 Rutas HTML
 	// -------------------------------
+	app.Get("/api/cloudinary-config", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"cloudName":          os.Getenv("CLOUDINARY_CLOUD_NAME"),
+			"uploadPresetSongs":  os.Getenv("CLOUDINARY_UPLOAD_PRESET_SONGS"),
+			"uploadPresetCovers": os.Getenv("CLOUDINARY_UPLOAD_PRESET_COVERS"),
+		})
+	})
+
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendFile("./frontend/SRC/html_templates/index.html")
 	})
@@ -75,11 +96,11 @@ func main() {
 	// -------------------------------
 	// 🎵 ÁLBUMES (solo admin)
 	// -------------------------------
-	app.Post("/api/crear_album_completo", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Post("/api/crear_album_completo", func(c *fiber.Ctx) error {
 		return utils.CrearAlbumCompleto(_DB, c)
 	})
 
-	app.Put("/api/actualizar_album_completo", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Put("/api/actualizar_album_completo", func(c *fiber.Ctx) error {
 		return utils.ActualizarAlbumConCanciones(_DB, c)
 	})
 
@@ -87,26 +108,27 @@ func main() {
 		return utils.ListarAlbums(_DB, c)
 	})
 
-	app.Put("/api/actualizar_estado_album/", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Put("/api/actualizar_estado_album", func(c *fiber.Ctx) error {
 		return utils.ActualizarEstadoAlbum(_DB, c)
 	})
 
-	app.Get("/api/albums/:id/canciones", func(c *fiber.Ctx) error {
+	// ✅ CAMBIADO: De GET con param a POST con body
+	app.Post("/api/albums/canciones", func(c *fiber.Ctx) error {
 		return utils.ObtenerCancionesPorAlbum(_DB, c)
 	})
 
 	// -------------------------------
 	// 🎶 CANCIONES (solo admin)
 	// -------------------------------
-	app.Put("/api/canciones/actualizar", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Put("/api/canciones/actualizar", func(c *fiber.Ctx) error {
 		return utils.ActualizarCancion(_DB, c)
 	})
 
-	app.Put("/api/canciones/estado", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Put("/api/canciones/estado", func(c *fiber.Ctx) error {
 		return utils.CambiarEstadoCancion(_DB, c)
 	})
 
-	app.Delete("/api/canciones/:id", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Delete("/api/canciones/:id", func(c *fiber.Ctx) error {
 		return utils.EliminarCancion(_DB, c)
 	})
 
@@ -120,24 +142,73 @@ func main() {
 	// -------------------------------
 	// 👥 USUARIOS (solo admin)
 	// -------------------------------
-	app.Get("/api/usuarios", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Get("/api/usuarios", func(c *fiber.Ctx) error {
 		return utils.ListarUsuarios(_DB, c)
 	})
 
-	app.Get("/api/usuarios/buscar/:nombre", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Get("/api/usuarios/buscar/:nombre", func(c *fiber.Ctx) error {
 		return utils.BuscarUsuariosPorNombre(_DB, c)
 	})
 
-	app.Put("/api/usuarios/:id/tipo", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Put("/api/usuarios/:id/tipo", func(c *fiber.Ctx) error {
 		return utils.CambiarTipoUsuario(_DB, c)
 	})
 
-	app.Put("/api/usuarios/:id/estado", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Put("/api/usuarios/:id/estado", func(c *fiber.Ctx) error {
 		return utils.CambiarEstadoUsuario(_DB, c)
 	})
 
-	app.Delete("/api/usuarios/:id", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+	app.Delete("/api/usuarios/:id", func(c *fiber.Ctx) error {
 		return utils.EliminarUsuarioPorID(_DB, c)
+	})
+
+	// --------- DESHABILITAR/HABILITAR CANCIONES -----------
+	app.Put("/api/canciones/deshabilitar", utils.AutenticacionRequerida(""), func(c *fiber.Ctx) error {
+		return utils.DeshabilitarCancion(_DB, c)
+	})
+
+	app.Put("/api/canciones/habilitar", utils.AutenticacionRequerida("admin"), func(c *fiber.Ctx) error {
+		return utils.HabilitarCancion(_DB, c)
+	})
+
+	// Rutas de playlists (requieren autenticación)
+	playlistGroup := app.Group("/api")
+	playlistGroup.Use(utils.AutenticacionRequerida(""))
+
+	playlistGroup.Post("/crear_playlist", func(c *fiber.Ctx) error {
+		return utils.CrearPlaylist(_DB, c)
+	})
+	playlistGroup.Get("/obtener_playlists", func(c *fiber.Ctx) error {
+		return utils.ObtenerPlaylistsPorUsuario(_DB, c)
+	})
+	playlistGroup.Post("/agregar_cancion_playlist", func(c *fiber.Ctx) error {
+		return utils.AgregarCancionAPlaylist(_DB, c)
+	})
+	playlistGroup.Post("/eliminar_cancion_playlist", func(c *fiber.Ctx) error {
+		return utils.EliminarCancionDePlaylist(_DB, c)
+	})
+	playlistGroup.Post("/obtener_canciones_playlist", func(c *fiber.Ctx) error {
+		return utils.ObtenerCancionesDePLaylist(_DB, c)
+	})
+	playlistGroup.Post("/eliminar_playlist", func(c *fiber.Ctx) error {
+		return utils.EliminarPlaylist(_DB, c)
+	})
+	// Búsqueda (dentro de playlist group con autenticación)
+	playlistGroup.Post("/buscar/canciones", func(c *fiber.Ctx) error {
+		return utils.BuscarCanciones(_DB, c)
+	})
+
+	playlistGroup.Post("/buscar/albumes", func(c *fiber.Ctx) error {
+		return utils.BuscarAlbumes(_DB, c)
+	})
+
+	// Álbumes activos y reproducciones
+	playlistGroup.Post("/albums/canciones-activas", func(c *fiber.Ctx) error {
+		return utils.ObtenerCancionesPorAlbumActivas(_DB, c)
+	})
+
+	playlistGroup.Post("/incrementar_reproducciones", func(c *fiber.Ctx) error {
+		return utils.IncrementarReproducciones(_DB, c)
 	})
 
 	// -------------------------------

@@ -61,7 +61,7 @@ func LoginValidacion(_db *gorm.DB, c *fiber.Ctx) error {
 	fmt.Printf("✅ Usuario logueado: %s (%s)\n", validador_user.Nombre, validador_user.Tipo_user)
 
 	// Si es admin, redirige al home admin
-	if validador_user.Tipo_user == "admin" || validador_user.Tipo_user == "Admin" {
+	if validador_user.Tipo_user == "admin" {
 		return c.JSON(fiber.Map{
 			"direccion": "/SRC/html_templates/home_admin.html",
 			"mensaje":   "Login exitoso",

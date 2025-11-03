@@ -224,3 +224,106 @@ func EliminarCancion(_db *gorm.DB, c *fiber.Ctx) error {
 		"mensaje": "Canción eliminada correctamente",
 	})
 }
+
+// DeshabilitarCancion desabilita una canción (solo para banda/curador)
+func DeshabilitarCancion(_db *gorm.DB, c *fiber.Ctx) error {
+	usuarioTipo := c.Locals("usuario_tipo").(string)
+
+	if usuarioTipo != "banda" && usuarioTipo != "curador" && usuarioTipo != "admin" {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "No tienes permisos para deshabilitar canciones",
+		})
+	}
+
+	var body struct {
+		IdCancion string `json:"id_cancion"`
+	}
+
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Datos inválidos",
+		})
+	}
+
+	if body.IdCancion == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "El ID de la canción es requerido",
+		})
+	}
+
+	var cancion models.Cancion
+	if err := _db.Where("id_cancion = ?", body.IdCancion).First(&cancion).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Canción no encontrada",
+		})
+	}
+
+	// Actualizar estado a deshabilitado
+	result := _db.Model(&models.Cancion{}).
+		Where("id_cancion = ?", body.IdCancion).
+		Update("estado", "deshabilitado")
+
+	if result.Error != nil {
+		log.Println("❌ Error al deshabilitar canción:", result.Error)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error al deshabilitar la canción",
+		})
+	}
+
+	log.Printf("✅ Canción deshabilitada: %s\n", body.IdCancion)
+	return c.JSON(fiber.Map{
+		"mensaje": "Canción deshabilitada correctamente",
+	})
+}
+
+// HabilitarCancion habilita una canción (solo para admin o banda propietaria)
+func HabilitarCancion(_db *gorm.DB, c *fiber.Ctx) error {
+	usuarioTipo := c.Locals("usuario_tipo").(string)
+
+	if usuarioTipo != "admin" {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"error": "Solo administradores pueden habilitar canciones",
+		})
+	}
+
+	var body struct {
+		IdCancion string `json:"id_cancion"`
+	}
+
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Datos inválidos",
+		})
+	}
+
+	if body.IdCancion == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "El ID de la canción es requerido",
+		})
+	}
+
+	var cancion models.Cancion
+	if err := _db.Where("id_cancion = ?", body.IdCancion).First(&cancion).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Canción no encontrada",
+		})
+	}
+
+	// Actualizar estado a activo
+	result := _db.Model(&models.Cancion{}).
+		Where("id_cancion = ?", body.IdCancion).
+		Update("estado", "activo")
+
+	if result.Error != nil {
+		log.Println("❌ Error al habilitar canción:", result.Error)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error al habilitar la canción",
+		})
+	}
+
+	log.Printf("✅ Canción habilitada: %s\n", body.IdCancion)
+	return c.JSON(fiber.Map{
+		"mensaje": "Canción habilitada correctamente",
+	})
+
+}

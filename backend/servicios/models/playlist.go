@@ -1,13 +1,13 @@
 package models
 
 type Playlist struct {
-	id_adicion   int    `gorm:"colum:id_adicion;primaryKey" json:"id_adicion"`
-	n_canciones  int    `gorm:"colum:n_canciones" json:"n_canciones"`
-	id_album     string `gorm:"column:id_album" json:"id_album"`
-	id_banda     int    `gorm:"column:id_banda" json:"id_banda"`
-	id_historial int    `gorm:"colum:id_historial" json:"id_historial"`
+	Id_playlist   string `gorm:"colum:id_playlist;primaryKey;default:id_personalizado_playlist()" json:"id_playlist"`
+	Estado        string `gorm:"colum:string" json:"estado"`
+	Nombre        string `gorm:"column:nombre" json:"nombre"`
+	Fecha_cracion string `gorm:"column:fecha_creacion" json:"fecha_cracion"`
+	Id_user_final int    `gorm:"column:id_user_final" json:"id_user_final"`
 }
 
-func (Playlist) Tablename() string {
+func (Playlist) TableName() string {
 	return "playlist"
 }

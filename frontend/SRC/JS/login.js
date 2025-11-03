@@ -17,16 +17,21 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log('📥 Respuesta login:', data);
         if (respuesta.ok) {
           // Guardar token
-          if (data.token) {
-            localStorage.setItem("token", data.token);
-          }
+           if (data.token) {
+    localStorage.setItem('token', data.token);
+  }
+  if (data.role) {
+    localStorage.setItem('userRole', data.role);
+  }
 
-          mensaje.innerText = `Bienvenido ${data.usuario}`;
-          mensaje.style.color = 'green';
+  mensaje.innerText = `Bienvenido ${data.usuario}`;
+  mensaje.style.color = 'green';
 
-          setTimeout(() => {
-            window.location.href = data.direccion;
-          }, 100);
+  setTimeout(() => {
+    // REEMPLAZA el historial: no se puede volver con "adelante"
+    window.location.replace(data.direccion);
+  }, 600);
+  LoginForm.reset();
         } else if (data.requiere_verificacion == true) {
           mensaje.innerText = data.error;
           mensaje.style.color = 'orange';

@@ -1,102 +1,252 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Dashboard de Música</title>
+    <link rel="stylesheet" href="/SRC/CSS/main_dashboard.css">
+    <script>
+  if (!localStorage.getItem("token")) {
+    window.location.replace("/");
+  }
+  window.onpageshow = function(event) {
+    if (event.persisted || !localStorage.getItem("token")) {
+      window.location.replace("/");
+    }
+  };
+</script>
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../CSS/home.css" />
-    <title>Document</title>
-  </head>
-  <body>
-    <div class="fondo">
-      <div class="fondo_canciones">
-        <header class="header">
-          <div class="logo">
-            <img src="../assets/logo que diga Projec.png" alt="logo" />
-          </div>
-          <div class="busqueda">
-            <div class="barra">
-              <input type="text" placeholder="buscar" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- HEADER / NAVBAR -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">♪</div>
+                    <h1 class="logo-text">PTV Music</h1>
+                </div>
+                
+                <nav class="nav-menu">
+                    <button class="nav-btn active" data-section="discover">🎵 Descubrir</button>
+                    <button class="nav-btn" data-section="search">🔍 Buscar</button>
+                    <button class="nav-btn" data-section="playlists">📋 Mis Playlists</button>
+                    <button class="nav-btn" data-section="favorite">❤️ Favoritos</button>
+                </nav>
+
+                <div class="header-actions">
+                    <span id="userRole" class="user-role-badge"></span>
+                    <button id="btnLogout" class="btn-logout">🚪 Cerrar Sesión</button>
+                </div>
             </div>
-            <div class="inicio_sesion">
-              <button type="submit">Iniciar Sesión</button>
-            </div>
-          </div>
         </header>
-        <div class="recomendados_cont_1">
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
-            </div>
-          </div>
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
-            </div>
-          </div>
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
-            </div>
-          </div>
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
-            </div>
-          </div>
+
+        <div class="dashboard-content">
+            <!-- SIDEBAR IZQUIERDO - REPRODUCTOR -->
+            <aside class="sidebar-player">
+                <div class="now-playing-card">
+                    <div class="now-playing-image">
+                        <img id="playerCover" src="/placeholder.svg?height=200&width=200" alt="Cover">
+                    </div>
+                    <div class="now-playing-info">
+                        <p class="track-label">Ahora reproduciendo</p>
+                        <h3 id="playerTitle">Selecciona una canción</h3>
+                        <p id="playerArtist" class="player-artist">Artista</p>
+                    </div>
+                </div>
+
+                <!-- PLAYER CONTROLS -->
+                <div class="player-controls">
+                    <audio id="audioPlayer" style="display: none;"></audio>
+                    
+                    <div class="time-display">
+                        <span id="currentTime">00:00</span>
+                        <div class="progress-bar">
+                            <div id="progressFill" class="progress-fill"></div>
+                            <input type="range" id="progressSlider" min="0" max="100" value="0">
+                        </div>
+                        <span id="duration">00:00</span>
+                    </div>
+
+                    <div class="control-buttons">
+                        <button id="prevBtn" class="control-btn">⏮️</button>
+                        <button id="playBtn" class="control-btn play-btn">▶️</button>
+                        <button id="nextBtn" class="control-btn">⏭️</button>
+                    </div>
+
+                    <div class="volume-control">
+                        <span>🔊</span>
+                        <input type="range" id="volumeSlider" min="0" max="100" value="70">
+                        <span id="volumeValue">70%</span>
+                    </div>
+                </div>
+
+                <!-- QUEUE -->
+                <div class="queue-section">
+                    <h4>Cola de reproducción</h4>
+                    <div id="queueList" class="queue-list">
+                        <p style="text-align: center; color: var(--text-secondary);">Queue vacía</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- CONTENIDO PRINCIPAL -->
+            <main class="main-content">
+                <!-- SECTION: DISCOVER -->
+                <section id="section-discover" class="content-section active">
+                    <div class="section-header">
+                        <h2>🎸 Descubre Música</h2>
+                        <button id="refreshBtn" class="btn-refresh">🔄 Refrescar</button>
+                    </div>
+
+                    <!-- RANDOM SONGS GRID -->
+                    <div class="songs-grid" id="songsGrid">
+                        <div class="loading-spinner">Cargando canciones...</div>
+                    </div>
+                </section>
+
+                <!-- SECTION: SEARCH -->
+                <section id="section-search" class="content-section">
+                    <div class="section-header">
+                        <h2>🔍 Búsqueda Avanzada</h2>
+                    </div>
+
+                    <!-- SEARCH BAR -->
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Buscar canciones, álbumes..." class="search-input">
+                        <div class="search-filters">
+                            <button class="filter-btn active" data-filter="all">Todos</button>
+                            <button class="filter-btn" data-filter="songs">Canciones</button>
+                            <button class="filter-btn" data-filter="albums">Álbumes</button>
+                        </div>
+                    </div>
+
+                    <!-- SEARCH RESULTS -->
+                    <div id="searchResults" class="search-results">
+                        <p style="text-align: center; color: var(--text-secondary);">Empieza a buscar...</p>
+                    </div>
+                </section>
+
+                <!-- SECTION: PLAYLISTS -->
+                <section id="section-playlists" class="content-section">
+                    <div class="section-header">
+                        <h2>📋 Mis Playlists</h2>
+                        <button id="createPlaylistBtn" class="btn-primary">+ Nueva Playlist</button>
+                    </div>
+
+                    <!-- MODAL CREAR PLAYLIST -->
+                    <div id="createPlaylistModal" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>Nueva Playlist</h3>
+                                <button class="modal-close">&times;</button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="text" id="playlistName" placeholder="Nombre de la playlist" maxlength="50">
+                                <textarea id="playlistDescription" placeholder="Descripción (opcional)" maxlength="200" rows="3"></textarea>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="playlistPublic">
+                                    <span>Hacer pública</span>
+                                </label>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn-secondary modal-close">Cancelar</button>
+                                <button id="savePlaylistBtn" class="btn-primary">Crear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PLAYLISTS LIST -->
+                    <div id="playlistsList" class="playlists-grid">
+                        <div class="loading-spinner">Cargando playlists...</div>
+                    </div>
+                </section>
+
+                <!-- SECTION: FAVORITES -->
+                <section id="section-favorite" class="content-section">
+                    <div class="section-header">
+                        <h2>❤️ Mis Favoritos</h2>
+                        <span id="favCount" class="count-badge">0</span>
+                    </div>
+
+                    <div id="favoritesList" class="songs-grid">
+                        <p style="text-align: center; color: var(--text-secondary);">No tienes canciones favoritas aún</p>
+                    </div>
+                </section>
+            </main>
         </div>
-        <div class="recomendados_cont_2">
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
+
+        <!-- MODAL DETALLES DE CANCIÓN -->
+        <div id="songDetailModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Detalles de la canción</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="song-detail-info">
+                        <img id="modalCover" src="/placeholder.svg" alt="Cover">
+                        <div class="detail-text">
+                            <h4 id="modalTitle"></h4>
+                            <p id="modalArtist"></p>
+                            <p id="modalDuration"></p>
+                            <p id="modalAlbum"></p>
+                            <div id="modalDisableSection" class="modal-disable-section" style="display: none;">
+                                <p id="disableInfo" style="color: var(--primary); font-size: 0.85rem;"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="addToPlaylistBtn" class="btn-primary">Agregar a Playlist</button>
+                    <button id="toggleFavBtn" class="btn-secondary">Agregar a Favoritos</button>
+                    <button id="toggleDisableBtn" class="btn-secondary" style="display: none; background: #e74c3c; border-color: #e74c3c; color: white;"></button>
+                </div>
             </div>
-          </div>
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
-            </div>
-          </div>
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
-            </div>
-          </div>
-          <div class="canciones">
-            <div class="song_container">
-              <div class="song_img"></div>
-              <div class="contenido_song"></div>
-            </div>
-          </div>
         </div>
-      </div>
-      <aside class="fondo_menu">
-        <div class="nav_menu">
-          <section class="seccion_menu">
-           <button type="submit">Canción del día</button>
-           <button type="submit">Estadísticas</button>
-           <button type="submit">Generos</button>
-          </section>
+
+        <!-- MODAL AGREGAR A PLAYLIST -->
+        <div id="addToPlaylistModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Agregar a Playlist</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="playlistsForAdd" class="playlists-list-modal">
+                        <p style="text-align: center;">Cargando playlists...</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="reproduccion_menu">
-          <section class="seccion_reproduccion">
-            <div class="playlist playlist_1"></div>
-            <div class="playlist playlist_2"></div>
-            <div class="playlist playlist_3"></div>
-            <div class="playlist playlist_4"></div>
-          </section>
+
+        <!-- MODAL ÁLBUMES CON CANCIONES -->
+        <div id="albumDetailModal" class="modal" style="display: none;">
+            <div class="modal-content large-modal">
+                <div class="modal-header">
+                    <h3 id="albumModalTitle">Detalles del Álbum</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="album-detail-header">
+                        <img id="albumModalCover" src="/placeholder.svg" alt="Album Cover" class="album-detail-cover">
+                        <div class="album-detail-info">
+                            <h2 id="albumDetailName"></h2>
+                            <p id="albumDetailDescription"></p>
+                            <p id="albumDetailSongCount" style="color: var(--primary); margin-top: 1rem; font-weight: 600;"></p>
+                        </div>
+                    </div>
+                    <div class="album-songs-section">
+                        <h4 style="margin-bottom: 1rem;">Canciones del álbum</h4>
+                        <div id="albumSongsList" class="album-songs-list">
+                            <p style="text-align: center; color: var(--text-secondary);">Cargando canciones...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </aside>
-      <footer class="barra_reproduccion"></footer>
     </div>
-  </body>
+
+    <script src="/SRC/JS/main_dashboard.js"></script>
+</body>
 </html>
