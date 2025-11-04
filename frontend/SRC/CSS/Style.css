@@ -26,7 +26,7 @@
     height: 100%;
     
     /* FONDO: Gradiente que simula el estilo de la imagen */
-    background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 50%, #34495e 100%);
+    background: linear-gradient(135deg, #1a1a2e 0%, #042824 50%, #1a1a2e 100%);
     
     /* LAYOUT: CSS Grid para distribuir las tarjetas */
     display: grid;
@@ -43,28 +43,33 @@
 /* ===== TARJETA INDIVIDUAL ===== */
 /* Cada álbum es una tarjeta con imagen y texto */
 .tarjeta {
-    /* TAMAÑO: Dimensiones controladas */
-    width: 180px;
-    height: 220px;
-    
-    /* APARIENCIA: Estilo de tarjeta física */
-    background: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente */
-    border-radius: 8px; /* Esquinas redondeadas */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Sombra para dar profundidad */
-    
-    /* LAYOUT INTERNO: Flexbox para organizar contenido */
-    display: flex;
-    flex-direction: column; /* Imagen arriba, texto abajo */
-    
-    /* ESPACIADO: Padding interno */
-    padding: 15px;
-    
-    /* EFECTOS: Transiciones suaves */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    
-    /* POSICIONAMIENTO: Permite rotaciones aleatorias */
-    transform-origin: center;
+  width: 180px;
+  height: 220px;
+  color: #ffffff;
+  background: rgba(6, 14, 11, 0.95);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-origin: center;
+
+  /* Efecto base de borde neón (sutil) */
+  border: 2px solid transparent;
 }
+
+/* 💡 Hover con resplandor neón */
+.tarjeta:hover {
+  transform: scale(1.05); /* efecto de zoom suave */
+  box-shadow:
+    0 0 8px #10b981,
+    0 0 16px #10b981,
+    0 0 24px #10b981,
+    0 0 32px #10b981;
+  border-color: #10b981;
+}
+
 
 /* ===== ROTACIONES ALEATORIAS ===== */
 /* Cada tarjeta tiene una ligera rotación para parecer dispersa */
@@ -112,7 +117,7 @@
 .contenido {
     /* ESPACIADO: Margen superior */
     margin-top: 10px;
-    
+    color: #e0e0e0;
     /* LAYOUT: Flexbox para organizar texto */
     display: flex;
     flex-direction: column;
@@ -123,7 +128,7 @@
     /* TIPOGRAFÍA: Título del álbum */
     font-size: 14px;
     font-weight: 600;
-    color: #2c3e50; /* Color oscuro */
+    color: #dcdfe1; /* Color oscuro */
     
     /* COMPORTAMIENTO: Controla texto largo */
     overflow: hidden;
@@ -134,7 +139,7 @@
 .contenido p {
     /* TIPOGRAFÍA: Información secundaria */
     font-size: 12px;
-    color: #7f8c8d; /* Color gris */
+    color: #d1e2e3; /* Color gris */
     font-weight: 400;
 }
 
@@ -142,6 +147,7 @@
 /* ===== MODAL DE LOGIN ===== */
 /* El formulario que aparece centrado sobre las tarjetas */
 .login_apartado {
+    color: #d6dade;
     /* POSICIONAMIENTO: Centrado absoluto */
     position: absolute;
     top: 50%;
@@ -155,7 +161,7 @@
     width: 400px;
     
     /* APARIENCIA: Estilo de modal */
-    background: rgba(255, 255, 255, 0.95); /* Fondo blanco semi-transparente */
+    background: linear-gradient(135deg,#1d4071 0%,#4e2376 50%,#1d4071 100%);/* Fondo blanco semi-transparente */
     backdrop-filter: blur(10px); /* Efecto de desenfoque del fondo */
     border-radius: 12px; /* Esquinas muy redondeadas */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Sombra intensa */
@@ -180,13 +186,14 @@
     /* TIPOGRAFÍA: Título principal */
     font-size: 18px;
     font-weight: 600;
-    color: #2c3e50;
+    color: #d6dade;
     
     /* ESPACIADO: Altura de línea para mejor legibilidad */
     line-height: 1.4;
 }
 .sesion_foot{
     display: flex;
+    color: whitesmoke;
     align-items: center;
     justify-content: center;
 }
@@ -194,6 +201,7 @@
 /* ===== CAMPOS DEL FORMULARIO ===== */
 .usuario_form,
 .password_form {
+    justify-content: center;
     /* LAYOUT: Cada campo ocupa toda la fila */
     width: 100%;
 }
@@ -220,6 +228,28 @@
     
     /* COMPORTAMIENTO: Sin outline por defecto */
     outline: none;
+}
+.sesion_foot a{
+    color: #d1e2e3;
+}
+.password_form button {
+margin: 20px 0px 0 30px;
+  width: 250px;
+  height: 50px;
+  background: linear-gradient(135deg, #10b981, #2c3e50); /* degradado verde-oscuro */
+  color: #d1e2e3;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 0 10px #10b981, 0 0 20px #2c3e50;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.password_form button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px #10b981, 0 0 30px #2c3e50;
 }
 
 /* ESTADO FOCUS: Cuando el usuario hace clic en el campo */
@@ -290,4 +320,37 @@
 #verificacionForm button:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}/* Estilo para los campos de entrada */
+.usuario_form input,
+.password_form input {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: 2px solid #10b981;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 16px;
+  color: #2c3e50;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Efecto al hacer focus */
+.usuario_form input:focus,
+.password_form input:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* Botón dentro de password_form */
+
+
+/* Hover del botón */
+
+
+/* Mensaje de login */
+#mensaje_login {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #ff4f4f;
+  text-align: center;
 }

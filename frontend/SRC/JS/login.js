@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="cabecera_Login">
         <h4>✉️ Verificación de correo</h4>
         <p style="color: #7f8c8d; font-size: 14px; margin-top: 10px;">
-          Código enviado a: <strong style="color: #3498db;">${correo}</strong>
+          Código enviado a: <strong style="color: #16213e;">${correo}</strong>
         </p>
       </div>
 
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
           padding: 12px;
           border: none;
           border-radius: 8px;
-          background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+          background: linear-gradient(45deg, #10b981, #14b8a6);
           color: white;
           font-size: 14px;
           font-weight: bold;

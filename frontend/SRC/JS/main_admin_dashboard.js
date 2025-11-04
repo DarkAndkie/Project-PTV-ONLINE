@@ -56,6 +56,63 @@ document.addEventListener("DOMContentLoaded", () => {
     canciones: {}
   }
 
+  // 🔒 Variable para saber si estamos editando
+  let modoEdicion = false
+  let albumEditandoId = null
+
+  // 🧹 Limpiar archivos al salir sin guardar
+  window.addEventListener('beforeunload', async (e) => {
+    if (modoEdicion || Object.keys(uploadedFiles.canciones).length > 0 || uploadedFiles.caratula) {
+      // Intentar limpiar archivos
+      await limpiarArchivosTemporales()
+      
+      e.preventDefault()
+      e.returnValue = '¿Seguro que quieres salir? Los archivos subidos se eliminarán.'
+      return e.returnValue
+    }
+  })
+
+  async function limpiarArchivosTemporales() {
+    const urlsALimpiar = []
+    
+    if (uploadedFiles.caratula) {
+      urlsALimpiar.push({
+        url: uploadedFiles.caratula.url,
+        type: "image"
+      })
+    }
+    
+    Object.values(uploadedFiles.canciones).forEach(cancion => {
+      if (cancion && cancion.url && cancion.nuevo) {
+        urlsALimpiar.push({
+          url: cancion.url,
+          type: "video"
+        })
+      }
+    })
+    
+    if (urlsALimpiar.length > 0) {
+      console.log(`🧹 Limpiando ${urlsALimpiar.length} archivos temporales...`)
+      
+      try {
+        const resp = await fetch("/api/cloudinary/cleanup", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            urls: urlsALimpiar.map(f => f.url),
+            resource_types: urlsALimpiar.map(f => f.type)
+          })
+        })
+        
+        if (resp.ok) {
+          console.log("✅ Archivos temporales eliminados")
+        }
+      } catch (error) {
+        console.error("❌ Error al limpiar:", error)
+      }
+    }
+  }
+
   // Load Cloudinary config on page load
   async function cargarConfigCloudinary() {
     try {
@@ -144,11 +201,9 @@ document.addEventListener("DOMContentLoaded", () => {
       switch (nombreModulo) {
         case "albums":
           htmlContent = await fetch("html_admin_dinamic/gest_albums.html").then((res) => res.text())
-          // Reemplazar el botón "Limpiar" con la función correcta
           htmlContent = htmlContent.replace('onclick="location.reload()"', 'onclick="limpiarFormularioAlbum()"')
           divEspacio.innerHTML = `<div class="modulo">${htmlContent}</div>`
           
-          // ✅ ESPERAR a que el DOM se actualice
           await new Promise(resolve => setTimeout(resolve, 100))
           inicializarModuloAlbums()
           break
@@ -399,7 +454,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function inicializarModuloAlbums() {
     console.log("✅ Inicializando módulo de álbumes...")
 
-    // ✅ CARGAR CLOUDINARY PRIMERO
     if (!cloudinaryConfig) {
       console.log("⏳ Esperando configuración de Cloudinary...")
       setTimeout(() => inicializarModuloAlbums(), 500)
@@ -409,7 +463,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadArtistas()
     cargarAlbums()
     
-    // ✅ Esperar a que los elementos existan antes de configurar
     setTimeout(() => {
       setupUploadZones()
       añadirCanciones()
@@ -540,7 +593,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return
     }
 
-    // ✅ EVENTO CLICK
     uploadCaratula.addEventListener("click", (e) => {
       console.log("🖱️ Click en zona de subida")
       e.preventDefault()
@@ -548,7 +600,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fileInput.click()
     })
 
-    // ✅ EVENTO DRAGOVER
     uploadCaratula.addEventListener("dragover", (e) => {
       console.log("📂 Dragover detectado")
       e.preventDefault()
@@ -556,14 +607,12 @@ document.addEventListener("DOMContentLoaded", () => {
       uploadCaratula.classList.add("dragover")
     })
 
-    // ✅ EVENTO DRAGLEAVE
     uploadCaratula.addEventListener("dragleave", (e) => {
       e.preventDefault()
       e.stopPropagation()
       uploadCaratula.classList.remove("dragover")
     })
 
-    // ✅ EVENTO DROP
     uploadCaratula.addEventListener("drop", (e) => {
       console.log("📥 Drop detectado")
       e.preventDefault()
@@ -576,7 +625,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
 
-    // ✅ EVENTO CHANGE DEL INPUT
     fileInput.addEventListener("change", (e) => {
       console.log("📁 Archivo seleccionado via input")
       if (e.target.files.length > 0) {
@@ -596,6 +644,11 @@ document.addEventListener("DOMContentLoaded", () => {
       if (file.size > 10 * 1024 * 1024) {
         alert("❌ La imagen no puede superar 10MB")
         return
+      }
+
+      // 🗑️ Eliminar carátula anterior si existe
+      if (uploadedFiles.caratula && uploadedFiles.caratula.url !== direccionInput.value) {
+        await eliminarDeCloudinary(uploadedFiles.caratula.url, "image")
       }
 
       const cloudName = cloudinaryConfig.cloudName
@@ -654,7 +707,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             uploadedFiles.caratula = {
               url: cloudinaryUrl,
-              publicId: response.public_id
+              publicId: response.public_id,
+              nuevo: true
             }
 
             console.log("✅ Carátula subida:", cloudinaryUrl)
@@ -707,7 +761,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     console.log("✅ Botón añadir canción encontrado")
 
-    // ✅ REMOVER listeners anteriores para evitar duplicados
     const nuevoBoton = agregarCancion.cloneNode(true)
     agregarCancion.parentNode.replaceChild(nuevoBoton, agregarCancion)
 
@@ -766,7 +819,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       songContainer.insertAdjacentHTML("beforeend", htmlContent)
       
-      // ✅ CONFIGURAR UPLOAD INMEDIATAMENTE
       console.log(`🔧 Configurando upload para la canción ${sonContador} recién agregada`)
       setTimeout(() => {
         setupSongUpload(sonContador)
@@ -774,7 +826,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  function setupSongUpload(cancionId) {
+  function setupSongUpload(cancionId, urlExistente = null) {
     console.log(`🎵 Configurando upload para canción ${cancionId}`)
     
     if (!cloudinaryConfig) {
@@ -804,7 +856,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return
     }
 
-    // ✅ CLICK
+    // 🎵 Si hay URL existente, guardarla
+    if (urlExistente) {
+      uploadedFiles.canciones[cancionId] = {
+        url: urlExistente,
+        nuevo: false,
+        urlOriginal: urlExistente
+      }
+    }
+
     uploadZone.addEventListener("click", (e) => {
       console.log(`🖱️ Click en zona canción ${cancionId}`)
       e.preventDefault()
@@ -812,7 +872,6 @@ document.addEventListener("DOMContentLoaded", () => {
       fileInput.click()
     })
 
-    // ✅ DRAGOVER
     uploadZone.addEventListener("dragover", (e) => {
       e.preventDefault()
       e.stopPropagation()
@@ -820,7 +879,6 @@ document.addEventListener("DOMContentLoaded", () => {
       uploadZone.style.background = "#d5f4e6"
     })
 
-    // ✅ DRAGLEAVE
     uploadZone.addEventListener("dragleave", (e) => {
       e.preventDefault()
       e.stopPropagation()
@@ -828,7 +886,6 @@ document.addEventListener("DOMContentLoaded", () => {
       uploadZone.style.background = "#fafafa"
     })
 
-    // ✅ DROP
     uploadZone.addEventListener("drop", (e) => {
       console.log(`📥 Drop en canción ${cancionId}`)
       e.preventDefault()
@@ -842,7 +899,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
 
-    // ✅ CHANGE
     fileInput.addEventListener("change", (e) => {
       console.log(`📁 Archivo seleccionado para canción ${cancionId}`)
       if (e.target.files.length > 0) {
@@ -851,7 +907,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
 
-    function handleSongUpload(file) {
+    async function handleSongUpload(file) {
       console.log(`🚀 Subiendo canción ${cancionId}:`, file.name, `${(file.size / 1024 / 1024).toFixed(2)}MB`)
 
       if (!file.type.startsWith("audio/")) {
@@ -863,6 +919,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (file.size > 50 * 1024 * 1024) {
         alert("❌ El archivo no puede superar 50MB")
         return
+      }
+
+      // 🗑️ Eliminar archivo anterior de Cloudinary si existe y es diferente
+      const archivoAnterior = uploadedFiles.canciones[cancionId]
+      if (archivoAnterior && archivoAnterior.url && archivoAnterior.nuevo) {
+        console.log(`🗑️ Eliminando archivo anterior de canción ${cancionId}`)
+        await eliminarDeCloudinary(archivoAnterior.url, "video")
       }
 
       const cloudName = cloudinaryConfig.cloudName
@@ -913,11 +976,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             uploadedFiles.canciones[cancionId] = {
               url: cloudinaryUrl,
-              publicId: response.public_id
+              publicId: response.public_id,
+              nuevo: true,
+              urlOriginal: archivoAnterior?.urlOriginal || null
             }
 
             console.log(`✅ Canción ${cancionId} subida:`, cloudinaryUrl)
-            alert(`✅ Canción "${file.name}" subida correctamente`)
           } else {
             console.error(`❌ Error canción ${cancionId}:`, {
               status: xhr.status,
@@ -955,10 +1019,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  window.eliminarCancion = (id) => {
+  // 🗑️ Función auxiliar para eliminar archivos de Cloudinary
+  async function eliminarDeCloudinary(url, resourceType = "video") {
+    try {
+      console.log(`🗑️ Eliminando de Cloudinary: ${url}`)
+      
+      const resp = await fetch("/api/cloudinary/cleanup", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          urls: [url],
+          resource_types: [resourceType]
+        })
+      })
+      
+      if (resp.ok) {
+        console.log("✅ Archivo eliminado de Cloudinary")
+        return true
+      } else {
+        console.warn("⚠️ No se pudo eliminar el archivo")
+        return false
+      }
+    } catch (error) {
+      console.error("❌ Error al eliminar:", error)
+      return false
+    }
+  }
+
+  window.eliminarCancion = async (id) => {
     const cancion = document.getElementById(`cancion-${id}`)
     if (cancion) {
-      if (confirm("¿Eliminar esta canción?")) {
+      if (confirm("¿Eliminar esta canción? El archivo se eliminará de Cloudinary.")) {
+        // 🗑️ Eliminar archivo de Cloudinary si es nuevo
+        const archivoCancion = uploadedFiles.canciones[id]
+        if (archivoCancion && archivoCancion.url && archivoCancion.nuevo) {
+          await eliminarDeCloudinary(archivoCancion.url, "video")
+        }
+        
         cancion.remove()
         delete uploadedFiles.canciones[id]
         console.log(`🗑️ Canción ${id} eliminada del formulario`)
@@ -1054,7 +1151,17 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (resp.ok) {
         alert("✅ ¡Álbum creado exitosamente!")
-        uploadedFiles = { caratula: null, canciones: {} }
+        // ✅ Marcar archivos como guardados
+        uploadedFiles.canciones = Object.fromEntries(
+          Object.entries(uploadedFiles.canciones).map(([id, archivo]) => [
+            id,
+            { ...archivo, nuevo: false }
+          ])
+        )
+        if (uploadedFiles.caratula) {
+          uploadedFiles.caratula.nuevo = false
+        }
+        
         location.reload()
       } else {
         alert("❌ Error: " + (data.error || "Error desconocido"))
@@ -1471,7 +1578,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  window.editarAlbum = (id_album) => {
+  window.editarAlbum = async (id_album) => {
     console.log("✏️ Editando álbum:", id_album)
     
     const album = todosLosAlbums.find((a) => a.id_album === id_album)
@@ -1480,6 +1587,10 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("❌ Álbum no encontrado")
       return
     }
+
+    // 🔒 Activar modo edición
+    modoEdicion = true
+    albumEditandoId = id_album
 
     document.querySelector('.albums_gestion').scrollIntoView({ behavior: 'smooth' })
 
@@ -1534,12 +1645,15 @@ document.addEventListener("DOMContentLoaded", () => {
       cancelBtn.style.cssText = 'margin-left: 10px; padding: 12px 25px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer;'
       submitBtn.parentNode.insertBefore(cancelBtn, submitBtn.nextSibling)
 
-      cancelBtn.addEventListener('click', () => {
-        location.reload()
+      cancelBtn.addEventListener('click', async () => {
+        if (confirm('¿Cancelar edición? Se eliminarán los archivos subidos que no se hayan guardado.')) {
+          await limpiarArchivosTemporales()
+          location.reload()
+        }
       })
     }
 
-    cargarCancionesParaEdicion(id_album)
+    await cargarCancionesParaEdicion(id_album)
   }
 
   async function actualizarAlbum(id_album) {
@@ -1599,6 +1713,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (resp.ok) {
         alert(data.mensaje || "¡Álbum actualizado exitosamente!")
+        
+        // ✅ Marcar archivos como guardados
+        uploadedFiles.canciones = Object.fromEntries(
+          Object.entries(uploadedFiles.canciones).map(([id, archivo]) => [
+            id,
+            { ...archivo, nuevo: false }
+          ])
+        )
+        if (uploadedFiles.caratula) {
+          uploadedFiles.caratula.nuevo = false
+        }
+        
+        modoEdicion = false
+        albumEditandoId = null
+        
         location.reload()
       } else {
         alert("❌ Error: " + (data.error || "No se pudo actualizar"))
@@ -1699,15 +1828,31 @@ document.addEventListener("DOMContentLoaded", () => {
                   <input type="text" id="duracion-cancion-${sonContador}" value="${cancion.duracion}" placeholder="03:45" pattern="[0-5][0-9]:[0-5][0-9]" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
                 </div>
                 <div class="form-group">
-                  <label>URL de la canción</label>
-                  <input type="url" id="path-cancion-${sonContador}" value="${cancion.cancion_path}" placeholder="https://..." required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                  <label>🎵 Archivo de música</label>
+                  <div class="upload-zone-cancion" id="upload-cancion-${sonContador}" style="border: 2px dashed #95a5a6; padding: 20px; text-align: center; border-radius: 6px; background: #fafafa; cursor: pointer;">
+                    <input type="file" id="archivo-cancion-${sonContador}" accept="audio/*" style="display: none;">
+                    <p style="margin: 0; font-size: 14px;">📁 Haz clic o arrastra para cambiar el archivo</p>
+                    <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 12px;">MP3, WAV, FLAC - Máx 50MB</p>
+                    <div class="upload-progress-cancion" id="progress-cancion-${sonContador}" style="display: none; margin-top: 10px; width: 100%; height: 6px; background: #ecf0f1; border-radius: 3px;">
+                      <div class="upload-progress-bar-cancion" style="height: 100%; background: #3498db; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <div id="preview-cancion-${sonContador}" style="margin-top: 10px;">
+                      <p style="color: #3498db; font-size: 12px;">📎 Archivo actual cargado</p>
+                    </div>
+                  </div>
+                  <input type="hidden" id="path-cancion-${sonContador}" value="${cancion.cancion_path}" required>
                 </div>
                 <div class="form-group">
-                  <button type="button" class="btn-eliminar" onclick="eliminarCancion(${sonContador})" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Eliminar canción</button>
+                  <button type="button" class="btn-eliminar" onclick="eliminarCancion(${sonContador})" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">🗑️ Eliminar canción</button>
                 </div>
               </div>
             `
             cancionContainer.insertAdjacentHTML('beforeend', htmlContent)
+            
+            // ⚙️ Configurar upload con URL existente
+            setTimeout(() => {
+              setupSongUpload(sonContador, cancion.cancion_path)
+            }, 100)
           })
         }
       }
@@ -1769,48 +1914,12 @@ document.addEventListener("DOMContentLoaded", () => {
       return
     }
     
-    const urlsALimpiar = []
+    await limpiarArchivosTemporales()
     
-    if (uploadedFiles.caratula) {
-      urlsALimpiar.push({
-        url: uploadedFiles.caratula.url,
-        type: "image"
-      })
-    }
-    
-    Object.values(uploadedFiles.canciones).forEach(cancion => {
-      if (cancion && cancion.url) {
-        urlsALimpiar.push({
-          url: cancion.url,
-          type: "video"
-        })
-      }
-    })
-    
-    console.log(`🗑️ Limpiando ${urlsALimpiar.length} archivos...`)
-    
-    if (urlsALimpiar.length > 0) {
-      try {
-        const resp = await fetch("/api/cloudinary/cleanup", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            urls: urlsALimpiar.map(f => f.url),
-            resource_types: urlsALimpiar.map(f => f.type)
-          })
-        })
-        
-        if (resp.ok) {
-          console.log("✅ Archivos eliminados de Cloudinary")
-        } else {
-          console.warn("⚠️ Algunos archivos no se pudieron eliminar")
-        }
-      } catch (error) {
-        console.error("❌ Error al limpiar archivos:", error)
-      }
-    }
-    
+    modoEdicion = false
+    albumEditandoId = null
     uploadedFiles = { caratula: null, canciones: {} }
+    
     location.reload()
   }
 })
