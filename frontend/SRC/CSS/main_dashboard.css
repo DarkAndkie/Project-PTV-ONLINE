@@ -483,6 +483,75 @@ body {
 }
 
 /* SONGS GRID */
+/* Grid de álbumes de banda */
+#albumsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem 0;
+  overflow-y: auto;
+}
+
+/* Tarjeta de álbum de banda */
+.album-band-card {
+  background: rgba(26, 188, 156, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  height: 100%;
+}
+
+.album-band-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(26, 188, 156, 0.2);
+  border-color: var(--primary);
+}
+
+.album-band-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  transition: border-color 0.3s ease;
+}
+
+.album-band-card:hover img {
+  border-color: var(--primary);
+}
+
+.album-band-info {
+  padding: 5px 0;
+  flex: 1;
+}
+
+.album-band-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.album-band-info p {
+  margin: 0 0 8px 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.album-band-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.album-band-actions .btn-mini {
+  flex: 1;
+}
 .songs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -1304,5 +1373,594 @@ body {
 
   .btn-mini {
     width: 100%;
+  }
+  /* Álbumes de banda */
+.album-band-card {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.album-band-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.album-band-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.album-band-info h4 {
+  margin: 0 0 5px 0;
+  font-size: 1.1rem;
+}
+
+.album-band-info p {
+  margin: 0 0 8px 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.badge-estado {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge-estado.activo {
+  background: #27ae60;
+  color: white;
+}
+
+.badge-estado.borrador {
+  background: #f39c12;
+  color: white;
+}
+
+.badge-estado.deshabilitado {
+  background: #e74c3c;
+  color: white;
+}
+
+.album-band-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.cancion-form-item {
+  display: grid;
+  grid-template-columns: 1fr 100px 1fr auto auto;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.cancion-form-item input {
+  padding: 8px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-group input, 
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.large-modal .modal-content {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+/* FORMULARIO ÁLBUM BANDA */
+.large-modal {
+  max-width: 800px !important;
+  max-height: 90vh;
+}
+
+.large-modal .modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.cancion-form-item {
+  background: rgba(26, 188, 156, 0.05) !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
+  margin-bottom: 12px !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.upload-zone {
+  transition: all 0.3s ease;
+}
+
+.upload-zone:hover {
+  border-color: var(--primary) !important;
+  background: rgba(26, 188, 156, 0.1) !important;
+}
+
+.album-band-card {
+  background: rgba(26, 188, 156, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.album-band-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(26, 188, 156, 0.2);
+  border-color: var(--primary);
+}
+
+.album-band-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+}
+
+.album-band-info h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.album-band-info p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.badge-estado {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.badge-estado.activo {
+  background: #27ae60;
+  color: white;
+}
+
+.badge-estado.borrador {
+  background: #f39c12;
+  color: white;
+}
+
+.badge-estado.deshabilitado {
+  background: #e74c3c;
+  color: white;
+}
+
+.album-band-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.album-band-actions .btn-mini {
+  flex: 1;
+}
+
+}
+/* ========================================
+   ESTILOS ADICIONALES PARA GESTIÓN DE ÁLBUMES
+   ======================================== */
+
+/* MODAL GRANDE */
+.large-modal {
+  max-width: 800px !important;
+  max-height: 90vh;
+}
+
+.large-modal .modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* TARJETAS DE ÁLBUMES DE BANDA */
+.album-band-card {
+  background: rgba(26, 188, 156, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 15px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.album-band-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(26, 188, 156, 0.2);
+  border-color: var(--primary);
+}
+
+.album-band-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  transition: border-color 0.3s ease;
+}
+
+.album-band-card:hover img {
+  border-color: var(--primary);
+}
+
+.album-band-info {
+  padding: 5px 0;
+}
+
+.album-band-info h4 {
+  margin: 0 0 8px 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.album-band-info p {
+  margin: 0 0 8px 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* BADGES DE ESTADO */
+.badge-estado {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.badge-estado.activo {
+  background: #27ae60;
+  color: white;
+}
+
+.badge-estado.borrador {
+  background: #f39c12;
+  color: white;
+}
+
+.badge-estado.deshabilitado {
+  background: #e74c3c;
+  color: white;
+}
+
+/* ACCIONES DE ÁLBUM */
+.album-band-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.album-band-actions .btn-mini {
+  flex: 1;
+}
+
+/* FORMULARIO DE ÁLBUM */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(26, 188, 156, 0.05);
+  box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.2);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ZONAS DE UPLOAD */
+.upload-zone,
+.upload-zone-cancion {
+  border: 2px dashed var(--border-color);
+  padding: 20px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-zone:hover,
+.upload-zone-cancion:hover {
+  border-color: var(--primary);
+  background: rgba(26, 188, 156, 0.1);
+  transform: translateY(-2px);
+}
+
+.upload-zone.dragover,
+.upload-zone-cancion.dragover {
+  border-color: var(--primary);
+  background: rgba(26, 188, 156, 0.15);
+  border-style: solid;
+}
+
+.upload-zone p,
+.upload-zone-cancion p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.upload-zone img {
+  max-width: 200px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 2px solid var(--primary);
+}
+
+/* ITEMS DE CANCIÓN EN FORMULARIO */
+.cancion-form-item {
+  background: rgba(26, 188, 156, 0.05) !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
+  margin-bottom: 12px !important;
+  border: 1px solid var(--border-color) !important;
+  transition: all 0.3s ease;
+}
+
+.cancion-form-item:hover {
+  background: rgba(26, 188, 156, 0.08) !important;
+  box-shadow: 0 4px 12px rgba(26, 188, 156, 0.15);
+}
+
+.cancion-form-item label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.cancion-form-item input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.cancion-form-item input[type="text"]:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: rgba(26, 188, 156, 0.05);
+  box-shadow: 0 0 0 2px rgba(26, 188, 156, 0.2);
+}
+
+/* BOTONES MINI */
+.btn-mini {
+  padding: 8px 16px;
+  background: rgba(26, 188, 156, 0.1);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-mini:hover {
+  background: rgba(26, 188, 156, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(26, 188, 156, 0.3);
+}
+
+.btn-mini:active {
+  transform: translateY(0);
+}
+
+/* BARRAS DE PROGRESO */
+.upload-progress,
+.upload-progress-cancion {
+  margin-top: 10px;
+  width: 100%;
+  height: 6px;
+  background: var(--bg-darker);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.upload-progress-bar,
+.upload-progress-bar-cancion {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+/* GRID DE CANCIONES EN FORMULARIO */
+.cancion-form-item > div:first-child {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+/* SCROLLBAR PERSONALIZADO PARA MODAL */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: var(--bg-darker);
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-light);
+}
+
+/* ANIMACIONES */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cancion-form-item {
+  animation: fadeIn 0.3s ease;
+}
+
+/* ESTADOS DE LOADING */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.loading-spinner::after {
+  content: "";
+  width: 20px;
+  height: 20px;
+  margin-left: 10px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .large-modal {
+    max-width: 95%;
+    width: 95%;
+  }
+  
+  .album-band-actions {
+    flex-direction: column;
+  }
+  
+  .album-band-actions .btn-mini {
+    width: 100%;
+  }
+  
+  .cancion-form-item > div:first-child {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-footer button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .album-band-card {
+    padding: 12px;
+  }
+  
+  .album-band-info h4 {
+    font-size: 1rem;
+  }
+  
+  .btn-mini {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
+  
+  .form-group label {
+    font-size: 0.85rem;
   }
 }

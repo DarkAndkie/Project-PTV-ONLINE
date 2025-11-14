@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   const LoginForm = document.getElementById('formulario_login');
   const mensaje = document.getElementById('mensaje_login');
-
+ 
   if (LoginForm) {
     LoginForm.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -20,8 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
            if (data.token) {
     localStorage.setItem('token', data.token);
   }
-  if (data.role) {
-    localStorage.setItem('userRole', data.role);
+  if (data.tipo_user) {
+    localStorage.setItem('tipo_user', data.tipo_user);
+  }
+  if(data.id_user){
+    localStorage.setItem('id_user',data.id_user);
   }
 
   mensaje.innerText = `Bienvenido ${data.usuario}`;
@@ -52,7 +55,43 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+  async function traer_Caratulas(){
+    const res = await fetch("/api/Buscar_Albums_Aleatorios",{
+      method:'GET',
+    })
+    return await res.json();
+  }
+  async  function tarjetas_loader(){
+  const contenedor = document.querySelector(".fondo_cartas");
+  const template = document.getElementById("plantilla-tarjeta");
 
+  contenedor.innerHTML='';
+  const datos = await traer_Caratulas();
+  console.log("📦 Datos recibidos:", datos);
+  datos.forEach((album, index) => {
+    const clon=template.content.cloneNode(true);
+    //vmos a añadir las id de cada tarjeta
+    const tarjeta=clon.querySelector('.tarjeta');
+    tarjeta.classList.add((`tarjeta_${index+1}`))
+    clon.querySelector("img").src=album.caratula_dir;
+    clon.querySelector("img").alt="Caratula";
+    const contenido =clon.querySelector(".contenido");
+    const fecha_album = new Date(album.fecha_lanza);
+    const fecha_regionalizada = fecha_album.toLocaleDateString("es-CO",{
+      year:"numeric",
+      month:"long",
+      day:"numeric",
+    });
+    contenido.innerHTML=`
+    <h4>${album.nombre_album}</h4>
+    <p>${fecha_regionalizada}</p>
+
+    `
+    contenedor.appendChild(clon);
+  });
+  template.remove();
+ }
+ tarjetas_loader();
   function mostrarFormularioVerificacion(correo) {
     const contenedor = document.querySelector('.login_apartado');
     
@@ -252,4 +291,189 @@ document.addEventListener('DOMContentLoaded', function () {
       location.reload();
     });
   }
-});
+  // ========================================
+  // RECUPERACIÓN DE CONTRASEÑA
+  // ========================================
+  const recuperarLink = document.getElementById("recuperarPassword")
+  if (recuperarLink) {
+    recuperarLink.addEventListener("click", (e) => {
+      e.preventDefault()
+      mostrarFormularioRecuperacion()
+    })
+  }
+
+  function mostrarFormularioRecuperacion() {
+    const contenedor = document.querySelector('.login_apartado')
+    
+    if (!contenedor) {
+      console.error('❌ No se encontró .login_apartado')
+      return
+    }
+    
+    contenedor.innerHTML = `
+      <div class="cabecera_Login">
+        <h4>🔑 Recuperar Contraseña</h4>
+        <p style="color: #7f8c8d; font-size: 14px; margin-top: 10px;">
+          Ingresa tu correo para recibir un código de verificación
+        </p>
+      </div>
+
+      <form id="recuperarForm" style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="usuario_form">
+          <input type="email" name="Correo" placeholder="Tu correo registrado" required />
+        </div>
+        
+        <div class="sesion_foot">
+          <button type="submit" id="btnEnviarCodigo" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            Enviar código
+          </button>
+        </div>
+        
+        <div id="mensaje_recuperar" style="text-align: center; margin-top: 10px;"></div>
+      </form>
+      
+      <div class="formulario_footer" style="margin-top: 15px; text-align: center;">
+        <button type="button" id="volverLogin" style="background: none; border: none; color: #3498db; cursor: pointer; text-decoration: underline; font-size: 14px;">
+          ← Volver al login
+        </button>
+      </div>
+    `
+    
+    const form = document.getElementById("recuperarForm")
+    const mensajeDiv = document.getElementById("mensaje_recuperar")
+    
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault()
+      const email = e.target.Correo.value.trim()
+      const btnEnviar = document.getElementById("btnEnviarCodigo")
+      
+      if (!email) {
+        mensajeDiv.innerHTML = '<p style="color: #e74c3c;">❌ Ingresa un correo</p>'
+        return
+      }
+      
+      btnEnviar.disabled = true
+      btnEnviar.textContent = "Enviando..."
+      mensajeDiv.innerHTML = '<p style="color: #3498db;">📧 Enviando código...</p>'
+      
+      try {
+        const resp = await fetch('/api/recuperar-password/enviar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ correo: email })
+        })
+        
+        const data = await resp.json()
+        
+        if (resp.ok) {
+          mensajeDiv.innerHTML = '<p style="color: #27ae60;">✅ ' + data.message + '</p>'
+          setTimeout(() => {
+            mostrarFormularioCambioPassword(email)
+          }, 1500)
+        } else {
+          mensajeDiv.innerHTML = '<p style="color: #e74c3c;">❌ ' + (data.error || 'Error al enviar código') + '</p>'
+          btnEnviar.disabled = false
+          btnEnviar.textContent = "Enviar código"
+        }
+      } catch (error) {
+        console.error('❌ Error:', error)
+        mensajeDiv.innerHTML = '<p style="color: #e74c3c;">❌ Error de conexión</p>'
+        btnEnviar.disabled = false
+        btnEnviar.textContent = "Enviar código"
+      }
+    })
+    
+    document.getElementById("volverLogin").addEventListener("click", () => {
+      location.reload()
+    })
+  }
+
+  function mostrarFormularioCambioPassword(email) {
+    const contenedor = document.querySelector('.login_apartado')
+    
+    contenedor.innerHTML = `
+      <div class="cabecera_Login">
+        <h4>🔐 Nueva Contraseña</h4>
+        <p style="color: #7f8c8d; font-size: 14px; margin-top: 10px;">
+          Código enviado a: <strong>${email}</strong>
+        </p>
+      </div>
+
+      <form id="cambioPasswordForm" style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="usuario_form">
+          <input type="text" name="Codigo" placeholder="Código de 6 dígitos" required maxlength="6" style="text-align: center; letter-spacing: 5px; font-size: 18px; font-weight: bold;" />
+        </div>
+        
+        <div class="password_form">
+          <input type="password" name="NuevaPassword" placeholder="Nueva contraseña" required />
+          <small style="color: #7f8c8d; font-size: 12px; display: block; margin-top: 5px;">
+            Mínimo 8 caracteres, incluye letras, números y símbolos
+          </small>
+        </div>
+        
+        <div class="sesion_foot">
+          <button type="submit" id="btnCambiar" style="width: 100%; padding: 12px; background: linear-gradient(45deg, #27ae60, #2ecc71); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+            Cambiar contraseña
+          </button>
+        </div>
+        
+        <div id="mensaje_cambio" style="text-align: center; margin-top: 10px;"></div>
+      </form>
+      
+      <button type="button" id="volverLogin" style="margin-top: 10px; background: none; border: none; color: #3498db; cursor: pointer; text-decoration: underline; font-size: 14px;">
+        ← Volver al login
+      </button>
+    `
+    
+    const form = document.getElementById("cambioPasswordForm")
+    const mensajeDiv = document.getElementById("mensaje_cambio")
+    
+    form.addEventListener("submit", async (e) => {
+  e.preventDefault()
+  const btnCambiar = document.getElementById("btnCambiar")
+  
+  const formData = new FormData()
+  formData.append('Correo', email)
+  formData.append('Codigo', e.target.Codigo.value.trim())
+  formData.append('NuevaPassword', e.target.NuevaPassword.value)
+  
+  btnCambiar.disabled = true
+  btnCambiar.textContent = "Cambiando..."
+  mensajeDiv.innerHTML = '<p style="color: #3498db;">🔄 Actualizando contraseña...</p>'
+  
+  try {
+    const resp = await fetch('/api/recuperar-password/cambiar', {
+      method: 'POST',
+      body: formData
+    })
+    
+    const data = await resp.json()
+    
+    if (resp.ok) {
+      mensajeDiv.innerHTML = '<p style="color: #27ae60;">✅ ' + data.message + '</p>'
+      
+      // ✅ LIMPIAR TOKEN VIEJO
+      localStorage.removeItem('token')
+      localStorage.removeItem('tipo_user')
+      localStorage.removeItem('id_user')
+      
+      setTimeout(() => {
+        location.reload() // Vuelve al login
+      }, 500)
+    } else {
+      mensajeDiv.innerHTML = '<p style="color: #e74c3c;">❌ ' + (data.error || 'Error al cambiar contraseña') + '</p>'
+      btnCambiar.disabled = false
+      btnCambiar.textContent = "Cambiar contraseña"
+    }
+  } catch (error) {
+    console.error('❌ Error:', error)
+    mensajeDiv.innerHTML = '<p style="color: #e74c3c;">❌ Error de conexión</p>'
+    btnCambiar.disabled = false
+    btnCambiar.textContent = "Cambiar contraseña"
+  }
+})
+    
+    document.getElementById("volverLogin").addEventListener("click", () => location.reload())
+  }
+
+}); 

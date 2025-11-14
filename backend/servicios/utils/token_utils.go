@@ -50,17 +50,13 @@ func VerificarToken(tokenString string) (*TokenClaims, error) {
 	}
 	return nil, errors.New("token inválido")
 }
-
-// Middleware para Fiber que exige token y (opcional) tipo
-// Uso: app.Post("/ruta", utils.AutenticacionRequerida("admin"), handler)
-
-func AutenticacionRequerida(tipoRequerido string) fiber.Handler {
+func AutenticacionRequerida(tipoRequerido []string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 		if authHeader == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Token requerido"})
 		}
-		// espera "Bearer <token>"
+
 		var tokenStr string
 		const bearerPrefix = "Bearer "
 		if len(authHeader) > len(bearerPrefix) && authHeader[:len(bearerPrefix)] == bearerPrefix {
@@ -74,9 +70,19 @@ func AutenticacionRequerida(tipoRequerido string) fiber.Handler {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Token inválido o expirado"})
 		}
 
-		// Si se requiere rol específico
-		if tipoRequerido != "" && claims.Tipo_user != tipoRequerido {
-			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"error": "Acceso denegado - rol requerido: " + tipoRequerido})
+		// Validar rol
+		permitido := false
+		for _, rol := range tipoRequerido {
+			if claims.Tipo_user == rol {
+				permitido = true
+				break
+			}
+		}
+
+		if !permitido {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"error": "Acceso denegado - rol requerido",
+			}) // 👈 AGREGADO return
 		}
 
 		// Guardar info útil en Locals
@@ -87,3 +93,6 @@ func AutenticacionRequerida(tipoRequerido string) fiber.Handler {
 		return c.Next()
 	}
 }
+
+// Middleware para Fiber que exige token y (opcional) tipo
+// Uso: app.Post("/ruta", utils.AutenticacionRequerida("admin"), handler)

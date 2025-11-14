@@ -31,7 +31,7 @@
                     <button class="nav-btn active" data-section="discover">🎵 Descubrir</button>
                     <button class="nav-btn" data-section="search">🔍 Buscar</button>
                     <button class="nav-btn" data-section="playlists">📋 Mis Playlists</button>
-                    <button class="nav-btn" data-section="favorite">❤️ Favoritos</button>
+                    <button class="nav-btn" data-section="admin-cuenta">Administración</button>
                 </nav>
 
                 <div class="header-actions">
@@ -69,9 +69,9 @@
                     </div>
 
                     <div class="control-buttons">
-                        <button id="prevBtn" class="control-btn">⏮️</button>
-                        <button id="playBtn" class="control-btn play-btn">▶️</button>
-                        <button id="nextBtn" class="control-btn">⏭️</button>
+                        <button id="prevBtn" class="control-btn">⏮</button>
+                        <button id="playBtn" class="control-btn play-btn">▶</button>
+                        <button id="nextBtn" class="control-btn">⏭</button>
                     </div>
 
                     <div class="volume-control">
@@ -161,7 +161,59 @@
                         <div class="loading-spinner">Cargando playlists...</div>
                     </div>
                 </section>
+<section id="section-admin-cuenta" class="content-section">
+    <div class="section-header">
+        <h2>⚙️ Administración</h2>
+        <button id="btnCreateAlbum" class="btn-primary">+ Crear Álbum</button>
+    </div>
 
+    <!-- Contenido para BANDAS -->
+    <div id="banda-content">
+        <h3>Mis Álbumes</h3>
+        <div id="albumsGrid" class="songs-grid">
+            <div class="loading-spinner">Cargando álbumes...</div>
+        </div>
+    </div>
+
+    <!-- Contenido para OTROS ROLES -->
+    <div id="other-content" style="display: block;">
+        <p style="text-align: center; color: var(--text-secondary); padding: 40px;">
+           <div style="max-width: 600px; margin: 0 auto; padding: 30px; background: rgba(26, 188, 156, 0.05); border-radius: 12px; border: 1px solid var(--border-color);">
+      <h2 style="margin-bottom: 30px; color: var(--primary);">⚙️ Mi Cuenta</h2>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600;">Nombre</label>
+        <input type="text" id="user-nombre" value="" style="width: 100%; padding: 12px; background: var(--bg-darker); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary);">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600;">Apellido</label>
+        <input type="text" id="user-apellido" value="" style="width: 100%; padding: 12px; background: var(--bg-darker); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary);">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600;">Correo</label>
+        <input type="email" id="user-email" value="" style="width: 100%; padding: 12px; background: var(--bg-darker); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary);">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600;">Teléfono</label>
+        <input type="tel" id="user-tel" value="" style="width: 100%; padding: 12px; background: var(--bg-darker); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary);">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 30px;">
+        <label style="display: block; margin-bottom: 8px; color: var(--text-secondary); font-weight: 600;">Nueva Contraseña (opcional)</label>
+        <input type="password" id="user-password" placeholder="Dejar vacío para no cambiar" style="width: 100%; padding: 12px; background: var(--bg-darker); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary);">
+        <small style="color: var(--text-secondary); font-size: 12px; display: block; margin-top: 5px;">Mínimo 8 caracteres, incluye letras, números y símbolos</small>
+      </div>
+      
+      <button onclick="guardarDatosPersonales()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+        Guardar Cambios
+      </button>
+    </div>
+        </p>
+    </div>
+</section>
                 <!-- SECTION: FAVORITES -->
                 <section id="section-favorite" class="content-section">
                     <div class="section-header">

@@ -19,25 +19,34 @@ func LoginValidacion(_db *gorm.DB, c *fiber.Ctx) error {
 
 	// Parsear body
 	if err := c.BodyParser(&user); err != nil {
-		return c.Status(400).SendString("Error en el parseo del body " + err.Error())
+
+		// ✅ POR ESTA:
+		return c.Status(400).JSON(fiber.Map{"error": "Error en el parseo del body: " + err.Error()})
 	}
 
 	// Buscar usuario por correo
 	if err1 := _db.Where("correo = ?", user.Correo).First(&validador_user).Error; err1 != nil {
-		return c.Status(400).SendString("El usuario no existe o el correo es incorrecto " + err1.Error())
+
+		// ✅ POR ESTA:
+		return c.Status(400).JSON(fiber.Map{"error": "Usuario no encontrado o correo incorrecto"})
 	}
 
 	// Comparar contraseñas
 	if err := bcrypt.CompareHashAndPassword([]byte(validador_user.Password), []byte(user.Password)); err != nil {
-		return c.Status(401).SendString("Contraseña incorrecta " + err.Error())
+
+		// ✅ POR ESTA:
+		return c.Status(401).JSON(fiber.Map{"error": "Contraseña incorrecta"})
 	}
 
 	// Verificar si el correo fue validado
 	var validacion models.ValidacionCorreo
 	err := _db.First(&validacion, "id_user = ?", validador_user.Id_user).Error
 	if err != nil {
-		return c.Status(401).SendString("Usuario no encontrado para validar " + err.Error())
+
+		// ✅ POR ESTA:
+		return c.Status(401).JSON(fiber.Map{"error": "Error al verificar usuario"})
 	}
+
 	if validacion.Verificado == false {
 		log.Printf("⚠️ Usuario %s necesita verificar correo", validador_user.Correo)
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
@@ -54,19 +63,23 @@ func LoginValidacion(_db *gorm.DB, c *fiber.Ctx) error {
 		string(validador_user.Tipo_user),
 	)
 	if err != nil {
-		return c.Status(500).SendString("Error generando token: " + err.Error())
+
+		// ✅ POR ESTA:
+		return c.Status(500).JSON(fiber.Map{"error": "Error al generar token de sesión"})
 	}
 
 	// Logs en consola
 	fmt.Printf("✅ Usuario logueado: %s (%s)\n", validador_user.Nombre, validador_user.Tipo_user)
 
 	// Si es admin, redirige al home admin
-	if validador_user.Tipo_user == "admin" {
+	if validador_user.Tipo_user == "admin" || validador_user.Tipo_user == "master" {
 		return c.JSON(fiber.Map{
 			"direccion": "/SRC/html_templates/home_admin.html",
 			"mensaje":   "Login exitoso",
 			"usuario":   validador_user.Nombre,
-			"token":     token, // 🔐 Devuelve token
+			"id_user":   validador_user.Id_user,
+			"token":     token,
+			"tipo_user": validador_user.Tipo_user,
 		})
 	}
 
@@ -75,6 +88,8 @@ func LoginValidacion(_db *gorm.DB, c *fiber.Ctx) error {
 		"direccion": "/SRC/html_templates/home.html",
 		"mensaje":   "Login exitoso",
 		"usuario":   validador_user.Nombre,
-		"token":     token, // 🔐 Devuelve token
+		"id_user":   validador_user.Id_user,
+		"token":     token,
+		"tipo_user": validador_user.Tipo_user,
 	})
 }

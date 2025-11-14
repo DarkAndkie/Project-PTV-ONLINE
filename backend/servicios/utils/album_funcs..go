@@ -285,6 +285,18 @@ func ActualizarEstadoAlbum(_db *gorm.DB, c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"message": "Estado actualizado correctamente"})
 }
+func Buscar_album(_db *gorm.DB, c *fiber.Ctx) error {
+	var album models.Albums
+	c.BodyParser(&album)
+	println("carat" + album.Id_album)
+	if err := _db.Where("id_album =?", album.Id_album).Find(&album).Error; err != nil {
+		c.Status(400).JSON(fiber.Map{
+			"Error": "No se pudo obtener el album",
+		})
+	}
+
+	return c.JSON(album.Caratula_dir)
+}
 
 // Listar todos los álbumes
 func ListarAlbums(_db *gorm.DB, c *fiber.Ctx) error {
@@ -383,4 +395,19 @@ func ActualizarAlbumConCanciones(_db *gorm.DB, c *fiber.Ctx) error {
 		"mensaje":  "Álbum y canciones actualizados correctamente",
 		"id_album": album.Id_album,
 	})
+}
+
+func Buscar_Albums_Aleatorios(_db *gorm.DB, c *fiber.Ctx) error {
+
+	const cantidad = 8
+
+	var albums = []models.Albums{}
+	if result := _db.Order("RANDOM()").Limit(cantidad).Find(&albums).Error; result != nil {
+		log.Println("❌ Error al consultar álbumes:", result.Error)
+		return c.Status(500).JSON(fiber.Map{
+			"error": "No se pudieron obtener los albumes",
+		})
+	}
+	return c.JSON(albums)
+
 }

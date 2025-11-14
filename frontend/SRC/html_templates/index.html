@@ -4,107 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bienvenido!</title>
-    <link rel="stylesheet" href="/SRC/CSS/Style.css">
+    <link rel="stylesheet" href="/SRC/CSS/Style.css" />
   </head>
   <body>
     <div class="container">
       <div class="fondo_cartas">
-        <div class="tarjeta tarjeta_1">
-          <div class="imagen_tarjeta">
-            <img
-              src="/SRC/Login_Imagenes/imagenes_tarjetas/a.png"
-              alt="Pierce The Veil Caratula"
-            />
+        <template id="plantilla-tarjeta">
+          <div class="tarjeta">
+            <div class="imagen_tarjeta">
+              <img src="" alt="" class ="img"/>
+            </div>
+            <div class="contenido"></div>
           </div>
-          <div class="contenido">
-            <h4>The jaws of life</h4>
-            <p>2023</p>
-          </div>
-        </div>
-        <div class="tarjeta tarjeta_2">
-          <div class="imagen_tarjeta">
-            <img
-              src="/SRC/Login_Imagenes/imagenes_tarjetas/ab67616d0000b27360e615e6135f4e1026e2994f.jpg"
-              alt="Get Scared Best Kind of mess"
-            />
-          </div>
-          <div class="contenido">
-            <h4>Best Kind Of Mess</h4>
-          </div>
-        </div>
-        <div class="tarjeta tarjeta_3">
-          <div class="imagen_tarjeta">
-            <img
-              src="/SRC/Login_Imagenes/imagenes_tarjetas/JTJGJTJGaW1hZ2UuaWhlYXJ0LmNvbSUyRmJlbGwtaW5nZXN0aW9uLXBpcGVsaW5lLXByb2R1Y3Rpb24tdW1nJTJGZnVsbCUyRjAwNzE0NzUzMDIxOTY5XzIwMTgxMjEyMDA0MTU4MTcwJTJGMDA3MTQ3NTMwMjE5NjlfVDFfY3ZyYXJ0LmpwZw==.webp"
-              alt="Get scared Demons"
-            />
-          </div>
-          <div class="contenido">
-            <h4>Demons</h4>
-          </div>
-        </div>
-        <div class="tarjeta tarjeta_4">
-          <div class="imagen_tarjeta">
-            <img
-              src="/SRC/Login_Imagenes/imagenes_tarjetas/R (1).jpg"
-              alt="Get Scared Everyone's Out Getme"
-            />
-          </div>
-          <div class="contenido">
-            <h4>Everyon'es out get me</h4>
-            <p>2012</p>
-          </div>
-        </div>
-        <div class="tarjeta tarjeta_5">
-          <div class="imagen_tarjeta">
-            <img
-              src="/SRC/Login_Imagenes/imagenes_tarjetas/R (2).jpg"
-              alt="Bring Me The Horizont That's The Spirit"
-            />
-          </div>
-          <div class="contenido">
-            <h4>That's The Spirit</h4>
-          </div>
-        </div>
-        <div class="tarjeta tarjeta_6">
-          <div class="imagen_tarjeta">
-            <img
-              src="/SRC/Login_Imagenes/imagenes_tarjetas/JTJGJTJGaW1hZ2UuaWhlYXJ0LmNvbSUyRmJlbGwtaW5nZXN0aW9uLXBpcGVsaW5lLXByb2R1Y3Rpb24tdW1nJTJGZnVsbCUyRjAwNzE0NzUzMDIxOTY5XzIwMTgxMjEyMDA0MTU4MTcwJTJGMDA3MTQ3NTMwMjE5NjlfVDFfY3ZyYXJ0LmpwZw==.webp"
-              alt="Pierce The Veil Collide With The Sky "
-            />
-          </div>
-          <div class="contenido">
-            <h4>Collide with The Sky</h4>
-            <p>2012</p>
-          </div>
-        </div>
+        </template>
       </div>
       <div class="login_apartado">
         <div class="cabecera_Login">
-            <h4>Toda tu musica en un solo lugar</h4>
+          <h4>Toda tu musica en un solo lugar</h4>
         </div>
         <form id="formulario_login">
-        <div class="usuario_form">
-            <input type="text"  name="correo"placeholder="correo">
-        </div>
-        <div class="password_form">
-            <input type="password" name="password" placeholder="Ingrese su contraseña">
-                        <button type="submit">Iniciar Sesión</button>
-                                  <div id="mensaje_login"></div>
-        </div>
+          <div class="usuario_form">
+            <input type="text" name="correo" placeholder="correo" />
+          </div>
+          <div class="password_form">
+            <input
+              type="password"
+              name="password"
+              placeholder="Ingrese su contraseña"
+            />
+            <button type="submit" id="btn-sesion">Iniciar Sesión</button>
+            <div id="mensaje_login"></div>
+          </div>
 
-            </form>
+<div class="formulario_footer" style="margin-top: 15px; text-align: center;">
+  <a href="#" id="recuperarPassword" style="color: var(--primary); text-decoration: none; font-size: 14px;">
+    🔑 ¿Olvidaste tu contraseña?
+  </a>
+</div>
+
+        </form>
         <div class="sesion_foot">
-
           <a href="/SRC/html_templates/registro.html">registrarse</a>
         </div>
       </div>
     </div>
     <script src="../../SRC/JS/login.js"></script>
     <script>
-  // Si el usuario vuelve al login, limpiamos el token
-  localStorage.removeItem("token");
-</script>
-
+      // Si el usuario vuelve al login, limpiamos el token
+      localStorage.removeItem("token");
+    </script>
   </body>
 </html>

@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="../CSS/styles_registro.css" />
+        <script>
+
+</script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
@@ -96,7 +100,7 @@
             <input type="text" name ="Celular" placeholder="celular" required/>
             <input type="text" name="Correo" placeholder="correo" required/>
             <input type="password"name="Password" placeholder="contraseña" required/>
-            <button type="submit">Aceptar</button>
+            <button type="submit" id="btn-registro">Aceptar</button>
           </form>
         </div>
         <div class="formulario_footer">
@@ -106,5 +110,14 @@
 
     </div>
     <script src="../JS/registro.js"></script>
+        <script>
+      // Si el usuario vuelve, limpiamos el token
+     window.addEventListener('pageshow',function(event){
+      if (event.persisted || (window,perfomance && window.navigation.type===2)){
+        localStorage.removeItem("token");
+        window.location.replace("/");
+      }
+     })
+    </script>
   </body>
 </html>

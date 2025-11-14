@@ -329,31 +329,70 @@ document.addEventListener("DOMContentLoaded", () => {
           return badges[tipo] || badges["finalusuario"]
         }
 
-        return `
-          <tr data-usuario-id="${usuario.id_user}" data-usuario-nombre="${usuario.nombre.toLowerCase()}" data-usuario-tipo="${usuario.tipo_user}">
-            <td><strong>${usuario.nombre}</strong></td>
-            <td>${usuario.apellido}</td>
-            <td>${usuario.celular || "N/A"}</td>
-            <td>${usuario.email}</td>
-            <td>
-              <select onchange="cambiarTipoUsuario(${usuario.id_user}, this.value)" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd; ${getTipoBadge(usuario.tipo_user)} font-weight: bold;">
-                <option value="admin" ${usuario.tipo_user === "admin" ? "selected" : ""}>👑 Admin</option>
-                <option value="curador" ${usuario.tipo_user === "curador" ? "selected" : ""}>📝 Curador</option>
-                <option value="banda" ${usuario.tipo_user === "banda" ? "selected" : ""}>🎸 Banda</option>
-                <option value="artista" ${usuario.tipo_user === "artista" ? "selected" : ""}>🎤 Artista</option>
-                <option value="finalusuario" ${usuario.tipo_user === "finalusuario" ? "selected" : ""}>👤 Usuario</option>
-                <option value="deshabilitado" ${usuario.tipo_user === "deshabilitado" ? "selected" : ""}>🚫 Deshabilitado</option>
-              </select>
-            </td>
-            <td>
-              <button onclick="verUsuario(${usuario.id_user})" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Ver</button>
-            </td>
-          </tr>
-        `
+return `
+  <tr data-usuario-id="${usuario.id_user}" data-usuario-nombre="${usuario.nombre.toLowerCase()}" data-usuario-tipo="${usuario.tipo_user}" style="${usuario.tipo_user === 'master' ? 'display: none;' : ''}">
+    <td><strong>${usuario.nombre}</strong></td>
+    <td>${usuario.apellido}</td>
+    <td>
+      <input type="tel" id="tel-${usuario.id_user}" value="${usuario.celular || 'N/A'}" 
+             style="width: 100%; padding: 4px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; color: #e0e0e0;">
+    </td>
+    <td>
+      <input type="email" id="email-${usuario.id_user}" value="${usuario.email}" 
+             style="width: 100%; padding: 4px; background: rgba(255,255,255,0.05); border: 1px solid #444; border-radius: 4px; color: #e0e0e0;">
+    </td>
+    <td>
+      <select onchange="cambiarTipoUsuario(${usuario.id_user}, this.value)" style="padding: 8px; border-radius: 4px; border: 1px solid #ddd; ${getTipoBadge(usuario.tipo_user)} font-weight: bold;">
+        <option value="admin" ${usuario.tipo_user === "admin" ? "selected" : ""}>👑 Admin</option>
+        <option value="curador" ${usuario.tipo_user === "curador" ? "selected" : ""}>📝 Curador</option>
+        <option value="banda" ${usuario.tipo_user === "banda" ? "selected" : ""}>🎸 Banda</option>
+        <option value="artista" ${usuario.tipo_user === "artista" ? "selected" : ""}>🎤 Artista</option>
+        <option value="finalusuario" ${usuario.tipo_user === "finalusuario" ? "selected" : ""}>👤 Usuario</option>
+        <option value="deshabilitado" ${usuario.tipo_user === "deshabilitado" ? "selected" : ""}>🚫 Deshabilitado</option>
+      </select>
+    </td>
+    <td>
+      <button onclick="guardarCambiosUsuario(${usuario.id_user})" style="padding: 5px 10px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">💾 Guardar</button>
+      <button onclick="verUsuario(${usuario.id_user})" style="padding: 5px 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 2px;">Ver</button>
+    </td>
+  </tr>
+`
       })
       .join("")
   }
+// AGREGAR después de la función cambiarTipoUsuario
+window.guardarCambiosUsuario = async (id_usuario) => {
+  const nuevoEmail = document.getElementById(`email-${id_usuario}`).value.trim()
+  const nuevoTel = document.getElementById(`tel-${id_usuario}`).value.trim()
 
+  if (!nuevoEmail) {
+    alert("❌ El correo no puede estar vacío")
+    return
+  }
+
+  try {
+    const resp = await fetch(`/api/usuarios/${id_usuario}/actualizar-info`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        email: nuevoEmail, 
+        celular: nuevoTel 
+      }),
+    })
+
+    const data = await resp.json()
+
+    if (resp.ok) {
+      alert("✅ Información actualizada correctamente")
+      cargarUsuarios()
+    } else {
+      alert(data.error || "Error al actualizar")
+    }
+  } catch (error) {
+    console.error("❌ Error:", error)
+    alert("❌ Error de conexión")
+  }
+}
   function filtrarUsuarios(textoBusqueda) {
     console.log("🔍 Buscando usuario:", textoBusqueda)
 
@@ -1601,7 +1640,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('nombre-album').value = album.nombre_album
     document.getElementById('direccion-caratula').value = album.caratula_dir
     document.getElementById('descripcion-album').value = album.descrip || ''
-    document.getElementById('fecha-album').value = album.fecha_lanza
+    const date = new Date(album.fecha_lanza);
+    const fechaISO=date.toISOString().split('T')[0];
+    document.getElementById('fecha-album').value = fechaISO
     document.getElementById('banda').value = album.id_banda
 
     const previewImg = document.getElementById('preview-img-caratula')

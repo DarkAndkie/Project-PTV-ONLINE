@@ -140,7 +140,7 @@ func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error {
 		}
 		return nil
 	})
-	
+
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Error al registrar el usuario: " + err.Error(),
@@ -184,25 +184,38 @@ func VerificarCodigo(_db *gorm.DB, c *fiber.Ctx) error {
 
 	}
 
+	//verificamos que solo exista un usuario y ese será el master
+	var master string = ""
+	var count int64 = 0
+	_db.Model(&models.Usuario{}).Count(&count)
+	if count == 1 {
+		master = "master"
+	}
 	validacion.Verificado = true
 	_db.Save(&validacion)
+	if master == "" {
+		usuario.Tipo_user = models.TipoUsuario(strings.ToLower(tipo))
+	}
+	if master == "master" {
+		usuario.Tipo_user = "master"
+	}
 
-	usuario.Tipo_user = models.TipoUsuario(strings.ToLower(tipo))
 	_db.Save(&usuario)
-
 	return c.JSON(fiber.Map{"message": "Correo verificado correctamente",
 		"direccion": "../../SRC/html_templates/index.html"})
 }
 
 // ✅ REENVIAR CÓDIGO DE VERIFICACIÓN
 func ReenviarCodigo(_db *gorm.DB, c *fiber.Ctx) error {
-	email := c.FormValue("Correo")
-
-	log.Printf("📧 Solicitud de reenvío de código para: %s", email)
+	var email struct {
+		Correo string `json:"Correo"`
+	}
+	c.BodyParser(&email)
+	log.Println("📥 Solicitud de reenvío de código para:", email)
 
 	var usuario models.Usuario
-	if err := _db.First(&usuario, "correo = ?", email).Error; err != nil {
-		log.Printf("❌ Usuario no encontrado: %s", email)
+	if err := _db.First(&usuario, "correo = ?", email.Correo).Error; err != nil {
+		log.Printf("❌ Usuario no encontrado: %s", email.Correo)
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"error": "Usuario no encontrado",
 		})
@@ -377,4 +390,238 @@ func ListarBandas(_db *gorm.DB, c *fiber.Ctx) error {
 		return err
 	}
 	return c.JSON(bandas)
+}
+
+// ========================================
+// ACTUALIZAR INFO DE USUARIO (ADMIN)
+// ========================================
+func ActualizarInfoUsuario(_db *gorm.DB, c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	var body struct {
+		Email   string `json:"email"`
+		Celular string `json:"celular"`
+	}
+
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear datos"})
+	}
+
+	// Validar email
+	if !ValidarEmail(body.Email) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido"})
+	}
+
+	// Validar que el email no esté en uso por otro usuario
+	var usuarioExistente models.Usuario
+	if err := _db.Where("correo = ? AND id_user != ?", body.Email, id).First(&usuarioExistente).Error; err == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El correo ya está en uso por otro usuario"})
+	}
+
+	// Actualizar datos
+	updates := map[string]interface{}{
+		"correo":  body.Email,
+		"celular": body.Celular,
+	}
+
+	if err := _db.Model(&models.Usuario{}).Where("id_user = ?", id).Updates(updates).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al actualizar información"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Información actualizada correctamente"})
+}
+
+// ========================================
+// OBTENER PERFIL DEL USUARIO AUTENTICADO
+// ========================================
+func ObtenerMiPerfil(_db *gorm.DB, c *fiber.Ctx) error {
+	userID := c.Locals("usuario_id").(int)
+
+	var usuario models.Usuario
+	if err := _db.First(&usuario, "id_user = ?", userID).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuario no encontrado"})
+	}
+
+	// No enviar la contraseña
+	usuario.Password = ""
+
+	return c.JSON(usuario)
+}
+
+// ========================================
+// ACTUALIZAR PERFIL PROPIO (USUARIO AUTENTICADO)
+// ========================================
+func ActualizarMiPerfil(_db *gorm.DB, c *fiber.Ctx) error {
+	userID := c.Locals("usuario_id").(int)
+
+	var body struct {
+		Nombre   string `json:"nombre"`
+		Apellido string `json:"apellido"`
+		Email    string `json:"email"`
+		Celular  string `json:"celular"`
+		Password string `json:"password"`
+	}
+
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear datos"})
+	}
+
+	// Validaciones
+	if body.Nombre == "" || body.Email == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nombre y correo son obligatorios"})
+	}
+
+	if !ValidarEmail(body.Email) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido"})
+	}
+
+	if utf8.RuneCountInString(body.Nombre) > 30 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El nombre no puede superar 30 caracteres"})
+	}
+
+	if utf8.RuneCountInString(body.Apellido) > 30 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El apellido no puede superar 30 caracteres"})
+	}
+
+	// Verificar que el email no esté en uso por otro usuario
+	var usuarioExistente models.Usuario
+	if err := _db.Where("correo = ? AND id_user != ?", body.Email, userID).First(&usuarioExistente).Error; err == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El correo ya está en uso"})
+	}
+
+	// Preparar actualizaciones
+	updates := map[string]interface{}{
+		"nombre":   body.Nombre,
+		"apellido": body.Apellido,
+		"correo":   body.Email,
+		"celular":  body.Celular,
+	}
+
+	// Si envía nueva contraseña, validarla y cifrarla
+	if body.Password != "" {
+		if err := PasswordFormato(body.Password); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+		}
+		hash, err := CifrarContraseña(body.Password)
+		if err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al cifrar contraseña"})
+		}
+		updates["password"] = hash
+	}
+
+	// Actualizar en la base de datos
+	if err := _db.Model(&models.Usuario{}).Where("id_user = ?", userID).Updates(updates).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al actualizar perfil"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Perfil actualizado correctamente"})
+}
+
+// ========================================
+// ENVIAR CÓDIGO DE RECUPERACIÓN DE CONTRASEÑA
+// ========================================
+func EnviarCodigoRecuperacion(_db *gorm.DB, c *fiber.Ctx) error {
+	var body struct {
+		Correo string `json:"correo"`
+	}
+
+	if err := c.BodyParser(&body); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear datos"})
+	}
+
+	if !ValidarEmail(body.Correo) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido"})
+	}
+
+	// Buscar usuario por correo
+	var usuario models.Usuario
+	if err := _db.First(&usuario, "correo = ?", body.Correo).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuario no encontrado"})
+	}
+
+	// Eliminar códigos anteriores del mismo usuario
+	_db.Where("id_user = ?", usuario.Id_user).Delete(&models.ValidacionCorreo{})
+
+	// Enviar nuevo código usando transacción
+	err := _db.Transaction(func(tx *gorm.DB) error {
+		return EnvioDeCodigo(tx, usuario, usuario.Email)
+	})
+
+	if err != nil {
+		log.Printf("❌ Error al enviar código de recuperación: %v", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Error al enviar código: " + err.Error(),
+		})
+	}
+
+	log.Printf("✅ Código de recuperación enviado a: %s", usuario.Email)
+	return c.JSON(fiber.Map{
+		"message": "Código enviado a tu correo. Revísalo para continuar.",
+	})
+}
+
+// ========================================
+// CAMBIAR CONTRASEÑA CON CÓDIGO DE RECUPERACIÓN
+// ========================================
+func CambiarPasswordConCodigo(_db *gorm.DB, c *fiber.Ctx) error {
+	email := c.FormValue("Correo")
+	codigo := c.FormValue("Codigo")
+	nuevaPassword := c.FormValue("NuevaPassword")
+
+	// Validaciones básicas
+	if email == "" || codigo == "" || nuevaPassword == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Todos los campos son obligatorios"})
+	}
+
+	// Buscar usuario
+	var usuario models.Usuario
+	if err := _db.First(&usuario, "correo = ?", email).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuario no encontrado"})
+	}
+
+	// Verificar código
+	var validacion models.ValidacionCorreo
+	if err := _db.First(&validacion, "id_user = ? AND codigo = ?", usuario.Id_user, codigo).Error; err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Código inválido"})
+	}
+	validacion.Verificado = true
+	_db.Save(&validacion)
+	// Verificar si el código expiró
+	if time.Now().UTC().After(validacion.Expiracion) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Código expirado. Solicita uno nuevo."})
+	}
+
+	// Validar formato de la nueva contraseña
+	if err := PasswordFormato(nuevaPassword); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	// Cifrar nueva contraseña
+	hash, err := CifrarContraseña(nuevaPassword)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al cifrar contraseña"})
+	}
+
+	// ✅ USAR TRANSACCIÓN para asegurar que todo se complete
+	err = _db.Transaction(func(tx *gorm.DB) error {
+		// Actualizar contraseña
+		if err := tx.Model(&usuario).Update("password", hash).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Printf("❌ Error al cambiar contraseña para %s: %v", email, err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al actualizar contraseña"})
+	}
+
+	log.Printf("✅ Contraseña cambiada para: %s", email)
+
+	// ✅ IMPORTANTE: Indicar que debe hacer login de nuevo
+	return c.JSON(fiber.Map{
+		"message":       "Contraseña actualizada correctamente. Inicia sesión con tu nueva contraseña.",
+		"require_login": true, // 👈 Nuevo campo
+	})
 }
