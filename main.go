@@ -57,6 +57,30 @@ func main() {
 	app.Delete("/api/cloudinary/cleanup", func(c *fiber.Ctx) error {
 		return utils.LimpiarCloudinary(c)
 	})
+
+	//para quitar archivos de cloudinary en tiempo asyn
+	// 🗑️ CLOUDINARY - Limpieza asíncrona (NUEVA RUTA)
+	app.Post("/api/cloudinary/cleanup-async", func(c *fiber.Ctx) error {
+		var body struct {
+			URLs          []string `json:"urls"`
+			ResourceTypes []string `json:"resource_types"`
+		}
+
+		if err := c.BodyParser(&body); err != nil {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+				"error": "Error al parsear datos",
+			})
+		}
+
+		// Procesar en background sin esperar respuesta
+		go func() {
+			log.Printf("🗑️ Limpiando %d archivos de Cloudinary (async)...", len(body.URLs))
+			utils.LimpiarCloudinaryAsync(body.URLs, body.ResourceTypes)
+		}()
+
+		// Responder inmediatamente
+		return c.SendStatus(204)
+	})
 	app.Get("/api/cloudinary-config", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"cloudName":          os.Getenv("CLOUDINARY_CLOUD_NAME"),
@@ -121,7 +145,7 @@ func main() {
 	app.Get("/api/Buscar_Albums_Aleatorios", func(c *fiber.Ctx) error {
 		return utils.Buscar_Albums_Aleatorios(_DB, c)
 	})
-	app.Post("/api/buscar_album_individual", func(c *fiber.Ctx) error {
+	app.Delete("/api/buscar_album_individual", func(c *fiber.Ctx) error {
 		return utils.Buscar_album(_DB, c)
 	})
 
@@ -141,7 +165,7 @@ func main() {
 		return utils.CambiarEstadoCancion(_DB, c)
 	})
 
-	app.Delete("/api/canciones/:id", func(c *fiber.Ctx) error {
+	app.Delete("/api/canciones/eliminar_cancion", func(c *fiber.Ctx) error {
 		return utils.EliminarCancion(_DB, c)
 	})
 

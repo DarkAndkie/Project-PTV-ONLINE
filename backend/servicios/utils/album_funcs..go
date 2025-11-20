@@ -60,7 +60,7 @@ func parsear_Validar_Cancion(_db *gorm.DB, cancion models.Cancion) error {
 		return errors.New("La descripción de la canción no puede ser superior a 300 caracteres")
 	}
 
-	if err := validarDuracionCancion(cancion.Duracion); err != nil {
+	if err := ValidarDuracionCancion(cancion.Duracion); err != nil {
 		return err
 	}
 
@@ -81,7 +81,7 @@ func parsear_Validar_Cancion(_db *gorm.DB, cancion models.Cancion) error {
 }
 
 // ✅ NUEVA FUNCIÓN: Validar duración con límites reales
-func validarDuracionCancion(duracion string) error {
+func ValidarDuracionCancion(duracion string) error {
 	// Verificar formato mm:ss
 	re := regexp.MustCompile(`^(\d{2}):(\d{2})$`)
 	matches := re.FindStringSubmatch(duracion)

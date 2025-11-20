@@ -189,9 +189,12 @@ func CambiarEstadoCancion(_db *gorm.DB, c *fiber.Ctx) error {
 
 // EliminarCancion elimina una canción de la base de datos
 func EliminarCancion(_db *gorm.DB, c *fiber.Ctx) error {
-	idCancion := c.Params("id")
-
-	if idCancion == "" {
+	var idCancion struct {
+		Id_cancion string `json:"id_cancion"`
+	}
+	c.BodyParser(&idCancion)
+	log.Println("id cancion", idCancion.Id_cancion)
+	if idCancion.Id_cancion == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "El ID de la canción es requerido",
 		})
@@ -199,7 +202,7 @@ func EliminarCancion(_db *gorm.DB, c *fiber.Ctx) error {
 
 	// Verificar que la canción existe
 	var cancion models.Cancion
-	if err := _db.Where("id_cancion = ?", idCancion).First(&cancion).Error; err != nil {
+	if err := _db.Where("id_cancion = ?", idCancion.Id_cancion).First(&cancion).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 				"error": "Canción no encontrada",

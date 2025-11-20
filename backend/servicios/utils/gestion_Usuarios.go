@@ -126,6 +126,7 @@ func EnvioDeCodigo(tx *gorm.DB, usuario models.Usuario, correo string) error {
 
 func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error {
 	usuario, err := validacionesCrearUsuario(_db, c)
+	var tipo = "finalusuario"
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -146,7 +147,20 @@ func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error {
 			"error": "Error al registrar el usuario: " + err.Error(),
 		})
 	}
+	var master string = ""
+	var count int64 = 0
+	_db.Model(&models.Usuario{}).Count(&count)
+	if count == 1 {
+		master = "master"
+	}
+	if master == "" {
+		usuario.Tipo_user = models.TipoUsuario(strings.ToLower(tipo))
+	}
+	if master == "master" {
+		usuario.Tipo_user = "master"
+	}
 
+	_db.Save(&usuario)
 	return c.JSON(fiber.Map{
 		"message": "Usuario registrado. Verifica tu correo.",
 		"user":    usuario,
@@ -155,7 +169,6 @@ func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error {
 func VerificarCodigo(_db *gorm.DB, c *fiber.Ctx) error {
 	email := c.FormValue("Correo")
 	codigo := c.FormValue("Codigo")
-	tipo := "finalusuario"
 
 	var usuario models.Usuario
 	if err := _db.First(&usuario, "correo = ?", email).Error; err != nil {
@@ -185,22 +198,10 @@ func VerificarCodigo(_db *gorm.DB, c *fiber.Ctx) error {
 	}
 
 	//verificamos que solo exista un usuario y ese será el master
-	var master string = ""
-	var count int64 = 0
-	_db.Model(&models.Usuario{}).Count(&count)
-	if count == 1 {
-		master = "master"
-	}
+
 	validacion.Verificado = true
 	_db.Save(&validacion)
-	if master == "" {
-		usuario.Tipo_user = models.TipoUsuario(strings.ToLower(tipo))
-	}
-	if master == "master" {
-		usuario.Tipo_user = "master"
-	}
 
-	_db.Save(&usuario)
 	return c.JSON(fiber.Map{"message": "Correo verificado correctamente",
 		"direccion": "../../SRC/html_templates/index.html"})
 }

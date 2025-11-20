@@ -101,18 +101,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
       
-      if (btnReenviar) {
-        btnReenviar.addEventListener('click', async function (e) {
-          e.preventDefault();
-          const textoOriginal = this.innerText;
-          this.innerText = "Enviando...";
-          
-          try {
-            const res = await fetch('/reenviar_codigo', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ 'Correo': correo}),
-            });
+        if (btnReenviar) {
+          btnReenviar.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const textoOriginal = this.innerText;
+            this.innerText = "Enviando...";
+            
+            try {
+              const res = await fetch('/reenviar_codigo', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'Correo': correo}),
+              });
             console.log("Reenviar respuesta:", correo);
             const data = await res.json();
             if (res.ok) {

@@ -648,3 +648,368 @@ footer {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #14b8a6, #10b981);
 }
+/* Zona de carga */
+.upload-zone-modern {
+  background-color: #0f3460;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.2s ease;
+}
+
+.upload-zone-modern:hover {
+  background-color: #1a1a2e;
+}
+/* ========================================
+   TABLA DE CANCIONES - TEMA OSCURO
+======================================== */
+
+/* Wrapper principal para aislar estilos */
+.canciones-wrapper-custom {
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.tabla-canciones-container {
+  overflow-x: auto !important;
+  background: transparent !important;
+}
+
+/* Estadísticas */
+.canciones-wrapper-custom .modern-stats,
+.modern-stats {
+  display: flex !important;
+  gap: 20px !important;
+  padding: 20px !important;
+  flex-wrap: wrap !important;
+  background: rgba(26, 26, 46, 0.6) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2) !important;
+  margin-bottom: 30px !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+.stat-card {
+  flex: 1 !important;
+  min-width: 120px !important;
+  text-align: center !important;
+  padding: 15px !important;
+  background: rgba(22, 33, 62, 0.4) !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+.stat-number {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  color: #10b981 !important;
+  margin-bottom: 8px !important;
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.5) !important;
+}
+
+.stat-label {
+  font-size: 12px !important;
+  color: #94a3b8 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  font-weight: 600 !important;
+}
+
+/* Tabla moderna oscura - SELECTORES MUY ESPECÍFICOS */
+.tabla-canciones-custom,
+.canciones-wrapper-custom .modern-table,
+table.tabla-canciones-custom {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  background: transparent !important;
+  font-family: 'Segoe UI', sans-serif !important;
+  overflow: hidden !important;
+  border-radius: 12px !important;
+}
+
+.tabla-canciones-custom thead,
+.canciones-wrapper-custom .modern-table thead,
+table.tabla-canciones-custom thead {
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;
+  color: white !important;
+}
+
+.tabla-canciones-custom thead th,
+.canciones-wrapper-custom .modern-table thead th,
+table.tabla-canciones-custom thead th {
+  padding: 16px 12px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  text-align: left !important;
+  border-bottom: none !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: white !important;
+  background: none !important;
+}
+
+.tabla-canciones-custom tbody tr,
+.canciones-wrapper-custom .modern-table tbody tr,
+table.tabla-canciones-custom tbody tr {
+  background: rgba(26, 26, 46, 0.6) !important;
+  transition: all 0.3s ease !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1) !important;
+}
+
+.tabla-canciones-custom tbody tr:hover,
+.canciones-wrapper-custom .modern-table tbody tr:hover,
+table.tabla-canciones-custom tbody tr:hover {
+  background: rgba(16, 185, 129, 0.15) !important;
+  transform: translateX(4px) !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
+}
+
+.tabla-canciones-custom td,
+.canciones-wrapper-custom .modern-table td,
+table.tabla-canciones-custom td {
+  padding: 14px 12px !important;
+  vertical-align: middle !important;
+  font-size: 13px !important;
+  color: #e0e0e0 !important;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1) !important;
+}
+
+.tabla-canciones-custom .col-num,
+.canciones-wrapper-custom .col-num {
+  font-weight: 700 !important;
+  color: #10b981 !important;
+  font-size: 14px !important;
+  width: 40px !important;
+}
+
+/* Inputs de canciones */
+.tabla-canciones-custom .song-input,
+.canciones-wrapper-custom .song-input,
+input.song-input {
+  width: 100% !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border-radius: 6px !important;
+  background-color: rgba(22, 33, 62, 0.8) !important;
+  font-size: 13px !important;
+  color: #e0e0e0 !important;
+  transition: all 0.3s ease !important;
+  font-weight: 500 !important;
+}
+
+.tabla-canciones-custom .song-input:focus,
+.canciones-wrapper-custom .song-input:focus,
+input.song-input:focus {
+  outline: none !important;
+  border-color: #10b981 !important;
+  background-color: rgba(22, 33, 62, 1) !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.4) !important;
+}
+
+.tabla-canciones-custom .song-input::placeholder,
+.canciones-wrapper-custom .song-input::placeholder,
+input.song-input::placeholder {
+  color: rgba(224, 224, 224, 0.4) !important;
+}
+
+.tabla-canciones-custom .duracion-input,
+.canciones-wrapper-custom .duracion-input,
+input.duracion-input {
+  text-align: center !important;
+  font-weight: 700 !important;
+  font-family: 'Courier New', monospace !important;
+  color: #14b8a6 !important;
+  font-size: 14px !important;
+  max-width: 80px !important;
+}
+
+/* Contador de reproducciones */
+.tabla-canciones-custom .reprod-count,
+.canciones-wrapper-custom .reprod-count,
+span.reprod-count {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+  color: #10b981 !important;
+  text-align: center !important;
+  display: block !important;
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Badges de estado */
+.tabla-canciones-custom .badge,
+.canciones-wrapper-custom .badge,
+span.badge {
+  padding: 6px 12px !important;
+  border-radius: 20px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  display: inline-block !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+
+.tabla-canciones-custom .badge-active,
+.canciones-wrapper-custom .badge-active,
+span.badge-active {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4) !important;
+}
+
+.tabla-canciones-custom .badge-disabled,
+.canciones-wrapper-custom .badge-disabled,
+span.badge-disabled {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Zona de carga de audio */
+.tabla-canciones-custom .upload-zone-modern,
+.canciones-wrapper-custom .upload-zone-modern,
+div.upload-zone-modern {
+  background: rgba(22, 33, 62, 0.6) !important;
+  padding: 10px !important;
+  border-radius: 8px !important;
+  border: 2px dashed rgba(16, 185, 129, 0.4) !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+}
+
+.tabla-canciones-custom .upload-zone-modern:hover,
+.canciones-wrapper-custom .upload-zone-modern:hover,
+div.upload-zone-modern:hover {
+  background: rgba(16, 185, 129, 0.1) !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+}
+
+.tabla-canciones-custom .upload-label,
+.canciones-wrapper-custom .upload-label,
+.upload-zone-modern .upload-label {
+  margin: 0 !important;
+  font-size: 11px !important;
+  color: #10b981 !important;
+  font-weight: 600 !important;
+}
+
+.tabla-canciones-custom .upload-hint,
+.canciones-wrapper-custom .upload-hint,
+.upload-zone-modern .upload-hint {
+  margin: 4px 0 0 !important;
+  font-size: 10px !important;
+  color: #94a3b8 !important;
+}
+
+.tabla-canciones-custom .upload-progress,
+.canciones-wrapper-custom .upload-progress,
+div.upload-progress {
+  margin-top: 8px !important;
+  width: 100% !important;
+  height: 4px !important;
+  background: rgba(22, 33, 62, 0.8) !important;
+  border-radius: 2px !important;
+  overflow: hidden !important;
+}
+
+.tabla-canciones-custom .upload-progress-bar,
+.canciones-wrapper-custom .upload-progress-bar,
+div.upload-progress-bar {
+  height: 100% !important;
+  background: linear-gradient(90deg, #10b981, #14b8a6) !important;
+  width: 0% !important;
+  transition: width 0.3s !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.6) !important;
+}
+
+/* Botones de acción */
+.tabla-canciones-custom .acciones-btns,
+.canciones-wrapper-custom .acciones-btns,
+div.acciones-btns {
+  display: flex !important;
+  gap: 8px !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+}
+
+.tabla-canciones-custom .btn-modern,
+.canciones-wrapper-custom .btn-modern,
+button.btn-modern {
+  padding: 8px 16px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+  transition: all 0.3s ease !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+.tabla-canciones-custom .btn-save,
+.canciones-wrapper-custom .btn-save,
+button.btn-save {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+  color: white !important;
+}
+
+.tabla-canciones-custom .btn-save:hover,
+.canciones-wrapper-custom .btn-save:hover,
+button.btn-save:hover {
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5) !important;
+}
+
+.tabla-canciones-custom .btn-toggle,
+.canciones-wrapper-custom .btn-toggle,
+button.btn-toggle {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: white !important;
+}
+
+.tabla-canciones-custom .btn-toggle:hover,
+.canciones-wrapper-custom .btn-toggle:hover,
+button.btn-toggle:hover {
+  background: linear-gradient(135deg, #dc2626, #ef4444) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5) !important;
+}
+
+.tabla-canciones-custom .btn-toggle.activate,
+.canciones-wrapper-custom .btn-toggle.activate,
+button.btn-toggle.activate {
+  background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.tabla-canciones-custom .btn-toggle.activate:hover,
+.canciones-wrapper-custom .btn-toggle.activate:hover,
+button.btn-toggle.activate:hover {
+  background: linear-gradient(135deg, #059669, #10b981) !important;
+}
+
+/* ========================================
+   RESETEAR ESTILOS DE LA FILA CONTENEDORA
+======================================== */
+tr[id^="canciones-"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+tr[id^="canciones-"] td {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+tr[id^="canciones-"]:hover {
+  background: transparent !important;
+  transform: none !important;
+  box-shadow: none !important;
+}

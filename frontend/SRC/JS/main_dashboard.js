@@ -852,9 +852,7 @@ function agregarCancionFormulario(cancion = null) {
         <input type="hidden" id="cancion-path-${id}" value="${cancion?.cancion_path || ''}" required>
       </div>
       
-      <div style="display: flex; justify-content: flex-end;">
-        <button type="button" onclick="eliminarCancionForm(${id})" class="btn-mini" style="background: #e74c3c; padding: 8px 16px;">🗑️ Eliminar</button>
-      </div>
+  
     </div>
   `
   
@@ -1007,11 +1005,13 @@ window.eliminarCancionForm = async function(id) {
     try {
       console.log(`🗑️ Eliminando canción ${idCancion} de la base de datos...`)
       
-      const resp = await fetch(`${state.baseUrl}/api/canciones/${idCancion}`, {
+      const resp = await fetch(`${state.baseUrl}/api/canciones/eliminar_cancion`, {
         method: "DELETE",
         headers: { 
-          Authorization: `Bearer ${state.token}` 
-        }
+          Authorization: `Bearer ${state.token}` ,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ "id_cancion": idCancion })
       })
       
       if (resp.ok) {

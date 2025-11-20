@@ -162,3 +162,46 @@ func eliminarDeCloudinary(cloudName, apiKey, apiSecret, publicID, resourceType s
 	log.Printf("⚠️ Status code: %d", resp.StatusCode)
 	return false
 }
+
+// ============================================
+// ✅ AGREGAR ESTAS FUNCIONES AL FINAL DEL ARCHIVO
+// ============================================
+
+// LimpiarCloudinaryAsync elimina archivos de forma asíncrona (para beforeunload)
+func LimpiarCloudinaryAsync(urls []string, resourceTypes []string) {
+	log.Printf("🗑️ [ASYNC] Iniciando limpieza de %d archivos...", len(urls))
+
+	cloudName := os.Getenv("CLOUDINARY_CLOUD_NAME")
+	apiKey := os.Getenv("CLOUDINARY_API_KEY")
+	apiSecret := os.Getenv("CLOUDINARY_API_SECRET")
+
+	if cloudName == "" || apiKey == "" || apiSecret == "" {
+		log.Println("❌ [ASYNC] Cloudinary no configurado")
+		return
+	}
+
+	eliminados := 0
+	for i, url := range urls {
+		resourceType := "video"
+		if i < len(resourceTypes) {
+			resourceType = resourceTypes[i]
+		}
+
+		publicID := extraerPublicID(url)
+		if publicID == "" {
+			log.Printf("⚠️ [ASYNC] No se pudo extraer public_id de: %s", url)
+			continue
+		}
+
+		if eliminarDeCloudinary(cloudName, apiKey, apiSecret, publicID, resourceType) {
+			eliminados++
+			log.Printf("✅ [ASYNC] Eliminado: %s", publicID)
+		} else {
+			log.Printf("❌ [ASYNC] Error al eliminar: %s", publicID)
+		}
+
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	log.Printf("📊 [ASYNC] Limpieza completada: %d/%d eliminados", eliminados, len(urls))
+}
