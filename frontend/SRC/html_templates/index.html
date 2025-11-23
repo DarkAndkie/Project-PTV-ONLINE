@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bienvenido!</title>
     <link rel="stylesheet" href="/SRC/CSS/Style.css" />
+        <script>
+      // ✅ Si ya hay token, redirigir al dashboard correspondiente
+      const token = localStorage.getItem("token");
+      const tipoUser = localStorage.getItem("tipo_user");
+      
+      if (token && tipoUser) {
+        console.log("✅ Sesión activa detectada, redirigiendo...");
+        
+        if (tipoUser === "admin" || tipoUser === "curador" || tipoUser === "master") {
+          window.location.replace("/SRC/html_templates/home_admin.html");
+        } else {
+          window.location.replace("/SRC/html_templates/home.html");
+        }
+      }
+    </script>
   </head>
   <body>
     <div class="container">
@@ -49,9 +64,6 @@
       </div>
     </div>
     <script src="../../SRC/JS/login.js"></script>
-    <script>
-      // Si el usuario vuelve al login, limpiamos el token
-      localStorage.removeItem("token");
-    </script>
+   
   </body>
 </html>

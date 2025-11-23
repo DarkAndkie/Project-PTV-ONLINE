@@ -14,27 +14,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         const data = await respuesta.json();
-        console.log('📥 Respuesta login:', data);
+        console.log('🔥 Respuesta login:', data);
+        
         if (respuesta.ok) {
-          // Guardar token
-           if (data.token) {
-    localStorage.setItem('token', data.token);
-  }
-  if (data.tipo_user) {
-    localStorage.setItem('tipo_user', data.tipo_user);
-  }
-  if(data.id_user){
-    localStorage.setItem('id_user',data.id_user);
-  }
+          // ✅ Generar ID único de sesión
+          const sessionId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+          
+          // ✅ Guardar TODOS los datos del usuario
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('tipo_user', data.tipo_user);
+          localStorage.setItem('id_user', data.id_user);
+          localStorage.setItem('session_id', sessionId); // ✅ NUEVO
+          
+          console.log('✅ Sesión iniciada con ID:', sessionId);
 
-  mensaje.innerText = `Bienvenido ${data.usuario}`;
-  mensaje.style.color = 'green';
+          mensaje.innerText = `Bienvenido ${data.usuario}`;
+          mensaje.style.color = 'green';
 
-  setTimeout(() => {
-    // REEMPLAZA el historial: no se puede volver con "adelante"
-    window.location.replace(data.direccion);
-  }, 600);
-  LoginForm.reset();
+          setTimeout(() => {
+            window.location.replace(data.direccion);
+          }, 600);
+          
+          LoginForm.reset();
         } else if (data.requiere_verificacion == true) {
           mensaje.innerText = data.error;
           mensaje.style.color = 'orange';
@@ -55,6 +56,9 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
+
+  
+
   async function traer_Caratulas(){
     const res = await fetch("/api/Buscar_Albums_Aleatorios",{
       method:'GET',

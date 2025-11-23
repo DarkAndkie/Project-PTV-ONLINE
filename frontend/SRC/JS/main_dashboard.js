@@ -818,6 +818,9 @@ function agregarCancionFormulario(cancion = null) {
   contadorCancionesBanda++
   const id = contadorCancionesBanda
   
+  // ✅ Solo mostrar botón de eliminar si NO tiene id_cancion (es nueva)
+  const puedeEliminar = !cancion || !cancion.id_cancion
+  
   const html = `
     <div class="cancion-form-item" id="cancion-form-${id}" data-id-cancion="${cancion?.id_cancion || ''}" style="background: rgba(26, 188, 156, 0.05); padding: 15px; border-radius: 8px; margin-bottom: 12px; border: 1px solid var(--border-color);">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
@@ -852,7 +855,21 @@ function agregarCancionFormulario(cancion = null) {
         <input type="hidden" id="cancion-path-${id}" value="${cancion?.cancion_path || ''}" required>
       </div>
       
-  
+      ${puedeEliminar ? `
+        <div style="text-align: right;">
+          <button type="button" onclick="eliminarCancionForm(${id})" style="
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+          ">🗑️ Eliminar espacio</button>
+        </div>
+      ` : ''}
     </div>
   `
   
@@ -986,11 +1003,9 @@ async function eliminarDeCloudinary(url, resourceType = "video") {
   }
 }
 
+
 // ========================================
-// ELIMINAR CANCIÓN DEL FORMULARIO
-// ========================================
-// ========================================
-// ELIMINAR CANCIÓN DEL FORMULARIO - CORREGIDO
+// ELIMINAR CANCIÓN DEL FORMULARIO - MEJORADO
 // ========================================
 window.eliminarCancionForm = async function(id) {
   const cancion = document.getElementById(`cancion-form-${id}`)
@@ -998,53 +1013,25 @@ window.eliminarCancionForm = async function(id) {
   
   const idCancion = cancion.dataset.idCancion
   
-  if (!confirm("¿Eliminar esta canción? Se eliminará permanentemente.")) return
-  
-  // Si la canción tiene ID (existe en DB), eliminarla de la base de datos
+  // ✅ SI LA CANCIÓN TIENE ID (existe en DB), no permitir eliminarla aquí
   if (idCancion && idCancion !== '') {
-    try {
-      console.log(`🗑️ Eliminando canción ${idCancion} de la base de datos...`)
-      
-      const resp = await fetch(`${state.baseUrl}/api/canciones/eliminar_cancion`, {
-        method: "DELETE",
-        headers: { 
-          Authorization: `Bearer ${state.token}` ,
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ "id_cancion": idCancion })
-      })
-      
-      if (resp.ok) {
-        const data = await resp.json()
-        console.log("✅ Canción eliminada de DB:", data)
-        
-        // Eliminar de Cloudinary
-        const archivoCancion = uploadedFilesAlbum.canciones[id]
-        if (archivoCancion && archivoCancion.url) {
-          await eliminarDeCloudinary(archivoCancion.url, "video")
-        }
-      } else {
-        const error = await resp.json()
-        alert("❌ Error al eliminar de DB: " + (error.error || "Error desconocido"))
-        return
-      }
-    } catch (error) {
-      console.error("❌ Error:", error)
-      alert("❌ Error de conexión al eliminar canción")
-      return
-    }
-  } else {
-    // Es una canción nueva que no se ha guardado aún
-    const archivoCancion = uploadedFilesAlbum.canciones[id]
-    if (archivoCancion && archivoCancion.url && archivoCancion.nuevo) {
-      await eliminarDeCloudinary(archivoCancion.url, "video")
-    }
+    alert("⚠️ No puedes eliminar canciones existentes desde aquí.\n\nPara gestionar canciones del álbum, ve a la vista de detalle del álbum.")
+    return
+  }
+  
+  // ✅ ES UNA CANCIÓN NUEVA (no guardada), se puede eliminar
+  if (!confirm("¿Eliminar este espacio de canción?")) return
+  
+  // Eliminar archivo de Cloudinary si existe y es nuevo
+  const archivoCancion = uploadedFilesAlbum.canciones[id]
+  if (archivoCancion && archivoCancion.url && archivoCancion.nuevo) {
+    await eliminarDeCloudinary(archivoCancion.url, "video")
   }
   
   // Remover del DOM
   cancion.remove()
   delete uploadedFilesAlbum.canciones[id]
-  console.log(`✅ Canción ${id} eliminada del formulario`)
+  console.log(`✅ Espacio de canción ${id} eliminado del formulario`)
 }
 // ========================================
 // RECOLECTAR CANCIONES CON ELIMINACIÓN
@@ -2566,13 +2553,20 @@ function closeAllModals() {
 // ========================================
 function logout() {
   if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+    // ✅ Limpiar TODO el localStorage
     localStorage.removeItem("token")
     localStorage.removeItem("userRole")
     localStorage.removeItem("userId")
-    window.location.href = "/"
+    localStorage.removeItem("tipo_user")
+    localStorage.removeItem("id_user")
+    localStorage.removeItem("session_id") // ✅ NUEVO
+    
+    console.log("✅ Sesión cerrada completamente")
+    
+    // ✅ Redirigir al login
+    window.location.replace("/")
   }
 }
-
 // ========================================
 // UTILIDADES
 // ========================================

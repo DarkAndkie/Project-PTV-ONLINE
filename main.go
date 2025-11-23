@@ -186,8 +186,8 @@ func main() {
 	app.Get("/api/usuarios/buscar/:nombre", func(c *fiber.Ctx) error {
 		return utils.BuscarUsuariosPorNombre(_DB, c)
 	})
-
-	app.Put("/api/usuarios/:id/tipo", func(c *fiber.Ctx) error {
+	var aut_master = []string{"master"}
+	app.Put("/api/usuarios/:id/tipo", utils.AutenticacionRequerida(aut_master), func(c *fiber.Ctx) error {
 		return utils.CambiarTipoUsuario(_DB, c)
 	})
 

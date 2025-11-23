@@ -1,0 +1,2919 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">proyecto-ptv-online/backend/servicios/config/ConnectDB.go (0.0%)</option>
+				
+				<option value="file1">proyecto-ptv-online/backend/servicios/config/usuario.go (0.0%)</option>
+				
+				<option value="file2">proyecto-ptv-online/backend/servicios/handlers/hand_login.go (0.0%)</option>
+				
+				<option value="file3">proyecto-ptv-online/backend/servicios/handlers/hand_registro.go (0.0%)</option>
+				
+				<option value="file4">proyecto-ptv-online/backend/servicios/handlers/search_handler.go (0.0%)</option>
+				
+				<option value="file5">proyecto-ptv-online/backend/servicios/models/ValidacionCorreo.go (0.0%)</option>
+				
+				<option value="file6">proyecto-ptv-online/backend/servicios/models/add_album.go (0.0%)</option>
+				
+				<option value="file7">proyecto-ptv-online/backend/servicios/models/add_playlist.go (0.0%)</option>
+				
+				<option value="file8">proyecto-ptv-online/backend/servicios/models/album.go (0.0%)</option>
+				
+				<option value="file9">proyecto-ptv-online/backend/servicios/models/cancion.go (0.0%)</option>
+				
+				<option value="file10">proyecto-ptv-online/backend/servicios/models/historial.go (0.0%)</option>
+				
+				<option value="file11">proyecto-ptv-online/backend/servicios/models/playlist.go (0.0%)</option>
+				
+				<option value="file12">proyecto-ptv-online/backend/servicios/models/usuario.go (0.0%)</option>
+				
+				<option value="file13">proyecto-ptv-online/backend/servicios/utils/album_funcs..go (9.0%)</option>
+				
+				<option value="file14">proyecto-ptv-online/backend/servicios/utils/auth_utils.go (0.0%)</option>
+				
+				<option value="file15">proyecto-ptv-online/backend/servicios/utils/canciones_utils.go (0.0%)</option>
+				
+				<option value="file16">proyecto-ptv-online/backend/servicios/utils/cloudinary_clean.go (0.0%)</option>
+				
+				<option value="file17">proyecto-ptv-online/backend/servicios/utils/gestion_Usuarios.go (1.1%)</option>
+				
+				<option value="file18">proyecto-ptv-online/backend/servicios/utils/password_format.go (76.5%)</option>
+				
+				<option value="file19">proyecto-ptv-online/backend/servicios/utils/playlist_funcs.go (0.0%)</option>
+				
+				<option value="file20">proyecto-ptv-online/backend/servicios/utils/token_utils.go (0.0%)</option>
+				
+				<option value="file21">proyecto-ptv-online/main.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package servicios
+
+import (
+        "fmt"
+        "log"
+
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+)
+
+// crearemos la función de conexión a la db
+func ConnectDB() *gorm.DB <span class="cov0" title="0">{
+        var (
+                host     = "localhost"
+                user     = "yisus"
+                port     = "5432"
+                password = "Chucho2003"
+                name     = "ptv_proyect"
+        )
+        //conectar ahora si a la db
+
+        dns := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+                host, port, user, password, name)
+        DB, err := gorm.Open(postgres.Open(dns), &amp;gorm.Config{})
+        DB.AutoMigrate(&amp;Usuario{})
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Error en hacer migración de db", err.Error())
+        }</span>
+        <span class="cov0" title="0">sqlDB, err2 := DB.DB()
+        if err2 != nil </span><span class="cov0" title="0">{
+                log.Fatalf("Error al conectar a la db %v", err2)
+                return nil
+        }</span>
+        <span class="cov0" title="0">if err3 := sqlDB.Ping(); err2 != nil </span><span class="cov0" title="0">{
+                log.Fatalln("Error haciendo ping a la db" + err3.Error())
+                return nil
+        }</span>
+        <span class="cov0" title="0">if DB.Error != nil </span><span class="cov0" title="0">{
+                log.Fatalln("Error en conexion a la db" + err.Error())
+                return nil
+        }</span>
+        <span class="cov0" title="0">log.Println("Conexion exitosa a la db")
+        return DB</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package servicios
+
+type Usuario struct {
+        Id_user   int    `gorm:"column:id_user;primaryKey;autoIncrement:false"`
+        Nombre    string `gorm:"column:nombre"`
+        Apellido  string `gorm:"column:apellido"`
+        Tipo_user string `gorm:"column:tipo_user"`
+        Celular   string `gorm: "column:celular"`
+        Correo    string `gorm: "column:correo"`
+        Password  string `gorm: "column:password"`
+}
+
+func (Usuario) TableName() string <span class="cov0" title="0">{
+        return "usuario"
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package handlers
+
+import (
+        "fmt"
+        "log"
+
+        servicios "proyecto-ptv-online/backend/servicios/config"
+        "proyecto-ptv-online/backend/servicios/models"
+        utils "proyecto-ptv-online/backend/servicios/utils"
+
+        "github.com/gofiber/fiber/v2"
+        "golang.org/x/crypto/bcrypt"
+        "gorm.io/gorm"
+)
+
+func LoginValidacion(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        user := servicios.Usuario{}
+        validador_user := servicios.Usuario{}
+
+        // Parsear body
+        if err := c.BodyParser(&amp;user); err != nil </span><span class="cov0" title="0">{
+
+                // ✅ POR ESTA:
+                return c.Status(400).JSON(fiber.Map{"error": "Error en el parseo del body: " + err.Error()})
+        }</span>
+
+        // Buscar usuario por correo
+        <span class="cov0" title="0">if err1 := _db.Where("correo = ?", user.Correo).First(&amp;validador_user).Error; err1 != nil </span><span class="cov0" title="0">{
+
+                // ✅ POR ESTA:
+                return c.Status(400).JSON(fiber.Map{"error": "Usuario no encontrado o correo incorrecto"})
+        }</span>
+
+        // Comparar contraseñas
+        <span class="cov0" title="0">if err := bcrypt.CompareHashAndPassword([]byte(validador_user.Password), []byte(user.Password)); err != nil </span><span class="cov0" title="0">{
+
+                // ✅ POR ESTA:
+                return c.Status(401).JSON(fiber.Map{"error": "Contraseña incorrecta"})
+        }</span>
+
+        // Verificar si el correo fue validado
+        <span class="cov0" title="0">var validacion models.ValidacionCorreo
+        err := _db.First(&amp;validacion, "id_user = ?", validador_user.Id_user).Error
+        if err != nil </span><span class="cov0" title="0">{
+
+                // ✅ POR ESTA:
+                return c.Status(401).JSON(fiber.Map{"error": "Error al verificar usuario"})
+        }</span>
+
+        <span class="cov0" title="0">if validacion.Verificado == false </span><span class="cov0" title="0">{
+                log.Printf("⚠️ Usuario %s necesita verificar correo", validador_user.Correo)
+                return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+                        "error":                 "Por favor verifica tu correo antes de iniciar sesión",
+                        "requiere_verificacion": true,
+                        "correo":                validador_user.Correo,
+                })
+        }</span>
+
+        // ✅ Generar token JWT con los datos del usuario
+        <span class="cov0" title="0">token, err := utils.GenerarTokenFromFields(
+                validador_user.Id_user,
+                validador_user.Correo,
+                string(validador_user.Tipo_user),
+        )
+        if err != nil </span><span class="cov0" title="0">{
+
+                // ✅ POR ESTA:
+                return c.Status(500).JSON(fiber.Map{"error": "Error al generar token de sesión"})
+        }</span>
+
+        // Logs en consola
+        <span class="cov0" title="0">fmt.Printf("✅ Usuario logueado: %s (%s)\n", validador_user.Nombre, validador_user.Tipo_user)
+
+        // Si es admin, redirige al home admin
+        if validador_user.Tipo_user == "admin" || validador_user.Tipo_user == "master" </span><span class="cov0" title="0">{
+                return c.JSON(fiber.Map{
+                        "direccion": "/SRC/html_templates/home_admin.html",
+                        "mensaje":   "Login exitoso",
+                        "usuario":   validador_user.Nombre,
+                        "id_user":   validador_user.Id_user,
+                        "token":     token,
+                        "tipo_user": validador_user.Tipo_user,
+                })
+        }</span>
+
+        // Si es usuario final
+        <span class="cov0" title="0">return c.JSON(fiber.Map{
+                "direccion": "/SRC/html_templates/home.html",
+                "mensaje":   "Login exitoso",
+                "usuario":   validador_user.Nombre,
+                "id_user":   validador_user.Id_user,
+                "token":     token,
+                "tipo_user": validador_user.Tipo_user,
+        })</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handlers
+
+import (
+        "log"
+        servicios "proyecto-ptv-online/backend/servicios/config"
+        utils "proyecto-ptv-online/backend/servicios/utils"
+
+        "github.com/gofiber/fiber/v2"
+        "gorm.io/gorm"
+)
+
+func RegistrarUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        user := servicios.Usuario{}
+        if err := c.BodyParser(&amp;user); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("Error en el parseo del body: " + err.Error())
+        }</span>
+
+        <span class="cov0" title="0">validador_user := servicios.Usuario{}
+        //validaremos esta wea
+        if err_1 := _db.First(&amp;validador_user, "id_user =? ", user.Id_user).Error; err_1 == nil </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("El usuario ya existe")
+        }</span>
+        <span class="cov0" title="0">if err_2 := _db.First(&amp;validador_user, "correo =?", user.Correo).Error; err_2 == nil </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("El correo ya está Registrado")
+        }</span>
+        <span class="cov0" title="0">if err_3 := utils.PasswordFormato(user.Password); err_3 != nil </span><span class="cov0" title="0">{
+                return c.Status(400).SendString(("Error en el formato de contraseña:" + err_3.Error()))
+        }</span>
+        //cifraré la wea contraseñosa
+        <span class="cov0" title="0">hash, err := utils.CifrarContraseña(user.Password)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("Error en el cifrado de contrasñea: " + err.Error())
+        }</span>
+        <span class="cov0" title="0">user.Password = hash
+        log.Printf("Usuario a registrar: %+v\n", user)
+
+        _db.Create(&amp;user)
+
+        return c.JSON(user)</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package handlers
+
+import (
+        "proyecto-ptv-online/backend/servicios/models"
+
+        "github.com/gofiber/fiber/v2"
+        "gorm.io/gorm"
+)
+
+// BuscarAlbumes busca álbumes por nombre
+func BuscarAlbumes(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        searchReq := struct {
+                Query string `json:"query"`
+        }{}
+
+        if err := c.BodyParser(&amp;searchReq); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("Error parseando body: " + err.Error())
+        }</span>
+
+        <span class="cov0" title="0">if searchReq.Query == "" </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("El parámetro 'query' es requerido")
+        }</span>
+
+        <span class="cov0" title="0">var albumes []models.Albums
+        if err := _db.Where("nombre_album ILIKE ? AND estado = ?", "%"+searchReq.Query+"%", "activo").
+                Find(&amp;albumes).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).SendString("Error en búsqueda: " + err.Error())
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(albumes)</span>
+}
+
+// BuscarCanciones busca canciones activas por nombre
+func BuscarCanciones(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        searchReq := struct {
+                Query string `json:"query"`
+        }{}
+
+        if err := c.BodyParser(&amp;searchReq); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("Error parseando body: " + err.Error())
+        }</span>
+
+        <span class="cov0" title="0">if searchReq.Query == "" </span><span class="cov0" title="0">{
+                return c.Status(400).SendString("El parámetro 'query' es requerido")
+        }</span>
+
+        <span class="cov0" title="0">var canciones []models.Cancion
+        if err := _db.Where("nombre ILIKE ? AND estado = ?", "%"+searchReq.Query+"%", "activo").
+                Find(&amp;canciones).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).SendString("Error en búsqueda: " + err.Error())
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(canciones)</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package models
+
+import (
+        "time"
+)
+
+type ValidacionCorreo struct {
+        Id         int       `gorm:"column:id; primaryKey; autoIncrement" json:"id"`
+        Id_user    int       `gorm:"column:id_user; NOTNULL" json:"id_user"`
+        Codigo     string    `gorm:"column:codigo; NOTNULL" json:"codigo"`
+        Expiracion time.Time `gorm:"column:expiracion; NOTNULL" json:"expiracion"`
+        Verificado bool      `gorm:"column:verificado; NOTNULL; default:false" json:"verificado"`
+}
+
+func (ValidacionCorreo) TableName() string <span class="cov0" title="0">{
+        return "validacioncorreo"
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package models
+
+type Add_Album struct {
+        id_adicion   int    `gorm:"column: id_adicion; PrimaryKey" json:"id_adicion"`
+        n_canciones  int    `gorm:"column:n_canciones" json:"n_canciones"`
+        id_album     string `gorm:"column:id_album" json:"id_album"`
+        id_banda     int    `gorm:"column:id_banda" json:"id_banda"`
+        id_historial int    `gorm:"column:id_historial" json:"id_historial"`
+}
+
+func (Add_Album) TableName() string <span class="cov0" title="0">{
+        return "add_album"
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package models
+
+type Add_Playlist struct {
+        Id_add_playlist int    `gorm:"column:id_add_playlist;primaryKey;" json:"id_add_playlist"`
+        Id_cancion      string `gorm:"column:id_cancion" json:"id_cancion"`
+        Id_playlist     string `gorm:"column:id_playlist" json:"id_playlist"`
+}
+
+func (Add_Playlist) TableName() string <span class="cov0" title="0">{
+        return "add_playlist"
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package models
+
+type Estado_Album string
+
+const (
+        Estado_Borrador      Estado_Album = "borrador"
+        Estado_Activo        Estado_Album = "activo"
+        Estado_Deshabilitado Estado_Album = "deshabilitado"
+)
+
+type Albums struct {
+        Id_album     string       `gorm:"column:id_album;primaryKey;default:id_personalizado_albums()" json:"id_album"`
+        Caratula_dir string       `gorm:"column:caratula_dir" json:"caratula_dir"`
+        Nombre_album string       `gorm:"column:nombre_album" json:"nombre_album"`
+        Descrip      string       `gorm:"column:descrip" json:"descrip"`
+        Estado       Estado_Album `gorm:"column:estado" json:"estado"`
+        Fecha_lanza  string       `gorm:"column:fecha_lanza" json:"fecha_lanza"`
+        Id_banda     int          `gorm:"column:id_banda" json:"id_banda"`
+}
+
+func (Albums) TableName() string <span class="cov0" title="0">{
+        return "album"
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package models
+
+type Cancion struct {
+        Id_cancion     string `gorm:"column:id_cancion;primaryKey;default:id_personalizado_cancion()" json:"id_cancion"`
+        Nombre         string `gorm:"column:nombre" json:"nombre"`
+        Descrip        string `gorm:"column:descrip" json:"descrip"`
+        Id_banda       int    `gorm:"column:id_banda" json:"id_banda"`
+        Id_album       string `gorm:"column:id_album" json:"id_album"`
+        Duracion       string `gorm:"column:duracion" json:"duracion"`
+        Cancion_path   string `gorm:"column:cancion_path" json:"cancion_path"`
+        N_reproduccion int    `gorm:"column:n_reproduccion;default:0" json:"n_reproduccion"`
+        Estado         string `gorm:"column:estado;default:'activo'" json:"estado"`
+}
+
+func (Cancion) TableName() string <span class="cov0" title="0">{
+        return "cancion"
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package models
+
+type Mv_Historial string
+
+const (
+        Adicion_album    Mv_Historial = "adicion_album"
+        Adicion_Playlist Mv_Historial = "adicion_playlist"
+        Estado_Usuario   Mv_Historial = "estado_usuario"
+        EstadoAlbum      Mv_Historial = "estado_album"
+        Estado_Cancion   Mv_Historial = "estado_cancion"
+        Estado_Playlist  Mv_Historial = "estado_palylist"
+)
+
+type Historial struct {
+        id_historial   int          `gorm:"column:id_historial;PrimaryKey" json:"id_historial"`
+        Tipo_Mv        Mv_Historial `gorm:"column:tipo_mv; PrimaryKey" json:" tipo_mv"`
+        fecha_mv       string       `gorm:"column:fecha_mv" json:"fecha_mv"`
+        descripcion    string       `gorm:"column:descripcion" json:"descripcion"`
+        id_responsable int          `gorm:"column:id_responsable" json:"id_responsable"`
+}
+
+func (Historial) TableName() string <span class="cov0" title="0">{
+        return "historial"
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package models
+
+type Playlist struct {
+        Id_playlist   string `gorm:"colum:id_playlist;primaryKey;default:id_personalizado_playlist()" json:"id_playlist"`
+        Estado        string `gorm:"colum:string" json:"estado"`
+        Nombre        string `gorm:"column:nombre" json:"nombre"`
+        Fecha_cracion string `gorm:"column:fecha_creacion" json:"fecha_cracion"`
+        Id_user_final int    `gorm:"column:id_user_final" json:"id_user_final"`
+}
+
+func (Playlist) TableName() string <span class="cov0" title="0">{
+        return "playlist"
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package models
+
+type TipoUsuario string
+
+const (
+        Admin         TipoUsuario = "admin"
+        Curador       TipoUsuario = "curador"
+        Banda         TipoUsuario = "banda"
+        Artista       TipoUsuario = "artista"
+        FinalUsuario  TipoUsuario = "finalusuario"
+        Deshabilitado TipoUsuario = "deshabilitado"
+)
+
+type Usuario struct {
+        Id_user   int         `gorm:"column:id_user; PrimaryKey; NOTNULL" json:"id_user"`
+        Nombre    string      `gomr:"column:nombre; NOTNULL" json:"nombre"`
+        Apellido  string      `gorm:"column:apellido; NOTNULL" json:"apellido"`
+        Email     string      `gorm:"column:correo; NOTNULL; unique" json:"email"`
+        Password  string      `gorm:"column:password; NOTNULL" json:"password"`
+        Tipo_user TipoUsuario `gorm:"column:tipo_user; NOTNULL" json:"tipo_user"`
+        Celular   string      `gorm:"column:celular; NOTNULL; default:true" json:"celular"`
+}
+
+func (Usuario) TableName() string <span class="cov0" title="0">{
+        return "usuario"
+}</span>
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package utils
+
+import (
+        "errors"
+        "log"
+        "net/http"
+        "regexp"
+        "strconv"
+        "strings"
+        "time"
+        "unicode/utf8"
+
+        models "proyecto-ptv-online/backend/servicios/models"
+
+        "github.com/gofiber/fiber/v2"
+        "gorm.io/gorm"
+)
+
+// Validar y parsear álbum
+func Parsear_ValidarAlbum(_db *gorm.DB, album models.Albums) error <span class="cov0" title="0">{
+
+        var count int64
+        _db.Model(&amp;models.Albums{}).Where("nombre_album = ?", album.Nombre_album).Count(&amp;count)
+        if count &gt; 0 </span><span class="cov0" title="0">{
+                return errors.New("Ya existe este nombre para un álbum")
+        }</span>
+
+        <span class="cov0" title="0">if utf8.RuneCountInString(album.Caratula_dir) &gt; 500 </span><span class="cov0" title="0">{
+                return errors.New("La dirección de carátula supera el límite permitido")
+        }</span>
+        <span class="cov0" title="0">if utf8.RuneCountInString(album.Nombre_album) &gt; 50 </span><span class="cov0" title="0">{
+                return errors.New("El nombre del álbum no puede superar 50 caracteres")
+        }</span>
+        <span class="cov0" title="0">if utf8.RuneCountInString(album.Descrip) &gt; 250 </span><span class="cov0" title="0">{
+                return errors.New("La descripción no puede superar 250 caracteres")
+        }</span>
+
+        <span class="cov0" title="0">if !strings.HasPrefix(album.Caratula_dir, "http://") &amp;&amp; !strings.HasPrefix(album.Caratula_dir, "https://") </span><span class="cov0" title="0">{
+                return errors.New("La URL de la carátula debe comenzar con http:// o https://")
+        }</span>
+
+        <span class="cov0" title="0">if strings.Contains(album.Caratula_dir, "cloudinary.com") || strings.Contains(album.Caratula_dir, "res.cloudinary.com") </span><span class="cov0" title="0">{
+                log.Printf("✅ Cloudinary URL aceptada: %s", album.Caratula_dir)
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">if !existeElArchivo(album.Caratula_dir, "caratula") </span><span class="cov0" title="0">{
+                return errors.New("El enlace de la carátula no es existente, por favor ingrese un enlace válido y que pertenezca a una imagen")
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+func parsear_Validar_Cancion(_db *gorm.DB, cancion models.Cancion) error <span class="cov0" title="0">{
+
+        if utf8.RuneCountInString(cancion.Nombre) &gt; 40 </span><span class="cov0" title="0">{
+                return errors.New("El nombre de la canción no puede ser superior a 40 caracteres")
+        }</span>
+        <span class="cov0" title="0">if utf8.RuneCountInString(cancion.Descrip) &gt; 300 </span><span class="cov0" title="0">{
+                return errors.New("La descripción de la canción no puede ser superior a 300 caracteres")
+        }</span>
+
+        <span class="cov0" title="0">if err := ValidarDuracionCancion(cancion.Duracion); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">if !strings.HasPrefix(cancion.Cancion_path, "http://") &amp;&amp; !strings.HasPrefix(cancion.Cancion_path, "https://") </span><span class="cov0" title="0">{
+                return errors.New("La URL de la canción debe comenzar con http:// o https://")
+        }</span>
+
+        <span class="cov0" title="0">if strings.Contains(cancion.Cancion_path, "cloudinary.com") || strings.Contains(cancion.Cancion_path, "res.cloudinary.com") </span><span class="cov0" title="0">{
+                log.Printf("✅ Cloudinary URL aceptada: %s", cancion.Cancion_path)
+                return nil
+        }</span>
+
+        <span class="cov0" title="0">if !existeElArchivo(cancion.Cancion_path, "audio") </span><span class="cov0" title="0">{
+                return errors.New("El enlace de la canción es inválido, por favor ingrese uno correcto y que sea un archivo de audio")
+        }</span>
+
+        <span class="cov0" title="0">return nil</span>
+}
+
+// ✅ NUEVA FUNCIÓN: Validar duración con límites reales
+func ValidarDuracionCancion(duracion string) error <span class="cov8" title="1">{
+        // Verificar formato mm:ss
+        re := regexp.MustCompile(`^(\d{2}):(\d{2})$`)
+        matches := re.FindStringSubmatch(duracion)
+
+        if matches == nil </span><span class="cov8" title="1">{
+                return errors.New("La duración debe tener el formato mm:ss (ejemplo: 03:45)")
+        }</span>
+
+        // Extraer minutos y segundos
+        <span class="cov8" title="1">minutos, err1 := strconv.Atoi(matches[1])
+        segundos, err2 := strconv.Atoi(matches[2])
+
+        if err1 != nil || err2 != nil </span><span class="cov0" title="0">{
+                return errors.New("La duración contiene valores no numéricos")
+        }</span>
+
+        // ✅ Validar rangos
+        <span class="cov8" title="1">if minutos &lt; 0 || minutos &gt; 59 </span><span class="cov8" title="1">{
+                return errors.New("Los minutos deben estar entre 00 y 59")
+        }</span>
+
+        <span class="cov8" title="1">if segundos &lt; 0 || segundos &gt; 59 </span><span class="cov8" title="1">{
+                return errors.New("Los segundos deben estar entre 00 y 59")
+        }</span>
+
+        // ✅ Validar que no sea 00:00
+        <span class="cov8" title="1">if minutos == 0 &amp;&amp; segundos == 0 </span><span class="cov8" title="1">{
+                return errors.New("La duración no puede ser 00:00")
+        }</span>
+
+        // ✅ Opcional: Validar duración máxima (ej: 60 minutos)
+        <span class="cov8" title="1">duracionTotal := minutos*60 + segundos
+        if duracionTotal &gt; 3600 </span><span class="cov0" title="0">{ // 60 minutos = 3600 segundos
+                return errors.New("La duración no puede superar 60 minutos")
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+// ✅ FUNCIÓN MEJORADA: Verificar archivos con mejor manejo
+func existeElArchivo(url string, tipoArchivo string) bool <span class="cov0" title="0">{
+        log.Printf("🔍 Verificando URL: %s (tipo: %s)", url, tipoArchivo)
+
+        // ✅ Manejar enlaces de Google Drive
+        if strings.Contains(url, "drive.google.com") </span><span class="cov0" title="0">{
+                log.Printf("⚠️ Advertencia: Google Drive no permite verificación directa de archivos")
+                // Convertir a formato directo si es posible
+                if strings.Contains(url, "/file/d/") </span><span class="cov0" title="0">{
+                        fileID := extraerGoogleDriveID(url)
+                        if fileID != "" </span><span class="cov0" title="0">{
+                                url = "https://drive.google.com/uc?export=view&amp;id=" + fileID
+                                log.Printf("🔄 URL convertida: %s", url)
+                        }</span>
+                }
+        }
+
+        <span class="cov0" title="0">client := http.Client{
+                Timeout: 10 * time.Second, // ✅ Aumentado a 10 segundos
+                CheckRedirect: func(req *http.Request, via []*http.Request) error </span><span class="cov0" title="0">{
+                        // Permitir hasta 10 redirects
+                        if len(via) &gt;= 10 </span><span class="cov0" title="0">{
+                                return errors.New("demasiados redirects")
+                        }</span>
+                        <span class="cov0" title="0">return nil</span>
+                },
+        }
+
+        <span class="cov0" title="0">resp, err := client.Get(url)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ Error al verificar URL: %v", err)
+                return false
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        log.Printf("📥 Status code: %d", resp.StatusCode)
+        log.Printf("📥 Content-Type: %s", resp.Header.Get("Content-Type"))
+
+        // ✅ CORREGIDO: StatusOK (200) en vez de StatusAccepted (202)
+        if resp.StatusCode != http.StatusOK </span><span class="cov0" title="0">{
+                log.Printf("❌ Status code inválido: %d", resp.StatusCode)
+                return false
+        }</span>
+
+        <span class="cov0" title="0">contentType := resp.Header.Get("Content-Type")
+        if contentType == "" </span><span class="cov0" title="0">{
+                log.Printf("⚠️ No hay Content-Type en la respuesta")
+                return false
+        }</span>
+
+        <span class="cov0" title="0">switch tipoArchivo </span>{
+        case "audio":<span class="cov0" title="0">
+                valido := strings.HasPrefix(contentType, "audio/")
+                log.Printf("🎵 ¿Es audio?: %v", valido)
+                return valido</span>
+        case "caratula":<span class="cov0" title="0">
+                valido := strings.HasPrefix(contentType, "image/")
+                log.Printf("🖼️ ¿Es imagen?: %v", valido)
+                return valido</span>
+        }
+
+        <span class="cov0" title="0">return false</span>
+}
+
+// ✅ NUEVA FUNCIÓN: Extraer ID de Google Drive
+func extraerGoogleDriveID(url string) string <span class="cov0" title="0">{
+        // Buscar el patrón /file/d/{FILE_ID}/
+        re := regexp.MustCompile(`/file/d/([^/]+)`)
+        matches := re.FindStringSubmatch(url)
+        if len(matches) &gt; 1 </span><span class="cov0" title="0">{
+                return matches[1]
+        }</span>
+        <span class="cov0" title="0">return ""</span>
+}
+
+// Registrar álbum
+// Agregar al archivo de utils o routes// CrearAlbumCompleto crea un álbum y sus canciones en una sola transacción
+func CrearAlbumCompleto(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+
+        //como me dió pereza hacer mas extenso el js de administración de albums y mandé album y el array de canciones juntos
+        //so toca hcaer un strcut para recbirlo con fiber
+        type Payload struct {
+                Album     models.Albums    `json:"album"`
+                Canciones []models.Cancion `json:"canciones"`
+        }
+        var datos Payload
+        if err := c.BodyParser(&amp;datos); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "no se pudo parsear correctamente los datos desde el payload",
+                })
+        }</span>
+        <span class="cov0" title="0">albums := datos.Album
+        canciones := datos.Canciones
+        albums.Estado = "borrador"
+        if err := Parsear_ValidarAlbum(_db, albums); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Error al rellenar alguno de los datos" + err.Error(),
+                })
+        }</span>
+        <span class="cov0" title="0">cancionesValidas := []models.Cancion{}
+        for _, d := range canciones </span><span class="cov0" title="0">{
+                if err := parsear_Validar_Cancion(_db, d); err != nil </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                                "Error": "Error al validar la canción: " + d.Nombre + " " + err.Error(),
+                        })
+                }</span>
+                <span class="cov0" title="0">cancionesValidas = append(cancionesValidas, d)</span>
+        }
+        <span class="cov0" title="0">err := _db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                if err := tx.Create(&amp;albums).Error; err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">for i := range cancionesValidas </span><span class="cov0" title="0">{
+                        cancionesValidas[i].Id_album = albums.Id_album
+                        cancionesValidas[i].Id_banda = albums.Id_banda
+                        if err := tx.Create(&amp;cancionesValidas[i]).Error; err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                }
+                <span class="cov0" title="0">log.Println("Creado en db")
+                return nil</span> //se supone que si todo sale fino se guarda
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error en transacción:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "No se pudo guardar el álbum y sus canciones",
+                })
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{
+                "mensaje":  "Álbum y canciones guardados correctamente",
+                "id_album": albums.Id_album,
+        })</span>
+}
+
+// Actualizar estado del álbum
+
+func ActualizarEstadoAlbum(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var body struct {
+                IdAlbum string `json:"id_album"`
+                Estado  string `json:"estado"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">if body.IdAlbum == "" </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "id_album es requerido"})
+        }</span>
+
+        <span class="cov0" title="0">if body.Estado == "" </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "estado es requerido"})
+        }</span>
+
+        <span class="cov0" title="0">result := _db.Model(&amp;models.Albums{}).Where("id_album = ?", body.IdAlbum).Update("estado", body.Estado)
+
+        if result.RowsAffected == 0 </span><span class="cov0" title="0">{
+                return c.Status(404).JSON(fiber.Map{"error": "Álbum no encontrado"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"message": "Estado actualizado correctamente"})</span>
+}
+func Buscar_album(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var album models.Albums
+        c.BodyParser(&amp;album)
+        println("carat" + album.Id_album)
+        if err := _db.Where("id_album =?", album.Id_album).Find(&amp;album).Error; err != nil </span><span class="cov0" title="0">{
+                c.Status(400).JSON(fiber.Map{
+                        "Error": "No se pudo obtener el album",
+                })
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(album.Caratula_dir)</span>
+}
+
+// Listar todos los álbumes
+func ListarAlbums(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var albums []models.Albums
+        if err := _db.Find(&amp;albums).Error; err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al consultar álbumes:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al consultar álbumes"})
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Álbums encontrados: %d\n", len(albums))
+        return c.JSON(albums)</span>
+}
+func ActualizarAlbumConCanciones(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        type Payload struct {
+                Album     models.Albums    `json:"album"`
+                Canciones []models.Cancion `json:"canciones"`
+        }
+
+        var datos Payload
+        if err := c.BodyParser(&amp;datos); err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al parsear:", err)
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "No se pudo parsear los datos",
+                })
+        }</span>
+
+        <span class="cov0" title="0">album := datos.Album
+        canciones := datos.Canciones
+
+        log.Printf("📥 Actualizando álbum: %s (ID: %s)", album.Nombre_album, album.Id_album)
+
+        // ✅ NO validar nombre duplicado en actualización
+        // Comentar la validación de nombre único en Parsear_ValidarAlbum para updates
+
+        // Transacción: actualizar álbum y canciones
+        err := _db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                // Actualizar álbum
+                if err := tx.Model(&amp;models.Albums{}).
+                        Where("id_album = ?", album.Id_album).
+                        Updates(map[string]interface{}{
+                                "nombre_album": album.Nombre_album,
+                                "caratula_dir": album.Caratula_dir,
+                                "descrip":      album.Descrip,
+                                "fecha_lanza":  album.Fecha_lanza,
+                                "id_banda":     album.Id_banda,
+                        }).Error; err != nil </span><span class="cov0" title="0">{
+                        log.Println("❌ Error actualizando álbum:", err)
+                        return err
+                }</span>
+
+                <span class="cov0" title="0">log.Println("✅ Álbum actualizado")
+
+                // Actualizar o insertar canciones
+                for i, cancion := range canciones </span><span class="cov0" title="0">{
+                        cancion.Id_album = album.Id_album
+                        cancion.Id_banda = album.Id_banda
+
+                        if cancion.Id_cancion != "" </span><span class="cov0" title="0">{
+                                // ✅ Canción existente: actualizar
+                                log.Printf("🔄 Actualizando canción %d: %s (ID: %s)", i+1, cancion.Nombre, cancion.Id_cancion)
+
+                                if err := tx.Model(&amp;models.Cancion{}).
+                                        Where("id_cancion = ?", cancion.Id_cancion).
+                                        Updates(map[string]interface{}{
+                                                "nombre":       cancion.Nombre,
+                                                "descrip":      cancion.Descrip,
+                                                "duracion":     cancion.Duracion,
+                                                "cancion_path": cancion.Cancion_path,
+                                        }).Error; err != nil </span><span class="cov0" title="0">{
+                                        log.Println("❌ Error actualizando canción:", err)
+                                        return err
+                                }</span>
+                        } else<span class="cov0" title="0"> {
+                                // ✅ Canción nueva: insertar
+                                log.Printf("➕ Insertando nueva canción %d: %s", i+1, cancion.Nombre)
+
+                                if err := tx.Create(&amp;cancion).Error; err != nil </span><span class="cov0" title="0">{
+                                        log.Println("❌ Error insertando canción:", err)
+                                        return err
+                                }</span>
+                        }
+                }
+
+                <span class="cov0" title="0">log.Println("✅ Todas las canciones procesadas")
+                return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error en transacción:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "No se pudo actualizar el álbum y sus canciones: " + err.Error(),
+                })
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{
+                "mensaje":  "Álbum y canciones actualizados correctamente",
+                "id_album": album.Id_album,
+        })</span>
+}
+
+func Buscar_Albums_Aleatorios(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+
+        const cantidad = 8
+
+        var albums = []models.Albums{}
+        if result := _db.Order("RANDOM()").Limit(cantidad).Find(&amp;albums).Error; result != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al consultar álbumes:", result.Error())
+                return c.Status(500).JSON(fiber.Map{
+                        "error": "No se pudieron obtener los albumes",
+                })
+        }</span>
+        <span class="cov0" title="0">return c.JSON(albums)</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package utils
+
+import (
+        "errors"
+        "os"
+        "strings"
+
+        "github.com/golang-jwt/jwt/v5"
+)
+
+// ExtraerInfoDelToken extrae id y role del token JWT
+func ExtraerInfoDelToken(authHeader string) (int, string, error) <span class="cov0" title="0">{
+        if authHeader == "" </span><span class="cov0" title="0">{
+                return 0, "", errors.New("token no proporcionado")
+        }</span>
+
+        // Remover "Bearer " del inicio
+        <span class="cov0" title="0">token := strings.TrimPrefix(authHeader, "Bearer ")
+        if token == authHeader </span><span class="cov0" title="0">{
+                return 0, "", errors.New("formato de token inválido")
+        }</span>
+
+        // Parsear token
+        <span class="cov0" title="0">claims := jwt.MapClaims{}
+        _, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) </span><span class="cov0" title="0">{
+                return []byte(os.Getenv("JWT_SECRET")), nil
+        }</span>)
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return 0, "", errors.New("token inválido: " + err.Error())
+        }</span>
+
+        // Extraer campos
+        <span class="cov0" title="0">userID, ok := claims["id"].(float64)
+        if !ok </span><span class="cov0" title="0">{
+                return 0, "", errors.New("id no encontrado en token")
+        }</span>
+
+        <span class="cov0" title="0">userRole, ok := claims["tipo_user"].(string)
+        if !ok </span><span class="cov0" title="0">{
+                return 0, "", errors.New("rol no encontrado en token")
+        }</span>
+
+        <span class="cov0" title="0">return int(userID), userRole, nil</span>
+}
+
+// ValidarRol verifica si el rol del usuario está en la lista permitida
+func ValidarRol(userRole string, rolesPermitidos []string) bool <span class="cov0" title="0">{
+        for _, rol := range rolesPermitidos </span><span class="cov0" title="0">{
+                if userRole == rol </span><span class="cov0" title="0">{
+                        return true
+                }</span>
+        }
+        <span class="cov0" title="0">return false</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package utils
+
+import (
+        "errors"
+        "log"
+        models "proyecto-ptv-online/backend/servicios/models"
+
+        "github.com/gofiber/fiber/v2"
+        "gorm.io/gorm"
+)
+
+// ObtenerCancionesPorAlbum obtiene todas las canciones de un álbum específico
+func ObtenerCancionesPorAlbum(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var body struct {
+                IdAlbum string `json:"id_album"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Datos inválidos",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if body.IdAlbum == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "El ID del álbum es requerido",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("🔍 Buscando canciones para álbum: %s\n", body.IdAlbum)
+
+        var album models.Albums
+        if err := _db.Where("id_album = ?", body.IdAlbum).First(&amp;album).Error; err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                                "error": "Álbum no encontrado",
+                        })
+                }</span>
+                <span class="cov0" title="0">log.Println("❌ Error al buscar álbum:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al buscar el álbum",
+                })</span>
+        }
+
+        // ✅ CRÍTICO: Seleccionar TODOS los campos incluyendo estado
+        <span class="cov0" title="0">var canciones []models.Cancion
+        if err := _db.Select("*").Where("id_album = ?", body.IdAlbum).Find(&amp;canciones).Error; err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al consultar canciones:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al consultar las canciones",
+                })
+        }</span>
+
+        // ✅ Log para debugging
+        <span class="cov0" title="0">for _, cancion := range canciones </span><span class="cov0" title="0">{
+                log.Printf("   📀 %s | Estado: '%s' | Reprod: %d\n", cancion.Nombre, cancion.Estado, cancion.N_reproduccion)
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Canciones encontradas para álbum %s: %d\n", body.IdAlbum, len(canciones))
+        return c.JSON(canciones)</span>
+}
+
+// ActualizarCancion actualiza los datos de una canción
+// ActualizarCancion actualiza una canción por su ID (recibido en el body)
+func ActualizarCancion(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var body struct {
+                IdCancion   string `json:"id_cancion"`
+                Nombre      string `json:"nombre"`
+                Descrip     string `json:"descrip"`
+                Duracion    string `json:"duracion"`
+                CancionPath string `json:"cancion_path"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Datos inválidos",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if body.IdCancion == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "El ID de la canción es requerido",
+                })
+        }</span>
+
+        <span class="cov0" title="0">var cancion models.Cancion
+        if err := _db.Where("id_cancion = ?", body.IdCancion).First(&amp;cancion).Error; err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                                "error": "Canción no encontrada",
+                        })
+                }</span>
+                <span class="cov0" title="0">return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al buscar la canción",
+                })</span>
+        }
+
+        // ✅ Actualizar TODOS los campos (incluyendo duración)
+        <span class="cov0" title="0">result := _db.Model(&amp;models.Cancion{}).
+                Where("id_cancion = ?", body.IdCancion).
+                Updates(map[string]interface{}{
+                        "nombre":       body.Nombre,
+                        "descrip":      body.Descrip,
+                        "duracion":     body.Duracion,
+                        "cancion_path": body.CancionPath,
+                })
+
+        if result.Error != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al actualizar canción:", result.Error)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al actualizar la canción",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Canción actualizada: %s\n", body.IdCancion)
+        return c.JSON(fiber.Map{
+                "mensaje": "Canción actualizada correctamente",
+        })</span>
+}
+
+func CambiarEstadoCancion(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var body struct {
+                IdCancion string `json:"id_cancion"`
+                Estado    string `json:"estado"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al parsear body:", err)
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Datos inválidos",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("📥 Recibido: id_cancion='%s', estado='%s'\n", body.IdCancion, body.Estado)
+
+        if body.IdCancion == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "El ID de la canción es requerido",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if body.Estado != "activo" &amp;&amp; body.Estado != "deshabilitado" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Estado inválido. Debe ser 'activo' o 'deshabilitado'",
+                })
+        }</span>
+
+        <span class="cov0" title="0">var cancion models.Cancion
+        if err := _db.Where("id_cancion = ?", body.IdCancion).First(&amp;cancion).Error; err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                                "error": "Canción no encontrada",
+                        })
+                }</span>
+                <span class="cov0" title="0">log.Println("❌ Error al buscar canción:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al buscar la canción",
+                })</span>
+        }
+
+        <span class="cov0" title="0">log.Printf("🔍 Canción encontrada: '%s' | Estado actual: '%s'\n", cancion.Nombre, cancion.Estado)
+
+        // ✅ Usar Update (singular) no Updates (plural)
+        result := _db.Model(&amp;models.Cancion{}).
+                Where("id_cancion = ?", body.IdCancion).
+                Update("estado", body.Estado)
+
+        if result.Error != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al actualizar estado:", result.Error)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al actualizar el estado",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if result.RowsAffected == 0 </span><span class="cov0" title="0">{
+                log.Println("⚠️ No se actualizó ninguna fila")
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                        "error": "No se pudo actualizar el estado",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Estado actualizado: '%s' -&gt; '%s' (Filas: %d)\n", body.IdCancion, body.Estado, result.RowsAffected)
+
+        return c.JSON(fiber.Map{
+                "mensaje": "Estado actualizado correctamente",
+                "estado":  body.Estado,
+        })</span>
+}
+
+// EliminarCancion elimina una canción de la base de datos
+func EliminarCancion(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var idCancion struct {
+                Id_cancion string `json:"id_cancion"`
+        }
+        c.BodyParser(&amp;idCancion)
+        log.Println("id cancion", idCancion.Id_cancion)
+        if idCancion.Id_cancion == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "El ID de la canción es requerido",
+                })
+        }</span>
+
+        // Verificar que la canción existe
+        <span class="cov0" title="0">var cancion models.Cancion
+        if err := _db.Where("id_cancion = ?", idCancion.Id_cancion).First(&amp;cancion).Error; err != nil </span><span class="cov0" title="0">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                                "error": "Canción no encontrada",
+                        })
+                }</span>
+                <span class="cov0" title="0">log.Println("❌ Error al buscar canción:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al buscar la canción",
+                })</span>
+        }
+
+        // Eliminar la canción
+        <span class="cov0" title="0">if err := _db.Delete(&amp;cancion).Error; err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al eliminar canción:", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al eliminar la canción",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Canción eliminada: %s\n", idCancion)
+        return c.JSON(fiber.Map{
+                "mensaje": "Canción eliminada correctamente",
+        })</span>
+}
+
+// DeshabilitarCancion desabilita una canción (solo para banda/curador)
+func DeshabilitarCancion(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuarioTipo := c.Locals("usuario_tipo").(string)
+
+        if usuarioTipo != "banda" &amp;&amp; usuarioTipo != "curador" &amp;&amp; usuarioTipo != "admin" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+                        "error": "No tienes permisos para deshabilitar canciones",
+                })
+        }</span>
+
+        <span class="cov0" title="0">var body struct {
+                IdCancion string `json:"id_cancion"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Datos inválidos",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if body.IdCancion == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "El ID de la canción es requerido",
+                })
+        }</span>
+
+        <span class="cov0" title="0">var cancion models.Cancion
+        if err := _db.Where("id_cancion = ?", body.IdCancion).First(&amp;cancion).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                        "error": "Canción no encontrada",
+                })
+        }</span>
+
+        // Actualizar estado a deshabilitado
+        <span class="cov0" title="0">result := _db.Model(&amp;models.Cancion{}).
+                Where("id_cancion = ?", body.IdCancion).
+                Update("estado", "deshabilitado")
+
+        if result.Error != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al deshabilitar canción:", result.Error)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al deshabilitar la canción",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Canción deshabilitada: %s\n", body.IdCancion)
+        return c.JSON(fiber.Map{
+                "mensaje": "Canción deshabilitada correctamente",
+        })</span>
+}
+
+// HabilitarCancion habilita una canción (solo para admin o banda propietaria)
+func HabilitarCancion(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuarioTipo := c.Locals("usuario_tipo").(string)
+
+        if usuarioTipo != "admin" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+                        "error": "Solo administradores pueden habilitar canciones",
+                })
+        }</span>
+
+        <span class="cov0" title="0">var body struct {
+                IdCancion string `json:"id_cancion"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Datos inválidos",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if body.IdCancion == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "El ID de la canción es requerido",
+                })
+        }</span>
+
+        <span class="cov0" title="0">var cancion models.Cancion
+        if err := _db.Where("id_cancion = ?", body.IdCancion).First(&amp;cancion).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                        "error": "Canción no encontrada",
+                })
+        }</span>
+
+        // Actualizar estado a activo
+        <span class="cov0" title="0">result := _db.Model(&amp;models.Cancion{}).
+                Where("id_cancion = ?", body.IdCancion).
+                Update("estado", "activo")
+
+        if result.Error != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al habilitar canción:", result.Error)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al habilitar la canción",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Canción habilitada: %s\n", body.IdCancion)
+        return c.JSON(fiber.Map{
+                "mensaje": "Canción habilitada correctamente",
+        })</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package utils
+
+import (
+        "encoding/json"
+        "fmt"
+        "log"
+        "net/http"
+        "os"
+        "strings"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+)
+
+// LimpiarCloudinary elimina archivos de Cloudinary
+func LimpiarCloudinary(c *fiber.Ctx) error <span class="cov0" title="0">{
+        var body struct {
+                URLs          []string `json:"urls"`
+                ResourceTypes []string `json:"resource_types"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al parsear body:", err)
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "Datos inválidos",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if len(body.URLs) == 0 </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": "No se proporcionaron URLs para eliminar",
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("🗑️ Eliminando %d archivos de Cloudinary...", len(body.URLs))
+
+        cloudName := os.Getenv("CLOUDINARY_CLOUD_NAME")
+        apiKey := os.Getenv("CLOUDINARY_API_KEY")
+        apiSecret := os.Getenv("CLOUDINARY_API_SECRET")
+
+        if cloudName == "" || apiKey == "" || apiSecret == "" </span><span class="cov0" title="0">{
+                log.Println("❌ Cloudinary no está configurado correctamente")
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Cloudinary no configurado",
+                })
+        }</span>
+
+        <span class="cov0" title="0">eliminados := 0
+        errores := 0
+
+        for i, url := range body.URLs </span><span class="cov0" title="0">{
+                resourceType := "video" // Default para canciones
+                if i &lt; len(body.ResourceTypes) </span><span class="cov0" title="0">{
+                        resourceType = body.ResourceTypes[i]
+                }</span>
+
+                <span class="cov0" title="0">publicID := extraerPublicID(url)
+                if publicID == "" </span><span class="cov0" title="0">{
+                        log.Printf("⚠️ No se pudo extraer public_id de: %s", url)
+                        errores++
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">if eliminarDeCloudinary(cloudName, apiKey, apiSecret, publicID, resourceType) </span><span class="cov0" title="0">{
+                        eliminados++
+                        log.Printf("✅ Eliminado: %s", publicID)
+                }</span> else<span class="cov0" title="0"> {
+                        errores++
+                        log.Printf("❌ Error al eliminar: %s", publicID)
+                }</span>
+
+                // Pequeña pausa para no saturar la API
+                <span class="cov0" title="0">time.Sleep(100 * time.Millisecond)</span>
+        }
+
+        <span class="cov0" title="0">log.Printf("📊 Resultado: %d eliminados, %d errores", eliminados, errores)
+
+        return c.JSON(fiber.Map{
+                "mensaje":    fmt.Sprintf("%d archivos eliminados correctamente", eliminados),
+                "eliminados": eliminados,
+                "errores":    errores,
+        })</span>
+}
+
+// extraerPublicID extrae el public_id de una URL de Cloudinary
+func extraerPublicID(url string) string <span class="cov0" title="0">{
+        // Ejemplo URL: https://res.cloudinary.com/demo/image/upload/v1234567890/sample.jpg
+        // public_id: sample
+
+        if !strings.Contains(url, "cloudinary.com") </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+
+        // Buscar el patrón /upload/v[números]/
+        <span class="cov0" title="0">parts := strings.Split(url, "/upload/")
+        if len(parts) &lt; 2 </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+
+        // Tomar la parte después de /upload/
+        <span class="cov0" title="0">afterUpload := parts[1]
+
+        // Remover la versión (v1234567890/)
+        versionParts := strings.SplitN(afterUpload, "/", 2)
+        if len(versionParts) &lt; 2 </span><span class="cov0" title="0">{
+                return ""
+        }</span>
+
+        // Obtener el nombre del archivo sin extensión
+        <span class="cov0" title="0">pathWithFile := versionParts[1]
+
+        // Remover la extensión
+        lastDot := strings.LastIndex(pathWithFile, ".")
+        if lastDot == -1 </span><span class="cov0" title="0">{
+                return pathWithFile
+        }</span>
+
+        <span class="cov0" title="0">return pathWithFile[:lastDot]</span>
+}
+
+// eliminarDeCloudinary hace la petición DELETE a Cloudinary
+func eliminarDeCloudinary(cloudName, apiKey, apiSecret, publicID, resourceType string) bool <span class="cov0" title="0">{
+        // URL de la API de Cloudinary para eliminar
+        apiURL := fmt.Sprintf("https://api.cloudinary.com/v1_1/%s/%s/destroy", cloudName, resourceType)
+
+        // Crear el payload
+        payload := map[string]string{
+                "public_id": publicID,
+        }
+
+        payloadBytes, err := json.Marshal(payload)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al crear payload:", err)
+                return false
+        }</span>
+
+        // Crear la petición
+        <span class="cov0" title="0">req, err := http.NewRequest("POST", apiURL, strings.NewReader(string(payloadBytes)))
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error al crear petición:", err)
+                return false
+        }</span>
+
+        // Agregar autenticación básica
+        <span class="cov0" title="0">req.SetBasicAuth(apiKey, apiSecret)
+        req.Header.Set("Content-Type", "application/json")
+
+        // Hacer la petición
+        client := &amp;http.Client{Timeout: 10 * time.Second}
+        resp, err := client.Do(req)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("❌ Error en la petición:", err)
+                return false
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        // Verificar respuesta
+        if resp.StatusCode == http.StatusOK </span><span class="cov0" title="0">{
+                return true
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("⚠️ Status code: %d", resp.StatusCode)
+        return false</span>
+}
+
+// ============================================
+// ✅ AGREGAR ESTAS FUNCIONES AL FINAL DEL ARCHIVO
+// ============================================
+
+// LimpiarCloudinaryAsync elimina archivos de forma asíncrona (para beforeunload)
+func LimpiarCloudinaryAsync(urls []string, resourceTypes []string) <span class="cov0" title="0">{
+        log.Printf("🗑️ [ASYNC] Iniciando limpieza de %d archivos...", len(urls))
+
+        cloudName := os.Getenv("CLOUDINARY_CLOUD_NAME")
+        apiKey := os.Getenv("CLOUDINARY_API_KEY")
+        apiSecret := os.Getenv("CLOUDINARY_API_SECRET")
+
+        if cloudName == "" || apiKey == "" || apiSecret == "" </span><span class="cov0" title="0">{
+                log.Println("❌ [ASYNC] Cloudinary no configurado")
+                return
+        }</span>
+
+        <span class="cov0" title="0">eliminados := 0
+        for i, url := range urls </span><span class="cov0" title="0">{
+                resourceType := "video"
+                if i &lt; len(resourceTypes) </span><span class="cov0" title="0">{
+                        resourceType = resourceTypes[i]
+                }</span>
+
+                <span class="cov0" title="0">publicID := extraerPublicID(url)
+                if publicID == "" </span><span class="cov0" title="0">{
+                        log.Printf("⚠️ [ASYNC] No se pudo extraer public_id de: %s", url)
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">if eliminarDeCloudinary(cloudName, apiKey, apiSecret, publicID, resourceType) </span><span class="cov0" title="0">{
+                        eliminados++
+                        log.Printf("✅ [ASYNC] Eliminado: %s", publicID)
+                }</span> else<span class="cov0" title="0"> {
+                        log.Printf("❌ [ASYNC] Error al eliminar: %s", publicID)
+                }</span>
+
+                <span class="cov0" title="0">time.Sleep(100 * time.Millisecond)</span>
+        }
+
+        <span class="cov0" title="0">log.Printf("📊 [ASYNC] Limpieza completada: %d/%d eliminados", eliminados, len(urls))</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package utils
+
+import (
+        "errors"
+        "fmt"
+        "log"
+        "math/rand"
+        "net/smtp"
+        "os"
+        models "proyecto-ptv-online/backend/servicios/models"
+        "regexp"
+        "strings"
+        "time"
+        "unicode/utf8"
+
+        "github.com/gofiber/fiber/v2"
+        "gorm.io/gorm"
+)
+
+func ValidarEmail(email string) bool <span class="cov8" title="1">{
+        regex := `^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$`
+        re := regexp.MustCompile(regex)
+        return re.MatchString(email)
+
+}</span>
+
+// parseo del body
+func validacionesCrearUsuario(_db *gorm.DB, c *fiber.Ctx) (*models.Usuario, error) <span class="cov0" title="0">{
+        usuario := models.Usuario{}
+
+        usuario.Nombre = c.FormValue("Nombre")
+        usuario.Apellido = c.FormValue("Apellido")
+        usuario.Email = c.FormValue("Correo")
+        usuario.Password = c.FormValue("Password")
+        usuario.Celular = c.FormValue("Celular")
+        usuario.Tipo_user = models.TipoUsuario(c.FormValue("Tipo_user"))
+        //bajamos a minuscula el tipo
+        usuario.Tipo_user = models.TipoUsuario(string(usuario.Tipo_user))
+        //validaciones
+        log.Println("📥 Body recibido:", string(c.Body()))
+        if ValidarEmail(usuario.Email) == false </span><span class="cov0" title="0">{
+                return nil, errors.New("el correo electrónico no tiene un formato válido")
+        }</span>
+
+        <span class="cov0" title="0">if utf8.RuneCountInString(usuario.Nombre) &gt; 30 || utf8.RuneCountInString(usuario.Nombre) &lt; 1 </span><span class="cov0" title="0">{
+                return nil, errors.New("el nombre de usuario no puede ser superior a 30 caracteres")
+        }</span>
+        <span class="cov0" title="0">if utf8.RuneCountInString(usuario.Apellido) &gt; 30 </span><span class="cov0" title="0">{
+                return nil, errors.New("el apellido no puede ser superior a 30 caracteres")
+        }</span>
+        <span class="cov0" title="0">if utf8.RuneCountInString(usuario.Celular) &gt; 13 || utf8.RuneCountInString(usuario.Celular) &lt; 10 </span><span class="cov0" title="0">{
+                return nil, errors.New("el celular no puede ser superior a 13 caracteres ni inferior a 10")
+        }</span>
+        <span class="cov0" title="0">if _db.First(&amp;usuario.Id_user, "id_user =? ", usuario.Id_user) == nil </span><span class="cov0" title="0">{
+                return nil, errors.New("El usuario ya existe")
+        }</span>
+        <span class="cov0" title="0">if _db.First(&amp;usuario, "correo =?", usuario.Email) == nil </span><span class="cov0" title="0">{
+                return nil, errors.New("El correo ya está Registrado")
+        }</span>
+        <span class="cov0" title="0">if PasswordFormato(usuario.Password) != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("Error en el formato de contraseña:" + PasswordFormato(usuario.Password).Error())
+        }</span>
+        //Ciframos la contraseña
+        <span class="cov0" title="0">hash, err := CifrarContraseña(usuario.Password)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("Error en el cifrado de contrasñea: " + err.Error())
+        }</span>
+        <span class="cov0" title="0">usuario.Password = hash
+        return &amp;usuario, nil</span>
+}
+
+//ahora se viene lo rico
+
+// funcion para crear un codigo aleatorio
+func GenerarCodigoCorreo() string <span class="cov0" title="0">{
+        return fmt.Sprintf("%06d", rand.Intn(1000000))
+}</span>
+
+// funcion para enviar el correo
+func EnvioDeCodigo(tx *gorm.DB, usuario models.Usuario, correo string) error <span class="cov0" title="0">{
+        host := os.Getenv("SMTP_HOST")
+        port := os.Getenv("SMTP_PORT")
+        user := os.Getenv("SMTP_USER")
+        password := os.Getenv("SMTP_PASSWORD")
+
+        fmt.Println("Preparando envío de correo")
+        fmt.Println("SMTP_HOST:", host)
+        fmt.Println("SMTP_PORT:", port)
+        fmt.Println("SMTP_USER:", user)
+        fmt.Println("Correo destino:", correo)
+
+        auth := smtp.PlainAuth("", user, password, host)
+        addr := host + ":" + port
+
+        codigo := GenerarCodigoCorreo()
+        TiempoExpiracion := time.Now().UTC().Add(10 * time.Minute)
+
+        fmt.Println("Código generado:", codigo)
+        fmt.Println("Expira en:", TiempoExpiracion.Format(time.RFC1123))
+
+        ModeloCodigo := models.ValidacionCorreo{
+                Id_user:    usuario.Id_user,
+                Codigo:     codigo,
+                Expiracion: TiempoExpiracion,
+                Verificado: false,
+        }
+
+        if err := tx.Create(&amp;ModeloCodigo).Error; err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error al guardar el código en la base de datos:", err)
+                return errors.New("Error al guardar el código de verificación en la base de datos")
+        }</span>
+
+        <span class="cov0" title="0">fmt.Println("Código guardado en base de datos")
+
+        mensaje := []byte(fmt.Sprintf("To: %s\r\nSubject: Código de verificación\r\n\r\n%s\r\n", correo, codigo))
+
+        err := smtp.SendMail(addr, auth, user, []string{correo}, mensaje)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Error al enviar el correo:", err)
+                return err
+        }</span>
+
+        <span class="cov0" title="0">fmt.Println("Correo enviado correctamente a", correo)
+        return nil</span>
+}
+
+func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuario, err := validacionesCrearUsuario(_db, c)
+        var tipo = "finalusuario"
+        if err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+        }</span>
+
+        <span class="cov0" title="0">err = _db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                usuario.Tipo_user = models.TipoUsuario("deshabilitado")
+                if err := tx.Create(&amp;usuario).Error; err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">if err := EnvioDeCodigo(tx, *usuario, usuario.Email); err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al registrar el usuario: " + err.Error(),
+                })
+        }</span>
+        <span class="cov0" title="0">var master string = ""
+        var count int64 = 0
+        _db.Model(&amp;models.Usuario{}).Count(&amp;count)
+        if count == 1 </span><span class="cov0" title="0">{
+                master = "master"
+        }</span>
+        <span class="cov0" title="0">if master == "" </span><span class="cov0" title="0">{
+                usuario.Tipo_user = models.TipoUsuario(strings.ToLower(tipo))
+        }</span>
+        <span class="cov0" title="0">if master == "master" </span><span class="cov0" title="0">{
+                usuario.Tipo_user = "master"
+        }</span>
+
+        <span class="cov0" title="0">_db.Save(&amp;usuario)
+        return c.JSON(fiber.Map{
+                "message": "Usuario registrado. Verifica tu correo.",
+                "user":    usuario,
+        })</span>
+}
+func VerificarCodigo(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        email := c.FormValue("Correo")
+        codigo := c.FormValue("Codigo")
+
+        var usuario models.Usuario
+        if err := _db.First(&amp;usuario, "correo = ?", email).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuario no encontrado"})
+        }</span>
+
+        <span class="cov0" title="0">var validacion models.ValidacionCorreo
+        if err := _db.First(&amp;validacion, "id_user = ? AND codigo = ?", usuario.Id_user, codigo).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Código inválido"})
+        }</span>
+
+        <span class="cov0" title="0">if validacion.Verificado </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Código ya usado"})
+        }</span>
+        <span class="cov0" title="0">if time.Now().UTC().After(validacion.Expiracion) </span><span class="cov0" title="0">{
+                // el código expiró; intentamos enviar uno nuevo antes de retornar
+                if err := _db.Where("id_user = ?", usuario.Id_user).Delete(&amp;models.ValidacionCorreo{}).Error; err != nil </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al limpiar códigos antiguos: " + err.Error()})
+                }</span>
+                <span class="cov0" title="0">if err := EnvioDeCodigo(_db, usuario, usuario.Email); err != nil </span><span class="cov0" title="0">{
+                        // si falla el reenvío, informamos el error correspondiente
+                        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Código expirado y no se pudo enviar uno nuevo: " + err.Error()})
+                }</span>
+
+                <span class="cov0" title="0">return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Código expirado. Se ha enviado un nuevo código al correo"})</span>
+
+        }
+
+        //verificamos que solo exista un usuario y ese será el master
+
+        <span class="cov0" title="0">validacion.Verificado = true
+        _db.Save(&amp;validacion)
+
+        return c.JSON(fiber.Map{"message": "Correo verificado correctamente",
+                "direccion": "../../SRC/html_templates/index.html"})</span>
+}
+
+// ✅ REENVIAR CÓDIGO DE VERIFICACIÓN
+func ReenviarCodigo(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var email struct {
+                Correo string `json:"Correo"`
+        }
+        c.BodyParser(&amp;email)
+        log.Println("📥 Solicitud de reenvío de código para:", email)
+
+        var usuario models.Usuario
+        if err := _db.First(&amp;usuario, "correo = ?", email.Correo).Error; err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ Usuario no encontrado: %s", email.Correo)
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                        "error": "Usuario no encontrado",
+                })
+        }</span>
+
+        // Verificar si ya está verificado
+        <span class="cov0" title="0">var validacion models.ValidacionCorreo
+        if err := _db.First(&amp;validacion, "id_user = ?", usuario.Id_user).Error; err == nil </span><span class="cov0" title="0">{
+                if validacion.Verificado </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                                "error": "Este usuario ya está verificado",
+                        })
+                }</span>
+        }
+
+        // Eliminar códigos anteriores del mismo usuario
+        <span class="cov0" title="0">if err := _db.Where("id_user = ?", usuario.Id_user).Delete(&amp;models.ValidacionCorreo{}).Error; err != nil </span><span class="cov0" title="0">{
+                log.Printf("⚠️ Error al limpiar códigos antiguos: %v", err)
+        }</span>
+
+        // Enviar nuevo código usando transacción
+        <span class="cov0" title="0">err := _db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                return EnvioDeCodigo(tx, usuario, usuario.Email)
+        }</span>)
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ Error al reenviar código: %v", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al reenviar código: " + err.Error(),
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Código reenviado a: %s", email)
+        return c.JSON(fiber.Map{
+                "message": "Código reenviado correctamente. Revisa tu correo.",
+        })</span>
+}
+
+// pucha la wea por fin, vamos con lo next
+func ConsultarUsuarios(_db *gorm.DB, c *fiber.Ctx, consulta string) error <span class="cov0" title="0">{
+        usuario := models.Usuario{}
+        if err := _db.First(&amp;usuario, "email=?", consulta).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                        "error": "No se ha encontrado el usuario" + err.Error(),
+                })
+        }</span>
+        <span class="cov0" title="0">return c.JSON(fiber.Map{
+                "message": "Usuario encontrado",
+                "usuario": usuario,
+        })</span>
+
+}
+func ListarUsuarios(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var usuarios []models.Usuario
+        if err := _db.Find(&amp;usuarios).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al consultar usuarios",
+                })
+        }</span>
+        <span class="cov0" title="0">return c.JSON(usuarios)</span>
+}
+
+func BuscarUsuariosPorNombre(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        nombre := c.Params("nombre")
+        var resultados []models.Usuario
+
+        patron := "%" + strings.ToLower(nombre) + "%"
+        if err := _db.Where("LOWER(nombre) LIKE ?", patron).Find(&amp;resultados).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al buscar usuarios por nombre",
+                })
+        }</span>
+
+        <span class="cov0" title="0">if len(resultados) == 0 </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+                        "message": "No se encontraron usuarios con ese nombre",
+                })
+        }</span>
+
+        // Solo mostramos datos clave
+        <span class="cov0" title="0">var respuesta []fiber.Map
+        for _, u := range resultados </span><span class="cov0" title="0">{
+                respuesta = append(respuesta, fiber.Map{
+                        "id_user": u.Id_user,
+                        "nombre":  u.Nombre,
+                        "correo":  u.Email,
+                        "tipo":    u.Tipo_user,
+                })
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(respuesta)</span>
+}
+
+func CambiarTipoUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        id := c.Params("id")
+        var body struct {
+                Tipo string `json:"tipo"`
+        }
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear"})
+        }</span>
+
+        <span class="cov0" title="0">tipo := strings.ToLower(body.Tipo)
+        tiposValidos := map[string]bool{
+                "admin": true, "banda": true, "curador": true,
+                "artista": true, "finalusuario": true, "deshabilitado": true,
+        }
+        if !tiposValidos[tipo] </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Tipo de usuario no válido"})
+        }</span>
+
+        <span class="cov0" title="0">if err := _db.Model(&amp;models.Usuario{}).Where("id_user = ?", id).Update("tipo_user", tipo).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al actualizar tipo"})
+        }</span>
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"message": "Tipo de usuario actualizado"})</span>
+}
+
+func CambiarEstadoUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        id := c.Params("id")
+        var body struct {
+                Habilitar bool `json:"habilitar"`
+        }
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear"})
+        }</span>
+
+        <span class="cov0" title="0">nuevoTipo := "deshabilitado"
+        if body.Habilitar </span><span class="cov0" title="0">{
+                nuevoTipo = "finalusuario"
+        }</span>
+
+        <span class="cov0" title="0">if err := _db.Model(&amp;models.Usuario{}).Where("id_user = ?", id).Update("tipo_user", nuevoTipo).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al cambiar estado"})
+        }</span>
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"message": "Estado actualizado"})</span>
+}
+
+func EliminarUsuarioPorID(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        id := c.Params("id")
+        if err := _db.Delete(&amp;models.Usuario{}, "id_user = ?", id).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al eliminar usuario"})
+        }</span>
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"message": "Usuario eliminado exitosamente"})</span>
+}
+
+func ActualizarUsuarios(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuario, err := validacionesCrearUsuario(_db, c)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                        "error": err.Error(),
+                })
+        }</span>
+        <span class="cov0" title="0">if err2 := _db.Model(&amp;usuario).Update(usuario.Nombre, usuario.Email).Error; err2 != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "Error": "Error al actualizar el usuario",
+                })
+        }</span>
+        <span class="cov0" title="0">if err3 := _db.Model(&amp;usuario).Update(string(usuario.Tipo_user), usuario.Password).Error; err3 != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "Error": "Error al actualizar el usuario",
+                })
+        }</span>
+        <span class="cov0" title="0">return c.JSON(fiber.Map{
+                "message": "Usuario actualizado exitosamente",
+                "user":    usuario,
+        })</span>
+}
+
+func ListarBandas(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var bandas []models.Usuario
+        if err := _db.Where("tipo_user = ?", models.Banda).Find(&amp;bandas).Error; err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">return c.JSON(bandas)</span>
+}
+
+// ========================================
+// ACTUALIZAR INFO DE USUARIO (ADMIN)
+// ========================================
+func ActualizarInfoUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        id := c.Params("id")
+
+        var body struct {
+                Email   string `json:"email"`
+                Celular string `json:"celular"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear datos"})
+        }</span>
+
+        // Validar email
+        <span class="cov0" title="0">if !ValidarEmail(body.Email) </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido"})
+        }</span>
+
+        // Validar que el email no esté en uso por otro usuario
+        <span class="cov0" title="0">var usuarioExistente models.Usuario
+        if err := _db.Where("correo = ? AND id_user != ?", body.Email, id).First(&amp;usuarioExistente).Error; err == nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El correo ya está en uso por otro usuario"})
+        }</span>
+
+        // Actualizar datos
+        <span class="cov0" title="0">updates := map[string]interface{}{
+                "correo":  body.Email,
+                "celular": body.Celular,
+        }
+
+        if err := _db.Model(&amp;models.Usuario{}).Where("id_user = ?", id).Updates(updates).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al actualizar información"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"message": "Información actualizada correctamente"})</span>
+}
+
+// ========================================
+// OBTENER PERFIL DEL USUARIO AUTENTICADO
+// ========================================
+func ObtenerMiPerfil(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        userID := c.Locals("usuario_id").(int)
+
+        var usuario models.Usuario
+        if err := _db.First(&amp;usuario, "id_user = ?", userID).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuario no encontrado"})
+        }</span>
+
+        // No enviar la contraseña
+        <span class="cov0" title="0">usuario.Password = ""
+
+        return c.JSON(usuario)</span>
+}
+
+// ========================================
+// ACTUALIZAR PERFIL PROPIO (USUARIO AUTENTICADO)
+// ========================================
+func ActualizarMiPerfil(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        userID := c.Locals("usuario_id").(int)
+
+        var body struct {
+                Nombre   string `json:"nombre"`
+                Apellido string `json:"apellido"`
+                Email    string `json:"email"`
+                Celular  string `json:"celular"`
+                Password string `json:"password"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear datos"})
+        }</span>
+
+        // Validaciones
+        <span class="cov0" title="0">if body.Nombre == "" || body.Email == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Nombre y correo son obligatorios"})
+        }</span>
+
+        <span class="cov0" title="0">if !ValidarEmail(body.Email) </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido"})
+        }</span>
+
+        <span class="cov0" title="0">if utf8.RuneCountInString(body.Nombre) &gt; 30 </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El nombre no puede superar 30 caracteres"})
+        }</span>
+
+        <span class="cov0" title="0">if utf8.RuneCountInString(body.Apellido) &gt; 30 </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El apellido no puede superar 30 caracteres"})
+        }</span>
+
+        // Verificar que el email no esté en uso por otro usuario
+        <span class="cov0" title="0">var usuarioExistente models.Usuario
+        if err := _db.Where("correo = ? AND id_user != ?", body.Email, userID).First(&amp;usuarioExistente).Error; err == nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "El correo ya está en uso"})
+        }</span>
+
+        // Preparar actualizaciones
+        <span class="cov0" title="0">updates := map[string]interface{}{
+                "nombre":   body.Nombre,
+                "apellido": body.Apellido,
+                "correo":   body.Email,
+                "celular":  body.Celular,
+        }
+
+        // Si envía nueva contraseña, validarla y cifrarla
+        if body.Password != "" </span><span class="cov0" title="0">{
+                if err := PasswordFormato(body.Password); err != nil </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+                }</span>
+                <span class="cov0" title="0">hash, err := CifrarContraseña(body.Password)
+                if err != nil </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al cifrar contraseña"})
+                }</span>
+                <span class="cov0" title="0">updates["password"] = hash</span>
+        }
+
+        // Actualizar en la base de datos
+        <span class="cov0" title="0">if err := _db.Model(&amp;models.Usuario{}).Where("id_user = ?", userID).Updates(updates).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al actualizar perfil"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"message": "Perfil actualizado correctamente"})</span>
+}
+
+// ========================================
+// ENVIAR CÓDIGO DE RECUPERACIÓN DE CONTRASEÑA
+// ========================================
+func EnviarCodigoRecuperacion(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var body struct {
+                Correo string `json:"correo"`
+        }
+
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Error al parsear datos"})
+        }</span>
+
+        <span class="cov0" title="0">if !ValidarEmail(body.Correo) </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Email inválido"})
+        }</span>
+
+        // Buscar usuario por correo
+        <span class="cov0" title="0">var usuario models.Usuario
+        if err := _db.First(&amp;usuario, "correo = ?", body.Correo).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuario no encontrado"})
+        }</span>
+
+        // Eliminar códigos anteriores del mismo usuario
+        <span class="cov0" title="0">_db.Where("id_user = ?", usuario.Id_user).Delete(&amp;models.ValidacionCorreo{})
+
+        // Enviar nuevo código usando transacción
+        err := _db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                return EnvioDeCodigo(tx, usuario, usuario.Email)
+        }</span>)
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ Error al enviar código de recuperación: %v", err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                        "error": "Error al enviar código: " + err.Error(),
+                })
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Código de recuperación enviado a: %s", usuario.Email)
+        return c.JSON(fiber.Map{
+                "message": "Código enviado a tu correo. Revísalo para continuar.",
+        })</span>
+}
+
+// ========================================
+// CAMBIAR CONTRASEÑA CON CÓDIGO DE RECUPERACIÓN
+// ========================================
+func CambiarPasswordConCodigo(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        email := c.FormValue("Correo")
+        codigo := c.FormValue("Codigo")
+        nuevaPassword := c.FormValue("NuevaPassword")
+
+        // Validaciones básicas
+        if email == "" || codigo == "" || nuevaPassword == "" </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Todos los campos son obligatorios"})
+        }</span>
+
+        // Buscar usuario
+        <span class="cov0" title="0">var usuario models.Usuario
+        if err := _db.First(&amp;usuario, "correo = ?", email).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Usuario no encontrado"})
+        }</span>
+
+        // Verificar código
+        <span class="cov0" title="0">var validacion models.ValidacionCorreo
+        if err := _db.First(&amp;validacion, "id_user = ? AND codigo = ?", usuario.Id_user, codigo).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Código inválido"})
+        }</span>
+        <span class="cov0" title="0">validacion.Verificado = true
+        _db.Save(&amp;validacion)
+        // Verificar si el código expiró
+        if time.Now().UTC().After(validacion.Expiracion) </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Código expirado. Solicita uno nuevo."})
+        }</span>
+
+        // Validar formato de la nueva contraseña
+        <span class="cov0" title="0">if err := PasswordFormato(nuevaPassword); err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
+        }</span>
+
+        // Cifrar nueva contraseña
+        <span class="cov0" title="0">hash, err := CifrarContraseña(nuevaPassword)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al cifrar contraseña"})
+        }</span>
+
+        // ✅ USAR TRANSACCIÓN para asegurar que todo se complete
+        <span class="cov0" title="0">err = _db.Transaction(func(tx *gorm.DB) error </span><span class="cov0" title="0">{
+                // Actualizar contraseña
+                if err := tx.Model(&amp;usuario).Update("password", hash).Error; err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+                <span class="cov0" title="0">return nil</span>
+        })
+
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                log.Printf("❌ Error al cambiar contraseña para %s: %v", email, err)
+                return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Error al actualizar contraseña"})
+        }</span>
+
+        <span class="cov0" title="0">log.Printf("✅ Contraseña cambiada para: %s", email)
+
+        // ✅ IMPORTANTE: Indicar que debe hacer login de nuevo
+        return c.JSON(fiber.Map{
+                "message":       "Contraseña actualizada correctamente. Inicia sesión con tu nueva contraseña.",
+                "require_login": true, // 👈 Nuevo campo
+        })</span>
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package utils
+
+import (
+        "fmt"
+        "regexp"
+
+        "golang.org/x/crypto/bcrypt"
+)
+
+// validación de formato de contraseña
+func PasswordFormato(password string) error <span class="cov8" title="1">{
+        if password == "" </span><span class="cov8" title="1">{
+                return fmt.Errorf("La contraseña no puede estar vacía")
+        }</span>
+        <span class="cov8" title="1">if len(password) &lt; 8 </span><span class="cov8" title="1">{
+                return fmt.Errorf("La contraseña debe tener al menos 8 caracteres")
+        }</span>
+        <span class="cov8" title="1">if match, _ := regexp.MatchString(`[A-Za-z]`, password); !match </span><span class="cov0" title="0">{
+                return fmt.Errorf("la contraseña debe contener al menos una letra")
+        }</span>
+        <span class="cov8" title="1">if match, _ := regexp.MatchString(`[0-9]`, password); !match </span><span class="cov8" title="1">{
+                return fmt.Errorf("la contraseña debe contener al menos un número")
+        }</span>
+        <span class="cov8" title="1">if match, _ := regexp.MatchString(`[A-Z]`, password); !match </span><span class="cov8" title="1">{
+                return fmt.Errorf("La contraseña debe contener al menos una letra mayúscula")
+        }</span>
+
+        // Al menos una letra minúscula
+        <span class="cov8" title="1">if match, _ := regexp.MatchString(`[a-z]`, password); !match </span><span class="cov0" title="0">{
+                return fmt.Errorf("La contraseña debe contener al menos una letra minúscula")
+        }</span>
+
+        <span class="cov8" title="1">if match, _ := regexp.MatchString((`[!@#\$%\^&amp;\*\(\)_\+\-=\[\]\{\};:'",.&lt;&gt;\/?\\|]`), password); !match </span><span class="cov8" title="1">{
+                return fmt.Errorf(("La contraseña debe tener al menos un caracter especial"))
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+func CifrarContraseña(password string) (string, error) <span class="cov0" title="0">{
+        hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+        return string(hash), err
+}</span>
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package utils
+
+import (
+        "fmt"
+        "proyecto-ptv-online/backend/servicios/models"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "gorm.io/gorm"
+)
+
+// CrearPlaylist - Crear playlist para usuario final
+func CrearPlaylist(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuarioIDInterface := c.Locals("usuario_id")
+        if usuarioIDInterface == nil </span><span class="cov0" title="0">{
+                return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
+        }</span>
+
+        <span class="cov0" title="0">userID, ok := usuarioIDInterface.(int)
+        if !ok </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Usuario ID inválido"})
+        }</span>
+
+        <span class="cov0" title="0">req := struct {
+                Nombre string `json:"nombre"`
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">if req.Nombre == "" </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "El nombre es requerido"})
+        }</span>
+
+        <span class="cov0" title="0">playlist := models.Playlist{
+                Nombre:        req.Nombre,
+                Id_user_final: userID,
+                Estado:        "activo",
+                Fecha_cracion: time.Now().Format("2006-01-02 15:04:05"),
+        }
+
+        if err := db.Create(&amp;playlist).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error creando playlist"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{
+                "mensaje":     "Playlist creada",
+                "id_playlist": playlist.Id_playlist,
+                "nombre":      playlist.Nombre,
+        })</span>
+}
+
+// ObtenerPlaylistsPorUsuario - Obtener playlists del usuario autenticado
+func ObtenerPlaylistsPorUsuario(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuarioIDInterface := c.Locals("usuario_id")
+        if usuarioIDInterface == nil </span><span class="cov0" title="0">{
+                return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
+        }</span>
+
+        <span class="cov0" title="0">userID, ok := usuarioIDInterface.(int)
+        if !ok </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Usuario ID inválido"})
+        }</span>
+
+        <span class="cov0" title="0">var playlists []models.Playlist
+        if err := db.Where("id_user_final = ? AND estado = ?", userID, "activo").Find(&amp;playlists).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error obteniendo playlists"})
+        }</span>
+
+        <span class="cov0" title="0">if len(playlists) == 0 </span><span class="cov0" title="0">{
+                return c.JSON([]models.Playlist{})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(playlists)</span>
+}
+
+// AgregarCancionAPlaylist - Agregar canción a playlist
+func AgregarCancionAPlaylist(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuarioIDInterface := c.Locals("usuario_id")
+        if usuarioIDInterface == nil </span><span class="cov0" title="0">{
+                return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
+        }</span>
+
+        <span class="cov0" title="0">userID, ok := usuarioIDInterface.(int)
+        if !ok </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Usuario ID inválido"})
+        }</span>
+
+        <span class="cov0" title="0">req := struct {
+                Id_playlist string `json:"id_playlist"` // Cambiar a string porque id_playlist es text en la BD
+                Id_cancion  string `json:"id_cancion"`
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">var playlist models.Playlist
+        if err := db.Where("id_playlist = ? AND id_user_final = ?", req.Id_playlist, userID).First(&amp;playlist).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(403).JSON(fiber.Map{"error": "Playlist no encontrada"})
+        }</span>
+
+        // Verificar si la canción ya está en la playlist
+        <span class="cov0" title="0">var existe models.Add_Playlist
+        if db.Where("id_playlist = ? AND id_cancion = ?", req.Id_playlist, req.Id_cancion).First(&amp;existe).RowsAffected &gt; 0 </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "La canción ya está en la playlist"})
+        }</span>
+
+        <span class="cov0" title="0">addPlaylist := models.Add_Playlist{
+                Id_cancion:  req.Id_cancion,
+                Id_playlist: req.Id_playlist,
+        }
+
+        if err := db.Create(&amp;addPlaylist).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error agregando canción"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"mensaje": "Canción agregada a playlist"})</span>
+}
+
+// EliminarCancionDePlaylist - Eliminar canción de playlist
+func EliminarCancionDePlaylist(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        usuarioIDInterface := c.Locals("usuario_id")
+        if usuarioIDInterface == nil </span><span class="cov0" title="0">{
+                return c.Status(401).JSON(fiber.Map{"error": "No autenticado"})
+        }</span>
+
+        <span class="cov0" title="0">userID, ok := usuarioIDInterface.(int)
+        if !ok </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Usuario ID inválido"})
+        }</span>
+
+        <span class="cov0" title="0">req := struct {
+                Id_playlist string `json:"id_playlist"` // Cambiar a string
+                Id_cancion  string `json:"id_cancion"`
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">var playlist models.Playlist
+        if err := db.Where("id_playlist = ? AND id_user_final = ?", req.Id_playlist, userID).First(&amp;playlist).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(403).JSON(fiber.Map{"error": "Playlist no encontrada"})
+        }</span>
+
+        <span class="cov0" title="0">if err := db.Where("id_playlist = ? AND id_cancion = ?", req.Id_playlist, req.Id_cancion).Delete(&amp;models.Add_Playlist{}).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error eliminando canción"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"mensaje": "Canción eliminada de playlist"})</span>
+}
+
+// ObtenerCancionesDePLaylist - Obtener canciones de una playlist
+func ObtenerCancionesDePLaylist(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        req := struct {
+                Id_playlist string `json:"id_playlist"` // Cambiar a string
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">var canciones []models.Cancion
+        if err := db.Joins("JOIN add_playlist ON cancion.id_cancion = add_playlist.id_cancion").
+                Where("add_playlist.id_playlist = ? AND cancion.estado = ?", req.Id_playlist, "activo").
+                Find(&amp;canciones).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error obteniendo canciones"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(canciones)</span>
+}
+
+// BuscarCanciones - Buscar canciones por nombre
+func BuscarCanciones(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        req := struct {
+                Nombre string `json:"nombre"`
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">if req.Nombre == "" </span><span class="cov0" title="0">{
+                return c.JSON([]models.Cancion{})
+        }</span>
+
+        <span class="cov0" title="0">var canciones []models.Cancion
+        query := "%" + req.Nombre + "%"
+        if err := db.Where("nombre ILIKE ? AND estado = ?", query, "activo").Limit(20).Find(&amp;canciones).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error en búsqueda"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(canciones)</span>
+}
+
+// BuscarAlbumes - Buscar álbumes por nombre
+func BuscarAlbumes(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        req := struct {
+                Nombre string `json:"nombre"`
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">if req.Nombre == "" </span><span class="cov0" title="0">{
+                return c.JSON([]models.Albums{})
+        }</span>
+
+        <span class="cov0" title="0">var albumes []models.Albums
+        query := "%" + req.Nombre + "%"
+        if err := db.Where("nombre_album ILIKE ? AND estado = ?", query, "activo").Limit(20).Find(&amp;albumes).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error en búsqueda"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(albumes)</span>
+}
+
+// IncrementarReproducciones - Incrementar reproducciones de una canción
+func IncrementarReproducciones(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        req := struct {
+                Id_cancion string `json:"id_cancion"`
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">if err := db.Model(&amp;models.Cancion{}).Where("id_cancion = ?", req.Id_cancion).Update("n_reproduccion", gorm.Expr("n_reproduccion + 1")).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error incrementando reproducciones"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"mensaje": "Reproducciones incrementadas"})</span>
+}
+
+// ObtenerCancionesPorAlbumActivas - Obtener solo canciones activas de un álbum
+func ObtenerCancionesPorAlbumActivas(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        req := struct {
+                Id_album string `json:"id_album"`
+        }{}
+
+        if err := c.BodyParser(&amp;req); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "Datos inválidos"})
+        }</span>
+
+        <span class="cov0" title="0">var canciones []models.Cancion
+        if err := db.Where("id_album = ? AND estado = ?", req.Id_album, "activo").Find(&amp;canciones).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "Error obteniendo canciones"})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(canciones)</span>
+}
+func EliminarPlaylist(db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
+        var body = models.Playlist{}
+        if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "body inválido: " + err.Error()})
+        }</span>
+
+        <span class="cov0" title="0">if body.Id_playlist == "" </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "id_playlist requerido"})
+        }</span>
+
+        // intentar convertir a int si tu BD guarda id numérico
+        // si usas string en BD, ajusta la query
+        // aquí asumo id numérico:
+        <span class="cov0" title="0">var id int
+        _, err := fmt.Sscanf(body.Id_playlist, "%d", &amp;id)
+        if err != nil </span><span class="cov0" title="0">{
+                return c.Status(400).JSON(fiber.Map{"error": "id_playlist inválido"})
+        }</span>
+
+        // 1) eliminar relaciones canciones-playlist
+        <span class="cov0" title="0">if err := db.Exec("DELETE FROM playlist_canciones WHERE id_playlist = ?", id).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "error al eliminar canciones de playlist: " + err.Error()})
+        }</span>
+
+        // 2) eliminar la playlist
+        <span class="cov0" title="0">if err := db.Exec("DELETE FROM playlist WHERE id_playlist = ?", id).Error; err != nil </span><span class="cov0" title="0">{
+                return c.Status(500).JSON(fiber.Map{"error": "error al eliminar playlist: " + err.Error()})
+        }</span>
+
+        <span class="cov0" title="0">return c.JSON(fiber.Map{"mensaje": "Playlist eliminada"})</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package utils
+
+import (
+        "errors"
+        "os"
+        "time"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/golang-jwt/jwt/v5"
+)
+
+// Claims simples
+type TokenClaims struct {
+        Id_user   int    `json:"id_user"`
+        Correo    string `json:"correo"`
+        Tipo_user string `json:"tipo_user"`
+        jwt.RegisteredClaims
+}
+
+var jwtKey = []byte(os.Getenv("JWT_SECRET"))
+
+// GenerarTokenFromFields genera un JWT con id, correo y tipo
+func GenerarTokenFromFields(id int, correo string, tipo string) (string, error) <span class="cov0" title="0">{
+        claims := TokenClaims{
+                Id_user:   id,
+                Correo:    correo,
+                Tipo_user: tipo,
+                RegisteredClaims: jwt.RegisteredClaims{
+                        ExpiresAt: jwt.NewNumericDate(time.Now().Add(3 * time.Hour)), // 3 horas
+                        IssuedAt:  jwt.NewNumericDate(time.Now()),
+                        Issuer:    "ptv-online",
+                },
+        }
+
+        token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+        return token.SignedString(jwtKey)
+}</span>
+
+// VerificarToken verifica y devuelve los claims
+func VerificarToken(tokenString string) (*TokenClaims, error) <span class="cov0" title="0">{
+        token, err := jwt.ParseWithClaims(tokenString, &amp;TokenClaims{}, func(token *jwt.Token) (interface{}, error) </span><span class="cov0" title="0">{
+                return jwtKey, nil
+        }</span>, jwt.WithLeeway(5*time.Second))
+        <span class="cov0" title="0">if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if claims, ok := token.Claims.(*TokenClaims); ok &amp;&amp; token.Valid </span><span class="cov0" title="0">{
+                return claims, nil
+        }</span>
+        <span class="cov0" title="0">return nil, errors.New("token inválido")</span>
+}
+func AutenticacionRequerida(tipoRequerido []string) fiber.Handler <span class="cov0" title="0">{
+        return func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                authHeader := c.Get("Authorization")
+                if authHeader == "" </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Token requerido"})
+                }</span>
+
+                <span class="cov0" title="0">var tokenStr string
+                const bearerPrefix = "Bearer "
+                if len(authHeader) &gt; len(bearerPrefix) &amp;&amp; authHeader[:len(bearerPrefix)] == bearerPrefix </span><span class="cov0" title="0">{
+                        tokenStr = authHeader[len(bearerPrefix):]
+                }</span> else<span class="cov0" title="0"> {
+                        tokenStr = authHeader
+                }</span>
+
+                <span class="cov0" title="0">claims, err := VerificarToken(tokenStr)
+                if err != nil </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Token inválido o expirado"})
+                }</span>
+
+                // Validar rol
+                <span class="cov0" title="0">permitido := false
+                for _, rol := range tipoRequerido </span><span class="cov0" title="0">{
+                        if claims.Tipo_user == rol </span><span class="cov0" title="0">{
+                                permitido = true
+                                break</span>
+                        }
+                }
+
+                <span class="cov0" title="0">if !permitido </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+                                "error": "Acceso denegado - rol requerido",
+                        }) // 👈 AGREGADO return
+                }</span>
+
+                // Guardar info útil en Locals
+                <span class="cov0" title="0">c.Locals("usuario_id", claims.Id_user)
+                c.Locals("usuario_correo", claims.Correo)
+                c.Locals("usuario_tipo", claims.Tipo_user)
+
+                return c.Next()</span>
+        }
+}
+
+// Middleware para Fiber que exige token y (opcional) tipo
+// Uso: app.Post("/ruta", utils.AutenticacionRequerida("admin"), handler)
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package main
+
+import (
+        "fmt"
+        "log"
+        "os"
+
+        config "proyecto-ptv-online/backend/servicios/config"
+        "proyecto-ptv-online/backend/servicios/handlers"
+        utils "proyecto-ptv-online/backend/servicios/utils"
+
+        "github.com/gofiber/fiber/v2"
+        "github.com/joho/godotenv"
+)
+
+func init() <span class="cov0" title="0">{
+        err := godotenv.Load("env.env")
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Error cargando el archivo .env")
+        }</span>
+}
+
+func main() <span class="cov0" title="0">{
+        fmt.Println("Hello world!")
+        log.Println("Comenzamos proyecto PTV-Online")
+
+        // 🔗 Conexión a la base de datos
+        _DB := config.ConnectDB()
+        sqlDB, err := _DB.DB()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("Error obteniendo sql.DB:", err)
+        }</span>
+        <span class="cov0" title="0">defer sqlDB.Close()
+
+        // 🚀 Inicializar Fiber
+        app := fiber.New()
+
+        // 🌐 Servir archivos estáticos
+        app.Static("/", "./frontend")
+
+        app.Use(func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                authHeader := c.Get("Authorization")
+                if authHeader != "" </span><span class="cov0" title="0">{
+                        userID, userRole, err := utils.ExtraerInfoDelToken(authHeader)
+                        if err == nil </span><span class="cov0" title="0">{
+                                c.Locals("userID", userID)
+                                c.Locals("userRole", userRole)
+                        }</span>
+                }
+                <span class="cov0" title="0">return c.Next()</span>
+        })
+
+        // -------------------------------
+        // 🌍 Rutas HTML
+        // -------------------------------
+        // 🗑️ CLOUDINARY - Limpiar archivos
+        <span class="cov0" title="0">app.Delete("/api/cloudinary/cleanup", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.LimpiarCloudinary(c)
+        }</span>)
+
+        //para quitar archivos de cloudinary en tiempo asyn
+        // 🗑️ CLOUDINARY - Limpieza asíncrona (NUEVA RUTA)
+        <span class="cov0" title="0">app.Post("/api/cloudinary/cleanup-async", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                var body struct {
+                        URLs          []string `json:"urls"`
+                        ResourceTypes []string `json:"resource_types"`
+                }
+
+                if err := c.BodyParser(&amp;body); err != nil </span><span class="cov0" title="0">{
+                        return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+                                "error": "Error al parsear datos",
+                        })
+                }</span>
+
+                // Procesar en background sin esperar respuesta
+                <span class="cov0" title="0">go func() </span><span class="cov0" title="0">{
+                        log.Printf("🗑️ Limpiando %d archivos de Cloudinary (async)...", len(body.URLs))
+                        utils.LimpiarCloudinaryAsync(body.URLs, body.ResourceTypes)
+                }</span>()
+
+                // Responder inmediatamente
+                <span class="cov0" title="0">return c.SendStatus(204)</span>
+        })
+        <span class="cov0" title="0">app.Get("/api/cloudinary-config", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return c.JSON(fiber.Map{
+                        "cloudName":          os.Getenv("CLOUDINARY_CLOUD_NAME"),
+                        "uploadPresetSongs":  os.Getenv("CLOUDINARY_UPLOAD_PRESET_SONGS"),
+                        "uploadPresetCovers": os.Getenv("CLOUDINARY_UPLOAD_PRESET_COVERS"),
+                })
+        }</span>)
+
+        <span class="cov0" title="0">app.Get("/", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return c.SendFile("./frontend/SRC/html_templates/index.html")
+        }</span>)
+
+        <span class="cov0" title="0">app.Get("/html_registro", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return c.SendFile("./frontend/SRC/html_templates/registro.html")
+        }</span>)
+
+        // 🔒 Solo el admin puede entrar al panel
+        <span class="cov0" title="0">var tiposMaster = []string{"admin", "master"}
+        app.Get("/html_reg_album", utils.AutenticacionRequerida(tiposMaster), func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return c.SendFile("./frontend/SRC/html_templates/home_admin.html")
+        }</span>)
+
+        // -------------------------------
+        // 👤 AUTENTICACIÓN
+        // -------------------------------
+        <span class="cov0" title="0">app.Post("/registro_post", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.CrearUsuario(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Post("/login_Post", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return handlers.LoginValidacion(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Post("/verificar_codigo", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.VerificarCodigo(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Post("/reenviar_codigo", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ReenviarCodigo(_DB, c)
+        }</span>)
+
+        // -------------------------------
+        // 🎵 ÁLBUMES (solo admin)
+        // -------------------------------
+        // var tipoAdminAlbum = []string{"admin", "master", "banda"}
+
+        <span class="cov0" title="0">app.Post("/api/crear_album_completo", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.CrearAlbumCompleto(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Put("/api/actualizar_album_completo", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ActualizarAlbumConCanciones(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Get("/api/albums_listar", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ListarAlbums(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Put("/api/actualizar_estado_album", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ActualizarEstadoAlbum(_DB, c)
+        }</span>)
+        <span class="cov0" title="0">app.Get("/api/Buscar_Albums_Aleatorios", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.Buscar_Albums_Aleatorios(_DB, c)
+        }</span>)
+        <span class="cov0" title="0">app.Delete("/api/buscar_album_individual", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.Buscar_album(_DB, c)
+        }</span>)
+
+        // ✅ CAMBIADO: De GET con param a POST con body
+        <span class="cov0" title="0">app.Post("/api/albums/canciones", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ObtenerCancionesPorAlbum(_DB, c)
+        }</span>)
+
+        // -------------------------------
+        // 🎶 CANCIONES (solo admin)
+        // -------------------------------
+        <span class="cov0" title="0">app.Put("/api/canciones/actualizar", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ActualizarCancion(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Put("/api/canciones/estado", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.CambiarEstadoCancion(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Delete("/api/canciones/eliminar_cancion", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.EliminarCancion(_DB, c)
+        }</span>)
+
+        // -------------------------------
+        // 🎸 BANDAS (público)
+        // -------------------------------
+        <span class="cov0" title="0">app.Get("/api/bandas", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ListarBandas(_DB, c)
+        }</span>)
+
+        // -------------------------------
+        // 👥 USUARIOS (solo admin)
+        // -------------------------------
+        <span class="cov0" title="0">app.Get("/api/usuarios", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ListarUsuarios(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Get("/api/usuarios/buscar/:nombre", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.BuscarUsuariosPorNombre(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Put("/api/usuarios/:id/tipo", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.CambiarTipoUsuario(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Put("/api/usuarios/:id/estado", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.CambiarEstadoUsuario(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Delete("/api/usuarios/:id", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.EliminarUsuarioPorID(_DB, c)
+        }</span>)
+
+        // 📝 Actualizar info usuario (solo admin)
+        <span class="cov0" title="0">app.Put("/api/usuarios/:id/actualizar-info", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ActualizarInfoUsuario(_DB, c)
+        }</span>)
+
+        // 👤 Perfil personal (usuarios autenticados)
+        <span class="cov0" title="0">permitidosPerfil := []string{"banda", "finalusuario", "admin", "curador", "artista"}
+
+        app.Get("/api/usuarios/mi-perfil", utils.AutenticacionRequerida(permitidosPerfil), func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ObtenerMiPerfil(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Put("/api/usuarios/actualizar-perfil", utils.AutenticacionRequerida(permitidosPerfil), func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ActualizarMiPerfil(_DB, c)
+        }</span>)
+
+        // 🔑 Recuperación de contraseña (público - no requiere autenticación)
+        <span class="cov0" title="0">app.Post("/api/recuperar-password/enviar", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.EnviarCodigoRecuperacion(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Post("/api/recuperar-password/cambiar", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.CambiarPasswordConCodigo(_DB, c)
+        }</span>)
+        // --------- DESHABILITAR/HABILITAR CANCIONES -----------
+        <span class="cov0" title="0">app.Put("/api/canciones/deshabilitar", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.DeshabilitarCancion(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">app.Put("/api/canciones/habilitar", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.HabilitarCancion(_DB, c)
+        }</span>)
+
+        // Rutas de playlists (requieren autenticación)
+        <span class="cov0" title="0">playlistGroup := app.Group("/api")
+        permitidos_palylist := []string{"banda", "finalusuario"}
+        playlistGroup.Use(utils.AutenticacionRequerida(permitidos_palylist))
+
+        playlistGroup.Post("/crear_playlist", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.CrearPlaylist(_DB, c)
+        }</span>)
+        <span class="cov0" title="0">playlistGroup.Get("/obtener_playlists", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ObtenerPlaylistsPorUsuario(_DB, c)
+        }</span>)
+        <span class="cov0" title="0">playlistGroup.Post("/agregar_cancion_playlist", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.AgregarCancionAPlaylist(_DB, c)
+        }</span>)
+        <span class="cov0" title="0">playlistGroup.Post("/eliminar_cancion_playlist", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.EliminarCancionDePlaylist(_DB, c)
+        }</span>)
+        <span class="cov0" title="0">playlistGroup.Post("/obtener_canciones_playlist", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ObtenerCancionesDePLaylist(_DB, c)
+        }</span>)
+        <span class="cov0" title="0">playlistGroup.Post("/eliminar_playlist", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.EliminarPlaylist(_DB, c)
+        }</span>)
+        // Búsqueda (dentro de playlist group con autenticación)
+        <span class="cov0" title="0">playlistGroup.Post("/buscar/canciones", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.BuscarCanciones(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">playlistGroup.Post("/buscar/albumes", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.BuscarAlbumes(_DB, c)
+        }</span>)
+
+        // Álbumes activos y reproducciones
+        <span class="cov0" title="0">playlistGroup.Post("/albums/canciones-activas", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.ObtenerCancionesPorAlbumActivas(_DB, c)
+        }</span>)
+
+        <span class="cov0" title="0">playlistGroup.Post("/incrementar_reproducciones", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+                return utils.IncrementarReproducciones(_DB, c)
+        }</span>)
+
+        // -------------------------------
+        // 🚀 Inicio del servidor
+        // -------------------------------
+        <span class="cov0" title="0">log.Println("🚀 Servidor iniciado en http://localhost:3000")
+        log.Fatal(app.Listen(":3000"))</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

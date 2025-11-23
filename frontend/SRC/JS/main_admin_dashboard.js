@@ -29,6 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       if (confirm("¿Deseas cerrar sesión?")) {
+        // ✅ Limpiar TODO el localStorage
+        localStorage.removeItem("token")
+        localStorage.removeItem("tipo_user")
+        localStorage.removeItem("id_user")
+        localStorage.removeItem("session_id") // ✅ NUEVO
+        
+        console.log("✅ Sesión cerrada completamente")
+        
+        // ✅ Redirigir al login
         window.location.replace("/")
       }
     })
@@ -441,7 +450,9 @@ window.guardarCambiosUsuario = async (id_usuario) => {
     try {
       const resp = await fetch(`/api/usuarios/${id_usuario}/tipo`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+          Authorization:`Bearer ${localStorage.getItem("token")}`
+         },
         body: JSON.stringify({ tipo: nuevoTipo }),
       })
 

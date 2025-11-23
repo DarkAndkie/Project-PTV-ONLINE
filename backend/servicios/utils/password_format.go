@@ -21,6 +21,15 @@ func PasswordFormato(password string) error {
 	if match, _ := regexp.MatchString(`[0-9]`, password); !match {
 		return fmt.Errorf("la contraseña debe contener al menos un número")
 	}
+	if match, _ := regexp.MatchString(`[A-Z]`, password); !match {
+		return fmt.Errorf("La contraseña debe contener al menos una letra mayúscula")
+	}
+
+	// Al menos una letra minúscula
+	if match, _ := regexp.MatchString(`[a-z]`, password); !match {
+		return fmt.Errorf("La contraseña debe contener al menos una letra minúscula")
+	}
+
 	if match, _ := regexp.MatchString((`[!@#\$%\^&\*\(\)_\+\-=\[\]\{\};:'",.<>\/?\\|]`), password); !match {
 		return fmt.Errorf(("La contraseña debe tener al menos un caracter especial"))
 	}

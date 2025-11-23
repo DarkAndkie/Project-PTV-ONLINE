@@ -11,13 +11,36 @@
   if (!localStorage.getItem("token")) {
     window.location.replace("/");
   }
+
+  // ✅ Guardar el ID de sesión actual de ESTA pestaña
+  const mySessionId = localStorage.getItem("session_id");
+  console.log("🔑 Mi session_id:", mySessionId);
+
+  // ✅ Escuchar cambios en localStorage (otra pestaña cambia el session_id)
+  window.addEventListener('storage', function(e) {
+    // Si otra pestaña inició sesión con OTRO usuario
+    if (e.key === 'session_id' && e.newValue !== mySessionId && e.newValue !== null) {
+      console.warn("⚠️ Nueva sesión detectada en otra pestaña. Cerrando esta sesión...");
+      alert("⚠️ Se detectó un inicio de sesión en otra pestaña. Esta sesión se cerrará.");
+      
+      // NO limpiar el localStorage aquí (la otra pestaña ya tiene los datos correctos)
+      window.location.replace("/");
+    }
+    
+    // Si se eliminó el token (logout desde otra pestaña)
+    if (e.key === 'token' && e.newValue === null) {
+      console.warn("⚠️ Sesión cerrada desde otra pestaña");
+      alert("⚠️ La sesión se cerró desde otra pestaña.");
+      window.location.replace("/");
+    }
+  });
+
   // También detecta navegación hacia adelante/atrás
-     window.addEventListener('pageshow',function(event){
-      if (event.persisted || (window,perfomance && window.navigation.type===2)){
-        localStorage.removeItem("token");
-        window.location.replace("/");
-      }
-     })
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted || !localStorage.getItem("token")) {
+      window.location.replace("/");
+    }
+  });
 </script>
 
 </head>

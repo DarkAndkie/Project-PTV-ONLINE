@@ -403,7 +403,7 @@ func Buscar_Albums_Aleatorios(_db *gorm.DB, c *fiber.Ctx) error {
 
 	var albums = []models.Albums{}
 	if result := _db.Order("RANDOM()").Limit(cantidad).Find(&albums).Error; result != nil {
-		log.Println("❌ Error al consultar álbumes:", result.Error)
+		log.Println("❌ Error al consultar álbumes:", result.Error())
 		return c.Status(500).JSON(fiber.Map{
 			"error": "No se pudieron obtener los albumes",
 		})
