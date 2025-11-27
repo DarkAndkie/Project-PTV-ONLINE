@@ -1013,3 +1013,148 @@ tr[id^="canciones-"]:hover {
   transform: none !important;
   box-shadow: none !important;
 }
+/* ========================================
+   ESTILOS PARA PESTAÑAS DE BANDA
+   ======================================== */
+
+/* Contenedor de pestañas */
+#banda-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+/* Botones de pestaña */
+.tab-btn {
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 15px;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-btn:hover {
+  color: var(--primary);
+  border-bottom-color: rgba(26, 188, 156, 0.3);
+  transform: translateY(-2px);
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--primary);
+  box-shadow: 0 0 10px rgba(26, 188, 156, 0.5);
+}
+
+/* ========================================
+   PREVENIR AUTOCOMPLETADO DE CONTRASEÑA
+   ======================================== */
+
+/* Bloquear autocompletado visual */
+input[type="password"][autocomplete="new-password"] {
+  background-color: var(--bg-darker) !important;
+  -webkit-text-security: disc !important;
+}
+
+/* Ocultar botón de autocompletado de Chrome */
+input[type="password"][autocomplete="new-password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}
+
+/* Prevenir autocompletado en Firefox */
+input[type="password"][autocomplete="new-password"]::-moz-credentials-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Estilo cuando el campo está vacío */
+input[type="password"][autocomplete="new-password"]:placeholder-shown {
+  font-style: italic;
+  color: rgba(224, 224, 224, 0.4);
+}
+
+/* ========================================
+   BADGE DE USUARIO MEJORADO
+   ======================================== */
+
+.user-role-badge {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.1), rgba(26, 188, 156, 0.2));
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+}
+
+.user-role-badge:hover {
+  background: linear-gradient(135deg, rgba(26, 188, 156, 0.2), rgba(26, 188, 156, 0.3));
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  #banda-tabs {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .tab-btn {
+    width: 100%;
+    text-align: left;
+    padding: 10px 16px;
+    border-bottom: none;
+    border-left: 3px solid transparent;
+  }
+  
+  .tab-btn.active {
+    border-left-color: var(--primary);
+    background: rgba(26, 188, 156, 0.1);
+  }
+  
+  .tab-btn.active::after {
+    display: none;
+  }
+  
+  .user-role-badge {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-role-badge {
+    display: none; /* Ocultar en móviles muy pequeños */
+  }
+}

@@ -31,9 +31,7 @@ console.log(`id usuario ${state.userId}`);
 
 
 
-// ========================================
-// FUNCIONES GLOBALES - DEBEN ESTAR FUERA DEL DOMContentLoaded
-// ========================================
+
 async function cargarConfigCloudinary() {
   if (cloudinaryConfig) return cloudinaryConfig
   
@@ -182,8 +180,8 @@ async function setupCaratulaBandaUpload() {
       return
     }
     
-    if (file.size > 10 * 1024 * 1024) {
-      alert("❌ La imagen no puede superar 10MB")
+    if (file.size > 20 * 1024 * 1024) {
+      alert("❌ La imagen no puede superar 20MB")
       return
     }
     
@@ -268,7 +266,7 @@ async function setupCaratulaBandaUpload() {
       alert("❌ Error al subir la carátula")
       uploadZone.innerHTML = `
         <p style="margin: 0; font-size: 16px; color: var(--text-secondary);">📁 Haz clic o arrastra una imagen</p>
-        <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">JPG, PNG - Máx 10MB</p>
+        <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">JPG, PNG - Máx 20MB</p>
       `
       if (progressBar) progressBar.style.display = "none"
     }
@@ -304,7 +302,7 @@ function setupCancionUpload(cancionId, urlExistente = null) {
   
   // Click en zona de upload
   uploadZone.addEventListener("click", (e) => {
-    e.preventDefault()
+
     e.stopPropagation()
     console.log(`🖱️ Click en zona canción ${cancionId}`)
     fileInput.click()
@@ -354,8 +352,8 @@ function setupCancionUpload(cancionId, urlExistente = null) {
       return
     }
     
-    if (file.size > 50 * 1024 * 1024) {
-      alert("❌ El archivo no puede superar 50MB")
+    if (file.size > 20 * 1024 * 1024) {
+      alert("❌ El archivo no puede superar 20MB")
       return
     }
     
@@ -431,7 +429,7 @@ function setupCancionUpload(cancionId, urlExistente = null) {
       alert("❌ Error al procesar el archivo")
       uploadZone.innerHTML = `
         <p style="margin: 0; font-size: 14px; color: var(--text-secondary);">📁 Haz clic o arrastra un archivo</p>
-        <p style="margin: 5px 0 0; font-size: 12px; color: var(--text-secondary);">MP3, WAV, FLAC - Máx 50MB</p>
+        <p style="margin: 5px 0 0; font-size: 12px; color: var(--text-secondary);">MP3, WAV, FLAC - Máx 20MB</p>
       `
       if (progressBar) progressBar.style.display = "none"
     }
@@ -659,7 +657,7 @@ async function mostrarFormularioAlbum() {
               <div class="upload-zone" id="upload-caratula-banda" style="border: 2px dashed var(--border-color); padding: 30px; text-align: center; border-radius: 10px; cursor: pointer; background: rgba(26, 188, 156, 0.05); transition: all 0.3s ease;">
                 <input type="file" id="caratula-banda-input" accept="image/*" style="display: none;">
                 <p style="margin: 0; font-size: 16px; color: var(--text-secondary);">📁 Haz clic o arrastra una imagen</p>
-                <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">JPG, PNG - Máx 10MB</p>
+                <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">JPG, PNG - Máx 20MB</p>
                 <div id="preview-caratula-banda" style="display: none; margin-top: 15px;">
                   <img id="preview-img-caratula-banda" style="max-width: 200px; border-radius: 8px; border: 2px solid var(--primary);">
                 </div>
@@ -720,8 +718,8 @@ async function handleCaratulaUpload(file) {
     return
   }
   
-  if (file.size > 10 * 1024 * 1024) {
-    alert("❌ La imagen no puede superar 10MB")
+  if (file.size > 20 * 1024 * 1024) {
+    alert("❌ La imagen no puede superar 20MB")
     return
   }
   
@@ -806,7 +804,7 @@ async function handleCaratulaUpload(file) {
     alert("❌ Error al subir la carátula")
     uploadZone.innerHTML = `
       <p style="margin: 0; font-size: 16px; color: var(--text-secondary);">📁 Haz clic o arrastra una imagen</p>
-      <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">JPG, PNG - Máx 10MB</p>
+      <p style="margin: 8px 0 0; font-size: 12px; color: var(--text-secondary);">JPG, PNG - Máx 20MB</p>
     `
     if (progressBar) progressBar.style.display = "none"
   }
@@ -844,7 +842,7 @@ function agregarCancionFormulario(cancion = null) {
         <div class="upload-zone-cancion" id="upload-cancion-${id}" style="border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 6px; background: rgba(255, 255, 255, 0.02); cursor: pointer; transition: all 0.3s ease;">
           <input type="file" id="archivo-cancion-${id}" accept="audio/*" style="display: none;">
           <p style="margin: 0; font-size: 14px; color: var(--text-secondary);">📁 Haz clic o arrastra un archivo</p>
-          <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-secondary);">MP3, WAV, FLAC - Máx 50MB</p>
+          <p style="margin: 5px 0 0 0; font-size: 12px; color: var(--text-secondary);">MP3, WAV, FLAC - Máx 10MB</p>
           <div id="progress-cancion-${id}" style="display: none; margin-top: 10px; width: 100%; height: 6px; background: var(--bg-darker); border-radius: 3px;">
             <div id="progress-bar-cancion-${id}" style="height: 100%; background: var(--primary); width: 0%; transition: width 0.3s;"></div>
           </div>
@@ -892,8 +890,8 @@ async function handleSongUpload(file) {
     return
   }
   
-  if (file.size > 50 * 1024 * 1024) {
-    alert("❌ El archivo no puede superar 50MB")
+  if (file.size > 20 * 1024 * 1024) {
+    alert("❌ El archivo no puede superar 20MB")
     return
   }
   
@@ -1335,6 +1333,11 @@ cargarConfigCloudinary()
     elements.navBtns.forEach((btn) => btn.classList.remove("active"));
     document.querySelector('[data-section="admin-cuenta"]')?.classList.add("active");
   }
+  
+
+if (state.userRole) {
+  cargarDatosUsuario()
+}
 })
 
 // ========================================
@@ -1603,31 +1606,33 @@ async function performSearch() {
       if (songResp.ok) {
         const songs = await songResp.json()
         if (songs && Array.isArray(songs)) {
-          // ✅ FILTRAR: Solo canciones de álbumes activos
-          const songsFiltradas = []
-          for (const song of songs) {
-            const albumResp = await fetch(`${state.baseUrl}/api/albums_listar`, {
-              headers: { Authorization: `Bearer ${state.token}` }
-            })
-            if (albumResp.ok) {
-              const albums = await albumResp.json()
+          // ✅ Cargar álbumes UNA SOLA VEZ
+          const albumResp = await fetch(`${state.baseUrl}/api/albums_listar`, {
+            headers: { Authorization: `Bearer ${state.token}` }
+          })
+          
+          if (albumResp.ok) {
+            const albums = await albumResp.json()
+            
+            // ✅ FILTRAR y enriquecer con datos del álbum
+            const songsFiltradas = []
+            for (const song of songs) {
               const album = albums.find(a => a.id_album === song.id_album)
               if (album && album.estado === 'activo' && song.estado === 'activo') {
-                songsFiltradas.push({ ...song, type: "song" })
+                songsFiltradas.push({ 
+                  ...song, 
+                  type: "song",
+                  album_cover: album.caratula_dir,
+                  album_name: album.nombre_album,
+                  caratula_path: album.caratula_dir // ✅ AÑADIDO
+                })
               }
             }
+            results.songs = songsFiltradas
           }
-          results.songs = songsFiltradas
         }
       }
     }
-    
-    const caratulas = await Promise.all(results.songs.map(async(song)=>{
-      const carat = await traer_caratulas(song.id_album);
-      return {...song,caratula_path:carat};
-    }))
-    results.songs = caratulas;
-
     if (state.searchFilter === "all" || state.searchFilter === "albums") {
       const albumResp = await fetch(`${state.baseUrl}/api/buscar/albumes`, {
         method: "POST",
@@ -2581,44 +2586,206 @@ function shuffleArray(array) {
 // ========================================
 // PERFIL PERSONAL - USUARIOS FINALES
 // ========================================
+// ========================================
+// MEJORAS PARA GESTIÓN DE USUARIO
+// ========================================
+
 async function cargarDatosUsuario() {
+  console.log("📥 Cargando datos del usuario...")
+  
   try {
     const resp = await fetch(`${state.baseUrl}/api/usuarios/mi-perfil`, {
       headers: { Authorization: `Bearer ${state.token}` }
     })
     
-    if (resp.ok) {
-      const user = await resp.json()
-      
-      // Verificar que los elementos existan antes de asignar
-      const nombreInput = document.getElementById("user-nombre")
-      const apellidoInput = document.getElementById("user-apellido")
-      const emailInput = document.getElementById("user-email")
-      const telInput = document.getElementById("user-tel")
-      
-      if (nombreInput) nombreInput.value = user.nombre || ""
-      if (apellidoInput) apellidoInput.value = user.apellido || ""
-      if (emailInput) emailInput.value = user.email || ""
-      if (telInput) telInput.value = user.celular || ""
-      
-      console.log("✅ Datos del usuario cargados:", user.nombre)
-    } else {
-      console.error("❌ Error al cargar perfil")
+    if (!resp.ok) {
+      console.error("❌ Error al cargar perfil:", resp.status)
+      return
     }
+    
+    const user = await resp.json()
+    console.log("✅ Datos recibidos:", user)
+    
+    // ✅ Actualizar badge con nombre
+    const userRoleBadge = document.getElementById("userRole")
+    if (userRoleBadge) {
+      const roleMap = {
+        admin: "👑 Administrador",
+        curador: "📝 Curador",
+        banda: "🎸 Banda",
+        artista: "🎤 Artista",
+        finalusuario: "👤 Usuario",
+      }
+      const roleText = roleMap[user.tipo_user] || "Usuario"
+      userRoleBadge.textContent = `${user.nombre} ${user.apellido} - ${roleText}`
+    }
+    
+    // ✅ Determinar prefijo según el rol
+    const esBanda = state.userRole === "banda"
+    const prefix = esBanda ? "banda-" : "user-"
+    
+    console.log("🔖 Usando prefijo:", prefix)
+    
+    // ✅ Cargar datos en formulario
+    const nombreInput = document.getElementById(`${prefix}nombre`)
+    const apellidoInput = document.getElementById(`${prefix}apellido`)
+    const emailInput = document.getElementById(`${prefix}email`)
+    const telInput = document.getElementById(`${prefix}tel`)
+    const passwordInput = document.getElementById(`${prefix}password`)
+    
+    console.log("📋 Elementos encontrados:", {
+      nombreInput: !!nombreInput,
+      apellidoInput: !!apellidoInput,
+      emailInput: !!emailInput,
+      telInput: !!telInput,
+      passwordInput: !!passwordInput
+    })
+    
+    if (nombreInput) nombreInput.value = user.nombre || ""
+    if (apellidoInput) apellidoInput.value = user.apellido || ""
+    if (emailInput) emailInput.value = user.email || ""
+    if (telInput) telInput.value = user.celular || ""
+    
+    // ✅ Campo de contraseña SIEMPRE vacío
+    if (passwordInput) {
+      passwordInput.value = ""
+      passwordInput.setAttribute("autocomplete", "new-password")
+      passwordInput.setAttribute("data-lpignore", "true")
+      passwordInput.setAttribute("data-form-type", "other")
+    }
+    
+    console.log("✅ Datos cargados en formulario")
+    
   } catch (error) {
     console.error("❌ Error cargando datos:", error)
+    alert("❌ Error al cargar datos: " + error.message)
   }
 }
 
-async function guardarDatosPersonales() {
-  const nombre = document.getElementById("user-nombre")?.value.trim()
-  const apellido = document.getElementById("user-apellido")?.value.trim()
-  const email = document.getElementById("user-email")?.value.trim()
-  const celular = document.getElementById("user-tel")?.value.trim()
-  const password = document.getElementById("user-password")?.value.trim()
+// 2. MODIFICAR switchSection para gestionar pestañas de banda
+function switchSection(section) {
+  elements.navBtns.forEach((btn) => btn.classList.remove("active"))
+  elements.contentSections.forEach((sec) => sec.classList.remove("active"))
+  document.querySelector(`[data-section="${section}"]`)?.classList.add("active")
+  document.getElementById(`section-${section}`)?.classList.add("active")
   
+  if (section === "admin-cuenta") {
+    const bandaContent = document.getElementById("banda-content")
+    const otherContent = document.getElementById("other-content")
+    const btnCreateAlbum = document.getElementById("btnCreateAlbum")
+    const bandaTabs = document.getElementById("banda-tabs")
+    
+    if (state.userRole === "banda") {
+      // ✅ MOSTRAR SISTEMA DE PESTAÑAS PARA BANDAS
+      if (bandaContent) bandaContent.style.display = "block"
+      if (otherContent) otherContent.style.display = "none"
+      if (btnCreateAlbum) btnCreateAlbum.style.display = "block"
+      
+      // Mostrar pestañas
+      if (bandaTabs) {
+        bandaTabs.style.display = "flex"
+        // Activar pestaña de álbumes por defecto
+        mostrarPestanaBanda('albums')
+      }
+      
+      // Cargar datos del usuario para la pestaña de perfil
+      setTimeout(() => cargarDatosUsuario(), 100)
+      // Cargar álbumes
+      setTimeout(() => cargarAlbumesBanda(), 300)
+    } else {
+      // Usuario normal
+      if (bandaContent) bandaContent.style.display = "none"
+      if (otherContent) otherContent.style.display = "block"
+      if (btnCreateAlbum) btnCreateAlbum.style.display = "none"
+      if (bandaTabs) bandaTabs.style.display = "none"
+      
+      setTimeout(() => cargarDatosUsuario(), 100)
+    }
+  }
+}
+
+// 3. NUEVA FUNCIÓN: Gestionar pestañas para bandas
+function mostrarPestanaBanda(tab) {
+  const albumsTab = document.getElementById("banda-albums-tab")
+  const perfilTab = document.getElementById("banda-perfil-tab")
+  const albumsContent = document.getElementById("albums-content")
+  const perfilContent = document.getElementById("banda-perfil-content")
+  const btnCreateAlbum = document.getElementById("btnCreateAlbum")
+  
+  // Remover clase active de todas las pestañas
+  if (albumsTab) albumsTab.classList.remove("active")
+  if (perfilTab) perfilTab.classList.remove("active")
+  
+  if (tab === "albums") {
+    // Mostrar álbumes
+    if (albumsTab) albumsTab.classList.add("active")
+    if (albumsContent) albumsContent.style.display = "block"
+    if (perfilContent) perfilContent.style.display = "none"
+    if (btnCreateAlbum) btnCreateAlbum.style.display = "block"
+  } else if (tab === "perfil") {
+    // Mostrar perfil
+    if (perfilTab) perfilTab.classList.add("active")
+    if (albumsContent) albumsContent.style.display = "none"
+    if (perfilContent) perfilContent.style.display = "block"
+    if (btnCreateAlbum) btnCreateAlbum.style.display = "none"
+    
+    // Cargar datos del usuario
+    cargarDatosUsuario()
+  }
+}
+
+
+async function guardarDatosPersonales() {
+  console.log("🔧 Iniciando guardarDatosPersonales()")
+  
+  // ✅ Determinar si es banda o usuario normal
+  const esBanda = state.userRole === "banda"
+  const prefix = esBanda ? "banda-" : "user-"
+  
+  console.log("👤 Tipo de usuario:", state.userRole)
+  console.log("🔖 Prefijo de IDs:", prefix)
+  
+  // ✅ Obtener elementos con el prefijo correcto
+  const nombreInput = document.getElementById(`${prefix}nombre`)
+  const apellidoInput = document.getElementById(`${prefix}apellido`)
+  const emailInput = document.getElementById(`${prefix}email`)
+  const telInput = document.getElementById(`${prefix}tel`)
+  const passwordInput = document.getElementById(`${prefix}password`)
+  
+  // 🔍 DEBUG: Verificar que los elementos existen
+  console.log("📋 Elementos encontrados:", {
+    nombreInput: !!nombreInput,
+    apellidoInput: !!apellidoInput,
+    emailInput: !!emailInput,
+    telInput: !!telInput,
+    passwordInput: !!passwordInput
+  })
+  
+  if (!nombreInput || !emailInput) {
+    console.error("❌ No se encontraron los campos necesarios")
+    alert("❌ Error: No se pueden encontrar los campos del formulario")
+    return
+  }
+  
+  // ✅ Obtener valores
+  const nombre = nombreInput.value.trim()
+  const apellido = apellidoInput?.value.trim() || ""
+  const email = emailInput.value.trim()
+  const celular = telInput?.value.trim() || ""
+  const password = passwordInput?.value.trim() || ""
+  
+  console.log("📋 Valores capturados:", {
+    nombre,
+    apellido,
+    email,
+    celular,
+    password: password ? "***" : "(vacío)"
+  })
+  
+  // ✅ Validaciones
   if (!nombre || !email) {
     alert("❌ Nombre y correo son obligatorios")
+    console.error("❌ Faltan campos:", { nombre, email })
     return
   }
   
@@ -2629,10 +2796,11 @@ async function guardarDatosPersonales() {
     return
   }
   
+  // ✅ Preparar payload
   const payload = { nombre, apellido, email, celular }
+  const cambioPassword = !!password
   
   // Si hay contraseña, validarla
-  const cambioPassword = !!password // 👈 Detectar si cambió contraseña
   if (password) {
     if (password.length < 8) {
       alert("❌ La contraseña debe tener al menos 8 caracteres")
@@ -2640,6 +2808,8 @@ async function guardarDatosPersonales() {
     }
     payload.password = password
   }
+  
+  console.log("📤 Payload a enviar:", payload)
   
   try {
     const resp = await fetch(`${state.baseUrl}/api/usuarios/actualizar-perfil`, {
@@ -2651,33 +2821,40 @@ async function guardarDatosPersonales() {
       body: JSON.stringify(payload)
     })
     
-    const data = await resp.json()
+    console.log("📥 Status de respuesta:", resp.status)
     
-    if (resp.ok) {
-      alert("✅ Perfil actualizado correctamente" + (cambioPassword ? ". Debes iniciar sesión nuevamente." : ""))
-      
-      if (cambioPassword) {
-        // ✅ Si cambió contraseña, cerrar sesión
-        localStorage.removeItem('token')
-        localStorage.removeItem('tipo_user')
-        localStorage.removeItem('id_user')
-        window.location.href = '/'
-      } else {
-        // Solo limpiar campo de contraseña si NO la cambió
-        const passwordInput = document.getElementById("user-password")
-        if (passwordInput) passwordInput.value = ""
-        
-        // Recargar datos
-        cargarDatosUsuario()
-      }
+    if (!resp.ok) {
+      const errorData = await resp.json()
+      console.error("❌ Error del servidor:", errorData)
+      alert("❌ " + (errorData.error || "Error al actualizar"))
+      return
+    }
+    
+    const data = await resp.json()
+    console.log("✅ Respuesta exitosa:", data)
+    
+    alert("✅ Perfil actualizado correctamente" + (cambioPassword ? ". Debes iniciar sesión nuevamente." : ""))
+    
+    if (cambioPassword) {
+      // Si cambió contraseña, cerrar sesión
+      localStorage.removeItem('token')
+      localStorage.removeItem('tipo_user')
+      localStorage.removeItem('id_user')
+      localStorage.removeItem('session_id')
+      window.location.href = '/'
     } else {
-      alert("❌ " + (data.error || "Error al actualizar"))
+      // Solo limpiar campo de contraseña
+      if (passwordInput) passwordInput.value = ""
+      
+      // Recargar datos
+      await cargarDatosUsuario()
     }
   } catch (error) {
-    console.error("❌ Error:", error)
-    alert("❌ Error de conexión")
+    console.error("❌ Error de red:", error)
+    alert("❌ Error de conexión: " + error.message)
   }
 }
+
 //GLOBALES//
 window.guardarDatosPersonales = guardarDatosPersonales
 window.cargarDatosUsuario = cargarDatosUsuario
@@ -2703,6 +2880,9 @@ window.removeFromPlaylist = removeFromPlaylist
 window.saveNewPlaylist = saveNewPlaylist
 window.loadPlaylists = loadPlaylists
 window.logout = logout
+window.mostrarPestanaBanda = mostrarPestanaBanda
+
+
 
 // Advertencia al salir sin guardar
 

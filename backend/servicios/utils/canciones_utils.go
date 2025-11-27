@@ -20,7 +20,7 @@ func ObtenerCancionesPorAlbum(_db *gorm.DB, c *fiber.Ctx) error {
 			"error": "Datos inválidos",
 		})
 	}
-
+	log.Printf("id del álbum: %s\n", body.IdAlbum)
 	if body.IdAlbum == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "El ID del álbum es requerido",

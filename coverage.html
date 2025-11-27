@@ -81,7 +81,7 @@
 				
 				<option value="file12">proyecto-ptv-online/backend/servicios/models/usuario.go (0.0%)</option>
 				
-				<option value="file13">proyecto-ptv-online/backend/servicios/utils/album_funcs..go (9.0%)</option>
+				<option value="file13">proyecto-ptv-online/backend/servicios/utils/album_funcs..go (20.3%)</option>
 				
 				<option value="file14">proyecto-ptv-online/backend/servicios/utils/auth_utils.go (0.0%)</option>
 				
@@ -653,7 +653,7 @@ func ValidarDuracionCancion(duracion string) error <span class="cov8" title="1">
 }
 
 // ✅ FUNCIÓN MEJORADA: Verificar archivos con mejor manejo
-func existeElArchivo(url string, tipoArchivo string) bool <span class="cov0" title="0">{
+func existeElArchivo(url string, tipoArchivo string) bool <span class="cov8" title="1">{
         log.Printf("🔍 Verificando URL: %s (tipo: %s)", url, tipoArchivo)
 
         // ✅ Manejar enlaces de Google Drive
@@ -669,7 +669,7 @@ func existeElArchivo(url string, tipoArchivo string) bool <span class="cov0" tit
                 }
         }
 
-        <span class="cov0" title="0">client := http.Client{
+        <span class="cov8" title="1">client := http.Client{
                 Timeout: 10 * time.Second, // ✅ Aumentado a 10 segundos
                 CheckRedirect: func(req *http.Request, via []*http.Request) error </span><span class="cov0" title="0">{
                         // Permitir hasta 10 redirects
@@ -680,12 +680,12 @@ func existeElArchivo(url string, tipoArchivo string) bool <span class="cov0" tit
                 },
         }
 
-        <span class="cov0" title="0">resp, err := client.Get(url)
-        if err != nil </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">resp, err := client.Get(url)
+        if err != nil </span><span class="cov8" title="1">{
                 log.Printf("❌ Error al verificar URL: %v", err)
                 return false
         }</span>
-        <span class="cov0" title="0">defer resp.Body.Close()
+        <span class="cov8" title="1">defer resp.Body.Close()
 
         log.Printf("📥 Status code: %d", resp.StatusCode)
         log.Printf("📥 Content-Type: %s", resp.Header.Get("Content-Type"))
@@ -696,18 +696,18 @@ func existeElArchivo(url string, tipoArchivo string) bool <span class="cov0" tit
                 return false
         }</span>
 
-        <span class="cov0" title="0">contentType := resp.Header.Get("Content-Type")
+        <span class="cov8" title="1">contentType := resp.Header.Get("Content-Type")
         if contentType == "" </span><span class="cov0" title="0">{
                 log.Printf("⚠️ No hay Content-Type en la respuesta")
                 return false
         }</span>
 
-        <span class="cov0" title="0">switch tipoArchivo </span>{
-        case "audio":<span class="cov0" title="0">
+        <span class="cov8" title="1">switch tipoArchivo </span>{
+        case "audio":<span class="cov8" title="1">
                 valido := strings.HasPrefix(contentType, "audio/")
                 log.Printf("🎵 ¿Es audio?: %v", valido)
                 return valido</span>
-        case "caratula":<span class="cov0" title="0">
+        case "caratula":<span class="cov8" title="1">
                 valido := strings.HasPrefix(contentType, "image/")
                 log.Printf("🖼️ ¿Es imagen?: %v", valido)
                 return valido</span>
@@ -1023,8 +1023,8 @@ func ObtenerCancionesPorAlbum(_db *gorm.DB, c *fiber.Ctx) error <span class="cov
                         "error": "Datos inválidos",
                 })
         }</span>
-
-        <span class="cov0" title="0">if body.IdAlbum == "" </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">log.Printf("id del álbum: %s\n", body.IdAlbum)
+        if body.IdAlbum == "" </span><span class="cov0" title="0">{
                 return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
                         "error": "El ID del álbum es requerido",
                 })
@@ -1672,7 +1672,7 @@ func EnvioDeCodigo(tx *gorm.DB, usuario models.Usuario, correo string) error <sp
 
 func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
         usuario, err := validacionesCrearUsuario(_db, c)
-        var tipo = "finalusuario"
+
         if err != nil </span><span class="cov0" title="0">{
                 return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
         }</span>
@@ -1693,18 +1693,6 @@ func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0"
                         "error": "Error al registrar el usuario: " + err.Error(),
                 })
         }</span>
-        <span class="cov0" title="0">var master string = ""
-        var count int64 = 0
-        _db.Model(&amp;models.Usuario{}).Count(&amp;count)
-        if count == 1 </span><span class="cov0" title="0">{
-                master = "master"
-        }</span>
-        <span class="cov0" title="0">if master == "" </span><span class="cov0" title="0">{
-                usuario.Tipo_user = models.TipoUsuario(strings.ToLower(tipo))
-        }</span>
-        <span class="cov0" title="0">if master == "master" </span><span class="cov0" title="0">{
-                usuario.Tipo_user = "master"
-        }</span>
 
         <span class="cov0" title="0">_db.Save(&amp;usuario)
         return c.JSON(fiber.Map{
@@ -1715,6 +1703,7 @@ func CrearUsuario(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0"
 func VerificarCodigo(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title="0">{
         email := c.FormValue("Correo")
         codigo := c.FormValue("Codigo")
+        var tipo = "finalusuario"
 
         var usuario models.Usuario
         if err := _db.First(&amp;usuario, "correo = ?", email).Error; err != nil </span><span class="cov0" title="0">{
@@ -1744,8 +1733,20 @@ func VerificarCodigo(_db *gorm.DB, c *fiber.Ctx) error <span class="cov0" title=
         }
 
         //verificamos que solo exista un usuario y ese será el master
-
-        <span class="cov0" title="0">validacion.Verificado = true
+        <span class="cov0" title="0">var master string = ""
+        var count int64 = 0
+        _db.Model(&amp;models.Usuario{}).Count(&amp;count)
+        if count == 1 </span><span class="cov0" title="0">{
+                master = "master"
+        }</span>
+        <span class="cov0" title="0">if master == "" </span><span class="cov0" title="0">{
+                usuario.Tipo_user = models.TipoUsuario(strings.ToLower(tipo))
+        }</span>
+        <span class="cov0" title="0">if master == "master" </span><span class="cov0" title="0">{
+                usuario.Tipo_user = "master"
+        }</span>
+        <span class="cov0" title="0">_db.Model(&amp;models.Usuario{}).Where("correo=?", email).Update("tipo_user", usuario.Tipo_user)
+        validacion.Verificado = true
         _db.Save(&amp;validacion)
 
         return c.JSON(fiber.Map{"message": "Correo verificado correctamente",
@@ -2792,8 +2793,8 @@ func main() <span class="cov0" title="0">{
         <span class="cov0" title="0">app.Get("/api/usuarios/buscar/:nombre", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
                 return utils.BuscarUsuariosPorNombre(_DB, c)
         }</span>)
-
-        <span class="cov0" title="0">app.Put("/api/usuarios/:id/tipo", func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
+        <span class="cov0" title="0">var aut_master = []string{"master"}
+        app.Put("/api/usuarios/:id/tipo", utils.AutenticacionRequerida(aut_master), func(c *fiber.Ctx) error </span><span class="cov0" title="0">{
                 return utils.CambiarTipoUsuario(_DB, c)
         }</span>)
 

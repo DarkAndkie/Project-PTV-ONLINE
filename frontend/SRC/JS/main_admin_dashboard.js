@@ -684,8 +684,8 @@ window.guardarCambiosUsuario = async (id_usuario) => {
     return
   }
 
-  if (file.size > 10 * 1024 * 1024) {
-    alert("❌ La imagen no puede superar 10MB")
+  if (file.size > 20 * 1024 * 1024) {
+    alert("❌ La imagen no puede superar 20MB")
     return
   }
 
@@ -888,114 +888,218 @@ window.guardarCambiosUsuario = async (id_usuario) => {
     })
   }
 
-  function setupSongUpload(cancionId, urlExistente = null) {
-    console.log(`🎵 Configurando upload para canción ${cancionId}`)
+ function setupSongUpload(cancionId, urlExistente = null) {
+  console.log(`🎵 Configurando upload para canción ${cancionId}`)
+  
+  if (!cloudinaryConfig) {
+    console.error("❌ Cloudinary no configurado")
+    alert("❌ Cloudinary no está configurado. Espera un momento y recarga la página.")
+    return
+  }
+
+  const uploadZone = document.getElementById(`upload-cancion-${cancionId}`)
+  const fileInput = document.getElementById(`archivo-cancion-${cancionId}`)
+  const pathInput = document.getElementById(`path-cancion-${cancionId}`)
+  const progressBar = document.getElementById(`progress-cancion-${cancionId}`)
+  const progressFill = progressBar?.querySelector(".upload-progress-bar-cancion")
+  const preview = document.getElementById(`preview-cancion-${cancionId}`)
+
+  console.log(`📋 Elementos canción ${cancionId}:`, {
+    uploadZone: !!uploadZone,
+    fileInput: !!fileInput,
+    pathInput: !!pathInput,
+    progressBar: !!progressBar,
+    progressFill: !!progressFill,
+    preview: !!preview
+  })
+
+  if (!uploadZone || !fileInput) {
+    console.error(`❌ Faltan elementos para canción ${cancionId}`)
+    return
+  }
+
+  // 🎵 Si hay URL existente, guardarla
+  if (urlExistente) {
+    uploadedFiles.canciones[cancionId] = {
+      url: urlExistente,
+      nuevo: false,
+      urlOriginal: urlExistente
+    }
+  }
+
+  // ✅ CLICK - Sin prevent
+  uploadZone.addEventListener("click", (e) => {
+    console.log(`🖱️ Click en zona canción ${cancionId}`)
+    fileInput.click()
+  })
+
+  // ✅ DRAGOVER - Con prevent
+  uploadZone.addEventListener("dragover", (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    uploadZone.style.borderColor = "#27ae60"
+    uploadZone.style.background = "#d5f4e6"
+  })
+
+  // ✅ DRAGLEAVE - Con prevent
+  uploadZone.addEventListener("dragleave", (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    uploadZone.style.borderColor = "#95a5a6"
+    uploadZone.style.background = "#fafafa"
+  })
+
+  // ✅ DROP - Con prevent
+  uploadZone.addEventListener("drop", (e) => {
+    console.log(`📥 Drop en canción ${cancionId}`)
+    e.preventDefault()
+    e.stopPropagation()
+    
+    uploadZone.style.borderColor = "#95a5a6"
+    uploadZone.style.background = "#fafafa"
+    
+    if (e.dataTransfer.files.length > 0) {
+      console.log(`📁 Archivo droppeado: ${e.dataTransfer.files[0].name}`)
+      handleSongUpload(e.dataTransfer.files[0])
+    }
+  })
+
+  // ✅ FILE INPUT CHANGE
+  fileInput.addEventListener("change", (e) => {
+    console.log(`📁 Archivo seleccionado para canción ${cancionId}`)
+    if (e.target.files.length > 0) {
+      console.log(`📄 Nombre del archivo: ${e.target.files[0].name}`)
+      handleSongUpload(e.target.files[0])
+    }
+  })
+
+  // ✅ FUNCIÓN DE UPLOAD CON VALIDACIÓN FLAC MEJORADA
+  async function handleSongUpload(file) {
+    console.log(`🚀 Subiendo canción ${cancionId}:`, file.name)
+    
+    // ✅ VALIDACIÓN MEJORADA PARA FLAC
+    const validAudioTypes = [
+      'audio/mpeg', 'audio/mp3',
+      'audio/wav', 'audio/wave', 'audio/x-wav',
+      'audio/flac', 'audio/x-flac',
+      'audio/ogg', 'audio/aac', 'audio/m4a'
+    ]
+    
+    const isValidAudio = validAudioTypes.includes(file.type) || 
+                        file.name.toLowerCase().endsWith('.flac') ||
+                        file.name.toLowerCase().endsWith('.mp3') ||
+                        file.name.toLowerCase().endsWith('.wav') ||
+                        file.name.toLowerCase().endsWith('.m4a')||
+                        file.name.toLowerCase().endsWith('.ogg')||
+                        file.name.toLowerCase().endsWith('.AAC')
+    
+    if (!isValidAudio) {
+      alert("❌ Formato no soportado. Usa: MP3, WAV, FLAC, OGG, AAC")
+      return
+    }
+    
+    // ✅ LÍMITE 20MB (plan free de Cloudinary)
+    const maxSize = 20 * 1024 * 1024
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2)
+      alert(`❌ El archivo pesa ${sizeMB}MB. El máximo permitido es 20MB`)
+      return
+    }
+    
+    // 🗑️ Eliminar archivo anterior si existe y es nuevo
+    const archivoAnterior = uploadedFiles.canciones[cancionId]
+    if (archivoAnterior && archivoAnterior.url && archivoAnterior.nuevo) {
+      console.log(`🗑️ Eliminando archivo anterior de canción ${cancionId}:`, archivoAnterior.url)
+      
+      try {
+        const respDelete = await fetch("/api/cloudinary/cleanup", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            urls: [archivoAnterior.url],
+            resource_types: ["video"]
+          })
+        })
+        
+        if (respDelete.ok) {
+          console.log("✅ Archivo anterior de canción eliminado")
+        }
+      } catch (error) {
+        console.error("❌ Error al eliminar:", error)
+      }
+    }
     
     if (!cloudinaryConfig) {
-      console.error("❌ Cloudinary no configurado")
-      alert("❌ Cloudinary no está configurado. Espera un momento y recarga la página.")
+      alert("❌ Cloudinary no está configurado. Recarga la página.")
       return
     }
-
-    const uploadZone = document.getElementById(`upload-cancion-${cancionId}`)
-    const fileInput = document.getElementById(`archivo-cancion-${cancionId}`)
-    const pathInput = document.getElementById(`path-cancion-${cancionId}`)
-    const progressBar = document.getElementById(`progress-cancion-${cancionId}`)
-    const progressFill = progressBar?.querySelector(".upload-progress-bar-cancion")
-    const preview = document.getElementById(`preview-cancion-${cancionId}`)
-
-    console.log(`📋 Elementos canción ${cancionId}:`, {
-      uploadZone: !!uploadZone,
-      fileInput: !!fileInput,
-      pathInput: !!pathInput,
-      progressBar: !!progressBar,
-      progressFill: !!progressFill,
-      preview: !!preview
-    })
-
-    if (!uploadZone || !fileInput) {
-      console.error(`❌ Faltan elementos para canción ${cancionId}`)
-      return
-    }
-
-    // 🎵 Si hay URL existente, guardarla
-    if (urlExistente) {
-      uploadedFiles.canciones[cancionId] = {
-        url: urlExistente,
-        nuevo: false,
-        urlOriginal: urlExistente
-      }
-    }
-
-    uploadZone.addEventListener("click", (e) => {
-      console.log(`🖱️ Click en zona canción ${cancionId}`)
- 
- 
-      fileInput.click()
-    })
-
-    uploadZone.addEventListener("dragover", (e) => {
-        e.preventDefault()  
-        e.stopPropagation()
-      uploadZone.style.borderColor = "#27ae60"
-      uploadZone.style.background = "#d5f4e6"
-    })
-
-    uploadZone.addEventListener("dragleave", (e) => {
-        e.preventDefault()  
-        e.stopPropagation()
-      uploadZone.style.borderColor = "#95a5a6"
-      uploadZone.style.background = "#fafafa"
-    })
-
-    uploadZone.addEventListener("drop", (e) => {
-      console.log(`📥 Drop en canción ${cancionId}`)
-  e.preventDefault()   
-  e.stopPropagation()
-      uploadZone.style.borderColor = "#95a5a6"
-      uploadZone.style.background = "#fafafa"
-      
-      if (e.dataTransfer.files.length > 0) {
-        console.log(`📁 Archivo droppeado: ${e.dataTransfer.files[0].name}`)
-        handleSongUpload(e.dataTransfer.files[0])
-      }
-    })
-
-    fileInput.addEventListener("change", (e) => {
-      console.log(`📁 Archivo seleccionado para canción ${cancionId}`)
-      if (e.target.files.length > 0) {
-        console.log(`📄 Nombre del archivo: ${e.target.files[0].name}`)
-        handleSongUpload(e.target.files[0])
-      }
-    })
-
-    async function handleSongUpload(file) {
-const archivoAnterior = uploadedFiles.canciones[cancionId]
-if (archivoAnterior && archivoAnterior.url && archivoAnterior.nuevo) {
-  console.log(`🗑️ Eliminando archivo anterior de canción ${cancionId}:`, archivoAnterior.url)
-  
-  try {
-    const respDelete = await fetch("/api/cloudinary/cleanup", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        urls: [archivoAnterior.url],
-        resource_types: ["video"]
-      })
-    })
     
-    if (respDelete.ok) {
-      console.log("✅ Archivo anterior de canción eliminado")
-    } else {
-      console.warn("⚠️ No se pudo eliminar archivo anterior")
+    if (progressBar) progressBar.style.display = "block"
+    if (progressFill) progressFill.style.width = "0%"
+    
+    uploadZone.innerHTML = '<p style="color: #3498db; margin: 20px 0;">⏳ Subiendo audio...</p>'
+    
+    try {
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("upload_preset", cloudinaryConfig.uploadPresetSongs)
+      
+      const xhr = new XMLHttpRequest()
+      
+      xhr.upload.addEventListener("progress", (e) => {
+        if (e.lengthComputable && progressFill) {
+          const percentComplete = (e.loaded / e.total) * 100
+          progressFill.style.width = percentComplete + "%"
+          console.log(`📊 Canción ${cancionId}: ${percentComplete.toFixed(0)}%`)
+        }
+      })
+      
+      xhr.addEventListener("load", () => {
+        if (xhr.status === 200) {
+          const response = JSON.parse(xhr.responseText)
+          const cloudinaryUrl = response.secure_url
+          
+          pathInput.value = cloudinaryUrl
+          if (preview) preview.style.display = "block"
+          if (progressBar) progressBar.style.display = "none"
+          
+          uploadedFiles.canciones[cancionId] = {
+            url: cloudinaryUrl,
+            publicId: response.public_id,
+            nuevo: true,
+            urlOriginal: archivoAnterior?.urlOriginal || null
+          }
+          
+          uploadZone.innerHTML = `
+            <p style="margin: 0; font-size: 14px; color: #27ae60;">✅ Audio subido correctamente</p>
+            <p style="margin: 5px 0 0; font-size: 12px; color: #7f8c8d;">📁 Haz clic para cambiar</p>
+          `
+          
+          console.log(`✅ Canción ${cancionId} subida:`, cloudinaryUrl)
+        } else {
+          throw new Error(`Error ${xhr.status}`)
+        }
+      })
+      
+      xhr.addEventListener("error", () => {
+        throw new Error("Error de red")
+      })
+      
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudinaryConfig.cloudName}/video/upload`
+      xhr.open("POST", uploadUrl)
+      xhr.send(formData)
+      
+    } catch (error) {
+      console.error(`❌ Error al procesar canción ${cancionId}:`, error)
+      alert("❌ Error al procesar el archivo")
+      uploadZone.innerHTML = `
+        <p style="margin: 0; font-size: 14px; color: #7f8c8d;">📁 Haz clic o arrastra un archivo</p>
+        <p style="margin: 5px 0 0; font-size: 12px; color: #95a5a6;">MP3, WAV, FLAC, OGG - Máx 10MB</p>
+      `
+      if (progressBar) progressBar.style.display = "none"
     }
-  } catch (error) {
-    console.error("❌ Error al eliminar:", error)
   }
 }
-    }
-  }
-
   // 🗑️ Función auxiliar para eliminar archivos de Cloudinary
   async function eliminarDeCloudinary(url, resourceType = "video") {
     try {
@@ -1464,8 +1568,8 @@ function setupCancionUploadAdmin(cancionId, urlActual) {
       return
     }
     
-    if (file.size > 50 * 1024 * 1024) {
-      alert("❌ El archivo no puede superar 50MB")
+    if (file.size > 20 * 1024 * 1024) {
+      alert("❌ El archivo no puede superar 20MB")
       return
     }
     
@@ -1536,7 +1640,7 @@ function setupCancionUploadAdmin(cancionId, urlActual) {
       alert("❌ Error al subir el archivo")
       uploadZone.innerHTML = `
         <p style="margin: 0; font-size: 12px; color: #7f8c8d;">🎵 Click para subir audio</p>
-        <p style="margin: 5px 0 0; font-size: 11px; color: #95a5a6;">MP3, WAV, FLAC - Máx 50MB</p>
+        <p style="margin: 5px 0 0; font-size: 11px; color: #95a5a6;">MP3, WAV, FLAC - Máx 10MB</p>
       `
       if (progressBar) progressBar.style.display = "none"
     }
@@ -1949,7 +2053,7 @@ function setupCancionUploadAdmin(cancionId, urlActual) {
                   <div class="upload-zone-cancion" id="upload-cancion-${sonContador}" style="border: 2px dashed #95a5a6; padding: 20px; text-align: center; border-radius: 6px; background: #fafafa; cursor: pointer;">
                     <input type="file" id="archivo-cancion-${sonContador}" accept="audio/*" style="display: none;">
                     <p style="margin: 0; font-size: 14px;">📁 Haz clic o arrastra para cambiar el archivo</p>
-                    <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 12px;">MP3, WAV, FLAC - Máx 50MB</p>
+                    <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 12px;">MP3, WAV, FLAC - Máx 10MB</p>
                     <div class="upload-progress-cancion" id="progress-cancion-${sonContador}" style="display: none; margin-top: 10px; width: 100%; height: 6px; background: #ecf0f1; border-radius: 3px;">
                       <div class="upload-progress-bar-cancion" style="height: 100%; background: #3498db; width: 0%; transition: width 0.3s;"></div>
                     </div>
@@ -2114,8 +2218,8 @@ async function handleCancionUploadAdmin(file, cancionId, urlAnterior) {
     return
   }
   
-  if (file.size > 50 * 1024 * 1024) {
-    alert("❌ El archivo no puede superar 50MB")
+  if (file.size > 10 * 1024 * 1024) {
+    alert("❌ El archivo no puede superar 10MB")
     return
   }
   
@@ -2219,7 +2323,7 @@ async function handleCancionUploadAdmin(file, cancionId, urlAnterior) {
     // Restaurar UI
     uploadZone.innerHTML = `
       <p style="margin: 0; font-size: 11px; color: #7f8c8d;">🎵 Click para subir audio</p>
-      <p style="margin: 3px 0 0; font-size: 10px; color: #95a5a6;">MP3, WAV, FLAC - Máx 50MB</p>
+      <p style="margin: 3px 0 0; font-size: 10px; color: #95a5a6;">MP3, WAV, FLAC - Máx 10MB</p>
     `
   }
 }
